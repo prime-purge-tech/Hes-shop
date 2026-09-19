@@ -1,44 +1,24 @@
 import { scrypt, randomBytes, timingSafeEqual } from 'node:crypto';
 import { promisify } from 'node:util';
-import { redis } from '../lib/db.js';
-
-const sc = promisify(scrypt);
-const DAY = 864e5;
+import { redis, limit, ip } from '../lib/db.js';
+const kdf = promisify(scrypt);
 
 export default async (req, res) => {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-
-  // anti brute-force : 30 tentatives / 10 min / IP
-  const ip = (req.headers['x-forwarded-for'] || 'x').split(',')[0];
-  const n = await redis.incr('rl:auth:' + ip);
-  if (n === 1) await redis.expire('rl:auth:' + ip, 600);
-  if (n > 30) return res.status(429).json({ error: 'Too many attempts, try again in a few minutes.' });
-
-  const action = req.body?.action;
-  const name = String(req.body?.username || '').trim().toLowerCase();
-  const pass = String(req.body?.password || '');
-  if (!/^[a-z0-9_.-]{3,20}$/.test(name) || pass.length < 4 || pass.length > 100)
-    return res.status(400).json({ error: 'Username: 3-20 characters (letters, digits, . _ -). Password: 4+ characters.' });
+  if (req.method !== 'POST') return res.status(405).end();
+  if (await limit('rl:a:' + ip(req), 15, 600)) return res.status(429).json({ error: 'Too many attempts, try again later' });
+  const { action, username, password } = req.body || {};
+  const n = String(username || '').trim().toLowerCase(), p = String(password || '');
+  if (!/^[a-z0-9_.-]{3,20}$/.test(n) || p.length < 4 || p.length > 100)
+    return res.status(400).json({ error: 'Username: 3-20 letters, digits, _ . - and password 4+' });
 
   if (action === 'register') {
     const salt = randomBytes(16).toString('hex');
-    const hash = (await sc(pass, salt, 32)).toString('hex');
-    const now = Date.now();
-    const created = await redis.hsetnx('accounts', name, { salt, hash, ts: now, exp: now + 30 * DAY });
-    if (!created) return res.status(409).json({ error: 'This username already exists' });
-    return res.json({ ok: true });
+    const h = (await kdf(p, salt, 32)).toString('hex');
+    const ok = await redis.hsetnx('users', n, { salt, h, exp: Date.now() + 30 * 864e5 });
+    return ok ? res.json({ ok: true }) : res.status(409).json({ error: 'This username already exists' });
   }
-
-  if (action === 'login') {
-    const acc = await redis.hget('accounts', name);
-    if (acc) {
-      const hash = await sc(pass, acc.salt, 32);
-      const good = Buffer.from(acc.hash, 'hex');
-      if (hash.length === good.length && timingSafeEqual(hash, good))
-        return res.json({ ok: true, name, exp: acc.exp });
-    }
-    return res.status(401).json({ error: 'Wrong username or password' });
-  }
-
-  res.status(400).json({ error: 'Unknown action' });
+  const u = await redis.hget('users', n);
+  const h = u && await kdf(p, u.salt, 32);
+  if (!u || !timingSafeEqual(h, Buffer.from(u.h, 'hex'))) return res.status(401).json({ error: 'Wrong username or password' });
+  res.json({ name: n, exp: u.exp });
 };
