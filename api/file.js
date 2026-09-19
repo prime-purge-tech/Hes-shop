@@ -8,6 +8,7 @@ export default async (req, res) => {
   if (!it) return res.status(404).end();
   const g = await tg('getFile', { file_id: k === 'img' ? it.photo : it.file });
   if (!g.ok) return res.status(404).end();
+  if (k === 'chk') return res.json({ ok: true });   // simple vérification, sans envoyer le fichier
   const r = await fetch(`https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${g.result.file_path}`);
   if (k === 'img') {
     res.setHeader('Content-Type', 'image/jpeg');
