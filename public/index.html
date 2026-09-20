@@ -1,306 +1,227 @@
-<!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>H'es</title>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>H'es Store</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0b0f1c;--card:#1b2030;--line:#2b3348;--tx:#eaf2ff;--mut:#8b98b5;--b1:#0d47a1;--b2:#1e88e5;--cy:#39c0ff;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-html,body{height:100%;margin:0;background:var(--bg);color:var(--tx);font:500 16px 'Rajdhani','Segoe UI',system-ui,sans-serif;overflow:hidden}
+:root{--bg:#0b0f1c;--card:#1b2030;--line:#2b3348;--tx:#eaf2ff;--mut:#8b98b5;--b1:#0d47a1;--b2:#1e88e5;--cy:#39c0ff;color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-h1,h2,h3,.of{font-family:'Orbitron','Segoe UI',sans-serif;margin:0}
-button{font:inherit;color:inherit;cursor:pointer}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--tx);font:500 16px 'Rajdhani','Segoe UI',system-ui,sans-serif;overflow:hidden}
+h1,h2,h3{font-family:'Orbitron',sans-serif;margin:0}
+button{font:inherit;color:inherit;cursor:pointer}[hidden]{display:none!important}
 .ic{width:1.2em;height:1.2em;flex:none}
 #app{position:relative;height:100%;max-width:480px;margin:auto;overflow:hidden;background:var(--bg)}
-.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;display:none}
-.screen.on{display:block}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;display:none;background:radial-gradient(ellipse at 80% 90%,#5b1560,transparent 55%),radial-gradient(ellipse at 0 40%,#1a2a5e,transparent 55%),var(--bg)}
+.screen.on{display:block}#chat.on{display:flex;flex-direction:column}
 .wrap{min-height:100%;padding:26px 20px 40px;animation:bl .9s ease both}
 @keyframes bl{from{filter:blur(18px);opacity:0;transform:scale(1.03)}to{filter:none;opacity:1;transform:none}}
-.hex{background:radial-gradient(circle at 50% 0,#12203d,transparent 60%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='98'%3E%3Cpath d='M28 2 54 17v30L28 62 2 47V17zM28 62v34M2 47 0 49M54 47l2 2' fill='none' stroke='%2339c0ff' stroke-opacity='.13'/%3E%3C/svg%3E")}
-.logo{font-size:38px;font-weight:800;letter-spacing:1px;line-height:1.1;margin-top:60px}
-.logo b{color:var(--cy);font-weight:800}
+#home{background:radial-gradient(circle at 50% 0,#12203d,transparent 60%),var(--bg)}
+.logo{font-size:38px;font-weight:800;margin-top:60px}.logo b{color:var(--cy)}
 .sub{color:var(--mut);margin:14px 0 26px;line-height:1.5}
 .card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:22px}
 .card h3{font-size:15px;display:flex;gap:10px;align-items:center}.card h3 .ic{color:var(--cy);font-size:22px}
 .card p{color:#aab5cf;line-height:1.75;margin:14px 0 0}
 .btn{display:flex;align-items:center;gap:16px;width:100%;padding:19px 22px;border:0;border-radius:22px;color:#fff;font:600 14px 'Orbitron',sans-serif;background:linear-gradient(90deg,var(--b1),var(--b2));box-shadow:0 8px 26px #1e88e544;margin-top:16px}
-.btn .ic{font-size:24px}.btn .ic:last-child{margin-left:auto;opacity:.6}
-.btn.c{justify-content:center;margin-top:24px}
-.row{display:flex;gap:16px;margin-top:16px}.row .btn{margin:0;padding:16px;font-size:13px;flex:1}
-.row .btn:last-child{background:linear-gradient(90deg,#1e88e5,#4fc3f7)}
+.btn .ic{font-size:24px}.btn .ic:last-child{margin-left:auto;opacity:.6}.btn.c{justify-content:center;margin-top:24px}
+.row{display:flex;gap:16px;margin-top:16px}.row .btn{margin:0;padding:16px;font-size:13px;flex:1}.row .btn .ic:last-child{margin:0;opacity:1}
 .foot{text-align:center;margin-top:30px;padding:26px 10px;border:1px solid var(--line);border-radius:24px;background:#ffffff06}
 .foot b{font:600 15px 'Orbitron';letter-spacing:1px}.foot div{color:var(--mut);font-size:13px;margin-top:8px}
-/* login */
 .av{display:block;margin:50px auto 26px;width:220px;height:210px;object-fit:contain}
 .form{padding:26px;border-radius:32px}
 label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 .inp{display:flex;align-items:center;gap:14px;background:#111524;border:1px solid var(--line);border-radius:20px;padding:0 18px;height:64px;margin-bottom:22px;color:var(--cy)}
-.inp:last-child{margin-bottom:0}
-.inp input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--tx);font:500 17px 'Rajdhani',sans-serif}
-.inp input::placeholder{color:#6c7896}.inp:focus-within{border-color:var(--cy)}
-.inp button{background:none;border:0;color:#8b98b5;padding:4px}
-.lnk{text-align:center;color:var(--mut);margin-top:26px}
-.lnk button{background:none;border:0;color:var(--cy);text-decoration:underline;font-weight:600;padding:0}
-/* splash */
-#splash{background:#000}
-#splash canvas,#splash video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.inp input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--tx);font:500 17px 'Rajdhani',sans-serif}.inp:focus-within{border-color:var(--cy)}.inp button{background:none;border:0;color:var(--mut);padding:4px}
+.lnk{text-align:center;color:var(--mut);margin-top:26px}.lnk button{background:none;border:0;color:var(--cy);text-decoration:underline;font-weight:600;padding:0}
+#splash{background:#000}#splash canvas,#splash video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .sp{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;animation:bl 1.2s ease both}
-.sp h1{font-size:30px;color:#3b8dff;text-shadow:0 0 22px #1e88e5;letter-spacing:2px}
-.sp p{color:#ddd;margin-top:16px;font-size:15px}
-.skip{position:absolute;top:calc(20px + env(safe-area-inset-top,0px));right:20px;z-index:3;border:1px solid #1e88e5;background:#0008;color:#5aa5ff;border-radius:24px;padding:10px 18px;font:600 13px 'Orbitron';display:flex;gap:6px;align-items:center}
-.bar{position:absolute;left:0;bottom:0;height:3px;width:0;background:var(--cy);z-index:3}
-.bar.go{animation:fill 5s linear forwards}@keyframes fill{to{width:100%}}
-/* dash + files + comments */
-#dash,#files,#comments{background:radial-gradient(ellipse at 80% 90%,#5b1560,transparent 55%),radial-gradient(ellipse at 0 40%,#1a2a5e,transparent 55%),var(--bg);background-attachment:local}
+.sp h1{font-size:30px;color:#3b8dff;text-shadow:0 0 22px #1e88e5;letter-spacing:2px}.sp p{color:#ddd;margin-top:16px}
+.skip{position:absolute;top:20px;right:20px;z-index:3;border:1px solid #1e88e5;background:#0008;color:#5aa5ff;border-radius:24px;padding:10px 18px;font:600 13px 'Orbitron';display:flex;gap:6px;align-items:center}
+.bar{position:absolute;left:0;bottom:0;height:3px;width:0;background:var(--cy);z-index:3}.bar.go{animation:fill 5s linear forwards}@keyframes fill{to{width:100%}}
 .top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:14px;padding:14px 18px;background:#080a12ee;backdrop-filter:blur(10px)}
 .top h2{flex:1;font-size:16px;letter-spacing:2px}
-.sq{width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:#ffffff0a;display:grid;place-items:center;font-size:20px}
-.sq.r{border-radius:50%;background:#14263f;border-color:#2a5b8f}
+.sq{width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:#ffffff0a;display:grid;place-items:center;font-size:20px;flex:none}
+.sq.r{border-radius:50%;background:#14263f;border-color:#2a5b8f;overflow:hidden;padding:0}
 .body{padding:16px 18px 130px}
 .hero{padding:0;overflow:hidden;text-align:center;border-radius:26px}.hero img{display:block;width:100%;max-height:280px;object-fit:cover}
-.hero .of{font-size:44px;font-weight:800}.hero .of b{color:var(--cy)}
-.hero p{color:var(--mut);margin:12px 0 0;letter-spacing:2px;font-size:13px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
 .st{border-radius:20px;padding:18px}.st small{color:var(--mut)}.st div{display:flex;gap:12px;align-items:center;font:600 24px 'Orbitron';margin-top:12px}.st .ic{color:var(--cy);font-size:30px}
 .sec{font:600 14px 'Orbitron';letter-spacing:2px;margin:28px 0 14px;padding-left:12px;border-left:3px solid #c9a86a}
-.feat{display:flex;align-items:center;gap:16px;padding:26px 22px;border-radius:26px;background:linear-gradient(120deg,#1faa59,#2ee86e 50%,#1a8fb0);position:relative;overflow:hidden;margin-bottom:16px}
-.feat .ic.big{position:absolute;right:-20px;top:-6px;width:150px;height:150px;opacity:.2}
-.feat h3{font-size:18px}.feat p{margin:6px 0 0;font-size:14px;opacity:.85}
-.feat .bx{width:54px;height:54px;border-radius:16px;background:#ffffff26;display:grid;place-items:center;font-size:28px}
-.wth{display:flex;align-items:center;gap:20px;padding:24px 22px;border-radius:26px;background:linear-gradient(120deg,#1565c0,#2a7fd6)}
-.wth .ic{font-size:56px}.wth h3{font-size:22px}.wth p{margin:4px 0 0;opacity:.8;font-size:14px}.wth small{margin-left:auto;display:flex;gap:4px;align-items:center;opacity:.75}
+.feat{display:flex;align-items:center;gap:16px;width:100%;border:0;text-align:left;color:#fff;padding:26px 22px;border-radius:26px;background:linear-gradient(120deg,#1faa59,#2ee86e 50%,#1a8fb0)}
+.feat h3{font-size:18px}.feat p{margin:6px 0 0;font-size:14px;opacity:.85}.feat .bx{width:54px;height:54px;border-radius:16px;background:#ffffff26;display:grid;place-items:center;font-size:28px;flex:none}
+.wth{display:flex;align-items:center;gap:20px;padding:24px 22px;border-radius:26px;background:linear-gradient(120deg,#1565c0,#2a7fd6);margin-top:16px}
+.wth .ic{font-size:56px}.wth h3{font-size:22px}.wth p{margin:4px 0 0;opacity:.8;font-size:14px}
 .me{display:flex;gap:18px;margin-top:16px;padding:26px 22px;border-radius:26px}
-.me .sh{width:74px;height:74px;border-radius:50%;border:1px solid #2a5b8f;background:#14263f;display:grid;place-items:center;font-size:36px;color:var(--cy);flex:none}
-.me small{color:var(--mut)}.me h3{font-size:20px;margin:4px 0 8px;display:flex;gap:8px;align-items:center;word-break:break-all}.me h3 .ic{color:#2f7cf6;font-size:18px}
+.sh{width:74px;height:74px;border-radius:50%;border:1px solid #2a5b8f;background:#14263f;display:grid;place-items:center;font-size:36px;color:var(--cy);flex:none;overflow:hidden;cursor:pointer}
+.av2{width:100%;height:100%;object-fit:cover}
+.me small{color:var(--mut)}.me h3{font-size:20px;margin:4px 0 8px;word-break:break-all}
 .mb{display:inline-block;background:#1547a8;padding:5px 14px;border-radius:12px;font:600 12px 'Orbitron';margin-bottom:8px}
 .pill{margin:20px auto 0;text-align:center;border:1px solid #2a5b8f66;border-radius:22px;padding:14px;background:#ffffff08;font-size:14px}
-.up{text-align:center;margin-top:22px;color:var(--mut);font-size:14px}.up a{color:var(--cy)}
-.car{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:6px}
-.car::-webkit-scrollbar{display:none}
-.sl{flex:0 0 88%;height:300px;border-radius:26px;scroll-snap-align:center;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:20px}
-.sl h3{font-size:18px}.sl p{margin:4px 0 0;font-size:14px;opacity:.75}
-.sl:nth-child(1){background:radial-gradient(circle at 70% 30%,#7a6bff88,transparent 50%),linear-gradient(160deg,#2c3f9c,#0f1a4a 70%,#1a1140)}
-.sl:nth-child(2){background:radial-gradient(circle at 30% 30%,#ff5fa288,transparent 50%),linear-gradient(160deg,#5a1a78,#1a0f3a)}
-.sl:nth-child(3){background:radial-gradient(circle at 60% 40%,#39c0ff88,transparent 50%),linear-gradient(160deg,#0f5a8c,#0a1a3a)}
-.sl img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.sl::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 45%,#000c)}.sl::before{content:"";position:absolute;top:18px;right:18px;width:14px;height:14px;border-radius:50%;background:#3ddc4f;z-index:2}.sl h3,.sl p{position:relative;z-index:2}.sl:nth-child(n+4){background:linear-gradient(160deg,#34206b,#0f1a3a)}
-.row .btn .ic:last-child{margin:0;opacity:1}
-.dots{display:flex;gap:8px;justify-content:center;margin-top:14px}.dots i{width:10px;height:10px;border-radius:5px;background:#ffffff40;transition:.3s}.dots i.a{width:34px;background:var(--cy)}
-.nav{position:absolute;left:18px;right:18px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:6;display:none;justify-content:space-around;padding:10px;border-radius:40px;background:#04060cf0;border:1px solid #ffffff10;box-shadow:0 10px 40px #000a}
+.up{text-align:center;margin:22px 0;color:var(--mut);font-size:14px}.up a{color:var(--cy)}
+.pillb{display:flex;align-items:center;gap:8px;height:44px;max-width:170px;padding:0 16px;border-radius:22px;border:1px solid #2a5b8f;background:linear-gradient(90deg,#0d47a166,#1e88e544);font:600 12px 'Orbitron',sans-serif;white-space:nowrap}.pillb .ic{color:var(--cy)}
+.nav{position:absolute;left:14px;right:14px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:6;display:none;justify-content:space-around;padding:8px;border-radius:40px;background:#04060cf0;border:1px solid #ffffff10;box-shadow:0 10px 40px #000a}
 #app.nv .nav{display:flex}
-.nav button{width:62px;height:52px;border:0;border-radius:26px;background:none;font-size:24px;color:#cbd6ee;display:grid;place-items:center}
+.nav button{width:52px;height:50px;border:0;border-radius:26px;background:none;font-size:23px;color:#cbd6ee;display:grid;place-items:center}
 .nav button.a{background:#0e3a55;color:var(--cy);box-shadow:0 0 18px #39c0ff66}
-.rv{opacity:0;transform:translateY(34px);filter:blur(10px);transition:opacity .7s,transform .7s,filter .7s}
-.rv.in{opacity:1;transform:none;filter:none}
-/* files + comments */
-.fc{padding:0;overflow:hidden;margin-bottom:18px}
-.fc img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#111524}
-.fc .tx{padding:18px 20px 20px}
-.tag{display:inline-block;background:#1547a8;padding:4px 12px;border-radius:12px;font:600 11px 'Orbitron',sans-serif;margin-bottom:10px}
-.fc h3{font-size:17px}.fc p{margin:10px 0 0;white-space:pre-line}
-.fc .btn{margin-top:16px;padding:16px;font-size:13px;text-decoration:none}
-.ta{display:block;width:100%;background:#111524;border:1px solid var(--line);border-radius:20px;padding:16px;color:var(--tx);font:500 16px 'Rajdhani',sans-serif;resize:vertical;outline:0}
-.ta::placeholder{color:#6c7896}.ta:focus{border-color:var(--cy)}
-.cf{padding:22px}.cf .btn{margin-top:14px;padding:16px;font-size:13px}.cf .btn:disabled{opacity:.6}
+.app{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;margin-bottom:14px}
+.r1{display:flex;gap:14px;align-items:center}
+.ic2{width:64px;height:64px;border-radius:16px;object-fit:cover;background:#111524;flex:none}
+.inf{min-width:0}.inf h3{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.inf small{color:var(--mut)}
+.mt{display:flex;gap:16px;align-items:center;margin-top:6px;color:#aab5cf;font-size:14px}
+.lk{display:flex;align-items:center;gap:6px;background:none;border:0;color:var(--mut);padding:0;font:600 14px 'Rajdhani',sans-serif}.lk.on{color:#ff5c7a}
+.ds{margin:12px 0 0;color:#aab5cf;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-line}.ds.open{-webkit-line-clamp:unset}
+.dl{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:46px;margin-top:14px;border:2px solid var(--cy);border-radius:24px;background:#111524;color:#fff;font:600 13px 'Orbitron',sans-serif;overflow:hidden}
+.dl .c{position:absolute;left:3px;top:3px;bottom:3px;width:34px;border-radius:50%;background:var(--cy);color:#06202e;display:grid;place-items:center;transition:width .9s ease,border-radius .9s}
+.dl span{position:relative}.dl.go .c{width:calc(100% - 6px);border-radius:22px}.dl.go span{color:#06202e}.dl.err .c{background:#e0405a}
+.sr{display:flex;align-items:center;width:44px;height:44px;margin-left:auto;border:1px solid var(--line);border-radius:14px;background:#ffffff0a;overflow:hidden;transition:width .4s}
+.top.s h2{display:none}.top.s .sr{width:calc(min(100vw,480px) - 94px)}
+.sr button{background:none;border:0;width:44px;height:44px;display:grid;place-items:center;flex:none;color:var(--cy)}
+.sr input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--tx);font:500 16px 'Rajdhani',sans-serif}
+.ta{display:block;width:100%;background:#111524;border:1px solid var(--line);border-radius:20px;padding:16px;color:var(--tx);font:500 16px 'Rajdhani',sans-serif;resize:vertical;outline:0}.ta:focus{border-color:var(--cy)}
+.cf{padding:22px}.cf .btn{margin-top:14px;padding:16px;font-size:13px}
 .cl{padding:0;margin-top:18px;overflow:hidden}
 .cm{padding:14px 18px;border-bottom:1px solid var(--line)}.cm:last-child{border:0}.cm b{color:var(--cy)}.cm small{color:var(--mut);margin-left:8px}
 .cm p{margin:6px 0 0;color:#aab5cf;word-break:break-word;white-space:pre-line}
-/* misc */
-[hidden]{display:none!important}
-.pillb{display:flex;align-items:center;gap:8px;height:44px;max-width:170px;padding:0 16px;border-radius:22px;border:1px solid #2a5b8f;background:linear-gradient(90deg,#0d47a166,#1e88e544);color:#fff;font:600 12px 'Orbitron',sans-serif;white-space:nowrap}
-.pillb .ic{font-size:18px;color:var(--cy)}.pillb span{overflow:hidden;text-overflow:ellipsis}
-button.feat{border:0;width:100%;text-align:left;color:#fff;font:inherit}
-.tiles{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.tile{padding:18px;border-radius:20px}.tile .ic{font-size:28px;color:var(--cy)}
-.tile b{display:block;font:600 13px 'Orbitron',sans-serif;margin-top:12px}
-.tile p{margin:6px 0 0;font-size:14px;line-height:1.5}
-.steps ol{list-style:none;margin:0;padding:0;counter-reset:s}
-.steps li{counter-increment:s;display:flex;gap:14px;align-items:flex-start;padding:10px 0;color:#aab5cf;line-height:1.5}
-.steps li::before{content:counter(s);flex:none;width:30px;height:30px;border-radius:50%;background:#1547a8;color:#fff;display:grid;place-items:center;font:600 13px 'Orbitron',sans-serif}
-/* drawer */
-.ov{position:absolute;inset:0;z-index:20;background:#000a;opacity:0;pointer-events:none;transition:.3s}
-.ov.on{opacity:1;pointer-events:auto}
-.dr{position:absolute;top:0;bottom:0;left:0;width:78%;background:#171b29;padding:34px 22px;transform:translateX(-100%);transition:.35s cubic-bezier(.2,.8,.2,1);overflow-y:auto}
-.ov.on .dr{transform:none}
-.dr h2{font-size:26px;color:var(--cy)}.dr small{color:var(--mut);font-style:italic}
-.dr hr{border:0;border-top:1px solid var(--line);margin:22px 0}
+.rp{margin:8px 0 0;padding:8px 12px;border-left:3px solid var(--cy);background:#ffffff08;border-radius:0 12px 12px 0;color:#aab5cf}.rp b{color:#c9a86a}
+#ch{flex:1;min-height:0;overflow-y:auto;padding:14px 18px 8px}
+.ms{max-width:82%;margin:0 0 10px;padding:10px 14px;border-radius:18px 18px 18px 6px;background:var(--card);border:1px solid var(--line)}
+.ms b{color:var(--cy);font:600 12px 'Orbitron',sans-serif}.ms.ad b{color:#c9a86a}.ms p{margin:4px 0 0;word-break:break-word;white-space:pre-line}
+.ms.me{margin-left:auto;border-radius:18px 18px 6px 18px;background:#0e3a55;border-color:#2a5b8f}
+.cfm{display:flex;gap:10px;padding:12px 18px calc(96px + env(safe-area-inset-bottom,0px));background:#080a12ee}
+.cfm .ta{flex:1;min-width:0;padding:12px 16px;border-radius:16px}.cfm .btn{width:auto;margin:0;padding:0 18px;border-radius:16px}.cfm .btn .ic:last-child{margin:0;opacity:1}
+.ov,.ov2{position:absolute;inset:0;z-index:20;background:#000a;opacity:0;pointer-events:none;transition:.3s}
+.ov.on,.ov2.on{opacity:1;pointer-events:auto}
+.dr{position:absolute;top:0;bottom:0;left:0;width:78%;background:#171b29;padding:34px 22px;transform:translateX(-100%);transition:.35s cubic-bezier(.2,.8,.2,1);overflow-y:auto}.ov.on .dr{transform:none}
+.dr h2{font-size:26px;color:var(--cy)}.dr small{color:var(--mut);font-style:italic}.dr hr{border:0;border-top:1px solid var(--line);margin:22px 0}
 .dr h4{margin:26px 0 16px;font:600 12px 'Orbitron';letter-spacing:2px;color:#9fb3d8;padding-left:12px;border-left:3px solid var(--cy)}
 .it{display:flex;align-items:center;gap:16px;width:100%;padding:16px;margin-bottom:14px;background:#20263a;border:1px solid #ffffff0d;border-radius:22px;text-align:left;font:600 14px 'Orbitron'}
-.it span{width:54px;height:54px;border-radius:16px;display:grid;place-items:center;font-size:26px;flex:none}
-.it .ic:last-child{margin-left:auto;opacity:.4}
-/* support */
-#help{background:radial-gradient(circle at 50% 0,#1a3a8c,transparent 45%),#070a1c}
-.bk{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:16px;z-index:3}
+.it span{width:54px;height:54px;border-radius:16px;display:grid;place-items:center;font-size:26px;flex:none}.it .ic:last-child{margin-left:auto;opacity:.4}
+.ov2{display:flex;align-items:center;justify-content:center;padding:20px;z-index:30}
+.pb{width:100%;max-width:360px;background:#171b29;border:1px solid var(--line);border-radius:26px;padding:22px;text-align:center}
+.pv{width:120px;height:120px;border-radius:50%;object-fit:cover;border:2px solid var(--cy);margin:14px 0}
+.pb .btn{margin-top:12px;padding:14px;font-size:12px;justify-content:center}.pb .ta{margin-top:12px}.pb small{display:block;color:var(--mut);margin-top:12px}
+.bk{position:absolute;top:14px;left:16px;z-index:3}
 .hd{width:120px;height:120px;border-radius:50%;background:#fff;color:#1a2a7a;display:grid;place-items:center;font-size:56px;margin:30px auto 0;box-shadow:0 0 60px #2a5bd7}
-.help h2{text-align:center;font-size:24px;margin-top:40px;letter-spacing:2px}.help>.wrap>p{text-align:center;color:#aab5cf}
+#help h2{text-align:center;font-size:24px;margin-top:40px;letter-spacing:2px}#help .wrap>p{text-align:center;color:#aab5cf}
 .g{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:30px}
-.sc{border:1px solid var(--c);border-radius:28px;background:#ffffff08;padding:24px 8px;text-align:center;box-shadow:0 0 22px color-mix(in srgb,var(--c) 22%,transparent)}
+.sc{border:1px solid var(--c);border-radius:28px;background:#ffffff08;padding:24px 8px;text-align:center;box-shadow:0 0 22px color-mix(in srgb,var(--c) 22%,transparent);color:#fff}
 .sc span{width:70px;height:70px;border-radius:50%;border:1px solid var(--c);display:grid;place-items:center;margin:0 auto 14px;font-size:32px;color:var(--c)}
 .sc b{display:block;font:600 14px 'Orbitron'}.sc small{color:var(--c);font-size:13px}
-.note{display:flex;gap:14px;align-items:center;margin-top:24px;padding:18px;border-radius:22px;background:#ffffff08;border:1px solid var(--line);color:#aab5cf;font-size:14px}
-.note .ic{font-size:26px;color:#4a7bff}
-.big-t{font:800 64px 'Orbitron';text-align:center;color:#1a2a7a;opacity:.5;margin-top:30px}
-#toast{position:fixed;left:50%;bottom:110px;transform:translate(-50%,20px);background:#10182d;border:1px solid var(--cy);padding:12px 20px;border-radius:16px;opacity:0;transition:.3s;z-index:50;max-width:88%;text-align:center;pointer-events:none}
-#toast.on{opacity:1;transform:translate(-50%,0)}
+#toast{position:fixed;left:50%;bottom:110px;transform:translate(-50%,20px);background:#10182d;border:1px solid var(--cy);padding:12px 20px;border-radius:16px;opacity:0;transition:.3s;z-index:50;max-width:88%;text-align:center;pointer-events:none}#toast.on{opacity:1;transform:translate(-50%,0)}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
-</style>
-<script>function heroFail(i){i.outerHTML='<div class="of" style="padding:34px 20px">H\'es</div>'}</script></head><body>
-<div id="app">
+</style></head><body><div id="app">
 
-<section class="screen on hex" id="home"><div class="wrap">
+<section class="screen on" id="home"><div class="wrap">
 <h1 class="logo">H'es <b>V1.5</b></h1>
 <p class="sub">Shop and store for resources and APK files. Fast, stable and built to feel smooth.</p>
-<div data-slot="aboutCard"></div>
-<button class="btn rv" data-go="login"><i data-i="login"></i>Login to Platform<i data-i="chev"></i></button>
-<button class="btn rv" data-link="wa"><i data-i="wa"></i>Follow Channel<i data-i="chev"></i></button>
-<div class="row rv"><button class="btn" data-link="yt"><i data-i="yt"></i>YouTube</button><button class="btn" data-link="tt"><i data-i="tt"></i>TikTok</button></div>
-<div data-slot="aboutMore" style="margin-top:8px"></div>
-<div class="foot rv"><b>Powered by H'es</b><div>© 2026 H'es – All Rights Reserved</div></div>
+<div class="card"><h3><i data-i="info"></i>About <span data-name></span></h3><p><b data-name></b> is a shop and store created by <b>Prime Purge</b> and <b>A+purge</b> to share resources and APK files. Every file is published by the team, so you find and download it in one place.</p></div>
+<button class="btn" data-go="login"><i data-i="login"></i>Login to Platform<i data-i="chev"></i></button>
+<button class="btn" data-link="wa"><i data-i="wa"></i>Follow Channel<i data-i="chev"></i></button>
+<div class="row"><button class="btn" data-link="yt"><i data-i="yt"></i>YouTube</button><button class="btn" data-link="tt"><i data-i="tt"></i>TikTok</button></div>
+<div class="foot"><b>Powered by H'es</b><div>© 2026 H'es – All Rights Reserved</div></div>
 </div></section>
 
-<section class="screen" id="login" style="background:radial-gradient(circle at 85% 30%,#123a55,transparent 45%),var(--bg)"><div class="wrap">
+<section class="screen" id="login"><div class="wrap">
 <button class="sq bk" data-back aria-label="Back"><i data-i="back"></i></button>
-<img class="av" id="avi" alt="" onerror="this.style.display='none';document.getElementById('avs').style.display='block'"><svg class="av" id="avs" style="display:none" viewBox="0 0 180 150"><defs><linearGradient id="hg" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#8fd0ff"/><stop offset="1" stop-color="#2a5bd7"/></linearGradient></defs><path d="M20 150c0-30 30-42 70-42s70 12 70 42z" fill="#1c2c66"/><path d="M62 108h56l-8 18H70z" fill="#0d1435"/><ellipse cx="90" cy="70" rx="32" ry="38" fill="#eef3ff"/><path d="M56 62C50 20 90 4 118 22c14 10 14 30 10 44-6-14-16-22-30-22-14 0-26 4-42 18z" fill="url(#hg)"/><path d="M62 60 44 84l12-4zM120 54l20 26-14-6z" fill="url(#hg)"/><circle cx="102" cy="72" r="4" fill="#e7d94a"/></svg>
-<form class="card form rv" id="frm" autocomplete="off">
+<img class="av" src="https://ganga--link--ghhzdp9sv8hk.code.run/i/jtn1l7jk.jpg" alt="" onerror="this.style.display='none'">
+<form class="card form" id="frm" autocomplete="off">
 <label for="u">Username</label><div class="inp"><i data-i="user"></i><input id="u" placeholder="Enter your username" autocapitalize="off"></div>
 <label for="p">Password</label><div class="inp"><i data-i="lock"></i><input id="p" type="password" placeholder="Enter your password"><button type="button" id="eye" aria-label="Show password"><i data-i="eyeoff"></i></button></div>
-<div class="inp" id="cbox" style="display:none;margin-top:22px"><i data-i="lock"></i><input id="p2" type="password" placeholder="Confirm your password"></div>
+<div class="inp" id="cbox" style="display:none"><i data-i="lock"></i><input id="p2" type="password" placeholder="Confirm your password"></div>
 <button class="btn c" id="sub"><i data-i="login"></i><span>Login Now</span></button>
 </form>
-<div class="lnk rv" id="lk1">create account? <button data-mode="reg">Click Here</button></div>
+<div class="lnk" id="lk1">create account? <button data-mode="reg">Click Here</button></div>
 <div class="lnk" id="lk2" style="display:none">Already have an account? <button data-mode="log">Click Here</button></div>
 </div></section>
 
-<section class="screen" id="splash">
-<canvas id="cv"></canvas><video id="bgv" muted playsinline loop preload="auto" style="display:none"></video>
-<button class="skip" id="skip">Skip <i data-i="chev"></i></button>
-<div class="sp"><h1>H'es</h1><p>Be the light behind the dark clouds.</p></div><div class="bar"></div>
-</section>
+<section class="screen" id="splash"><canvas id="cv"></canvas><video id="bgv" muted playsinline loop preload="auto" src="https://ganga--link--ghhzdp9sv8hk.code.run/i/6tsywrtc.mp4"></video>
+<button class="skip" id="skip">Skip <i data-i="chev"></i></button><div class="sp"><h1>H'es</h1><p>Be the light behind the dark clouds.</p></div><div class="bar"></div></section>
 
 <section class="screen" id="dash">
-<div class="top"><button class="sq mn" aria-label="Menu"><i data-i="menu"></i></button><h2>H'es</h2><button class="pillb" id="set" aria-label="Settings"><i data-i="sl"></i><span data-name></span></button><button class="sq r" data-prof aria-label="Profile"><i data-i="user"></i></button></div>
+<div class="top"><button class="sq mn" aria-label="Menu"><i data-i="menu"></i></button><h2>H'es</h2><button class="pillb mn" aria-label="Settings"><i data-i="sl"></i><span data-name></span></button><button class="sq r" id="tp" aria-label="Profile"><i data-i="user"></i></button></div>
 <div class="body">
-<div class="card hero rv"><img src="https://ganga--link--ghhzdp9sv8hk.code.run/i/hikuwux5.jpg" alt="" onerror="heroFail(this)"></div>
-<div class="two rv"><div class="card st"><small>Accounts</small><div><i data-i="users"></i><span id="stA">…</span></div></div><div class="card st"><small>APK &amp; ZIP</small><div><i data-i="phone"></i><span id="stF">…</span></div></div></div>
-<div class="sec rv">FEATURE NEWS</div>
-<button class="feat rv" data-link="wa"><i data-i="wa" data-c="#fff" class="big"></i><div class="bx"><i data-i="wa" data-c="#fff"></i></div><div><h3>WhatsApp Hub</h3><p>Maximizing potential, boundless performance</p></div></button>
-<div class="wth rv"><i data-i="cloud"></i><div><h3 id="clk">--:--</h3><p id="dt">--</p></div><small><i data-i="pin"></i>Local time</small></div>
-<div class="card me rv"><div class="sh"><i data-i="shield"></i></div><div><small id="gr">Hello</small><h3><span id="nm">user</span><i data-i="shield"></i></h3><span class="mb">MEMBER</span><br><small id="ex">Expired: --</small></div></div>
-<div class="pill rv">✦ Stars don't shine without darkness ✦</div>
-<div class="up rv">Upgrade role? Chat creator <a href="#" data-link="tg">@PRIME_PURGE</a></div>
-<div class="sec rv" style="border-color:#e0405a">LATEST NEWS</div>
-<div class="rv"><div class="car" id="car"></div><div class="dots" id="dots"></div></div>
-<div class="foot rv"><b>Powered by H'es</b><div>© 2026 H'es – All Rights Reserved</div></div>
-</div>
-</section>
+<div class="card hero"><img src="https://ganga--link--ghhzdp9sv8hk.code.run/i/hikuwux5.jpg" alt="" onerror="this.parentNode.style.display='none'"></div>
+<div class="two"><div class="card st"><small>Accounts</small><div><i data-i="users"></i><span id="stA">…</span></div></div><div class="card st"><small>APK &amp; ZIP</small><div><i data-i="phone"></i><span id="stF">…</span></div></div></div>
+<div class="sec">FEATURE NEWS</div>
+<button class="feat" data-link="wa"><div class="bx"><i data-i="wa"></i></div><div><h3>WhatsApp Hub</h3><p>Maximizing potential, boundless performance</p></div></button>
+<div class="card wth"><i data-i="cloud"></i><div><h3 id="clk">--:--</h3><p id="dt">--</p></div></div>
+<div class="card me"><div class="sh" id="mp"><i data-i="shield"></i></div><div><small id="gr">Hello</small><h3 id="nm">user</h3><span class="mb">MEMBER</span><br><small id="ex">Expired: --</small></div></div>
+<div class="pill">✦ Stars don't shine without darkness ✦</div>
+<div class="up">Upgrade role? Chat creator <a href="#" data-link="tg">@PRIME_PURGE</a></div>
+<div class="foot"><b>Powered by H'es</b><div>© 2026 H'es – All Rights Reserved</div></div>
+</div></section>
 
-<section class="screen" id="files">
-<div class="top"><button class="sq mn" aria-label="Menu"><i data-i="menu"></i></button><h2>FILES</h2></div>
-<div class="body">
-<p class="sub" style="margin:0 0 18px">APK and ZIP files shared by Team H'es.</p>
-<div id="fl"></div>
-</div>
-</section>
+<section class="screen" id="files"><div class="top"><button class="sq mn" aria-label="Menu"><i data-i="menu"></i></button><h2>FILES</h2><div class="sr"><button id="sb" aria-label="Search"><i data-i="search"></i></button><input id="q" placeholder="Search apps &amp; files" aria-label="Search" autocomplete="off"></div></div>
+<div class="body"><div id="fl"></div></div></section>
 
-<section class="screen" id="comments">
-<div class="top"><button class="sq mn" aria-label="Menu"><i data-i="menu"></i></button><h2>COMMENTS</h2></div>
-<div class="body">
-<form class="card cf rv" id="cf"><textarea class="ta" id="ct" rows="3" maxlength="500" placeholder="Write your comment" aria-label="Your comment" required></textarea><button class="btn c" id="csub"><i data-i="send"></i><span>Send</span></button></form>
-<div class="card cl rv" id="cl"></div>
-</div>
-</section>
+<section class="screen" id="comments"><div class="top"><button class="sq mn" aria-label="Menu"><i data-i="menu"></i></button><h2>COMMENTS</h2></div>
+<div class="body"><form class="card cf" id="cf"><textarea class="ta" id="ct" rows="3" maxlength="500" placeholder="Write your comment" aria-label="Your comment" required></textarea><button class="btn c" id="csub"><i data-i="send"></i><span>Send</span></button></form><div class="card cl" id="cl"></div></div></section>
 
-<section class="screen" id="about">
-<div class="top"><button class="sq mn" aria-label="Menu"><i data-i="menu"></i></button><h2>ABOUT</h2></div>
-<div class="body"><div data-slot="aboutCard"></div><div data-slot="aboutMore"></div>
-<div class="foot rv"><b>Powered by H'es</b><div>© 2026 H'es – All Rights Reserved</div></div></div>
-</section>
+<section class="screen" id="chat"><div class="top"><button class="sq mn" aria-label="Menu"><i data-i="menu"></i></button><h2>CHAT</h2></div><div id="ch"></div>
+<form class="cfm" id="chf"><input class="ta" id="cx" maxlength="300" placeholder="Write a message…" aria-label="Chat message" autocomplete="off" required><button class="btn c" aria-label="Send"><i data-i="send"></i></button></form></section>
 
-<section class="screen help" id="help"><button class="sq bk" data-back aria-label="Back"><i data-i="back"></i></button>
-<div class="wrap"><div class="hd rv"><i data-i="head"></i></div><h2 class="rv">WE'RE HERE TO HELP</h2><p class="rv">Contact our support team on these platforms</p>
+<section class="screen" id="about"><div class="top"><button class="sq mn" aria-label="Menu"><i data-i="menu"></i></button><h2>ABOUT</h2></div>
+<div class="body"><div class="card"><h3><i data-i="info"></i>About <span data-name></span></h3><p>Apps and ZIP packs shared by <b>Prime Purge</b> and <b>A+purge</b>. Create an account, open Files, tap Download. Big files open our Telegram bot. Leave a comment or join the chat with the community.</p><button class="btn" data-link="tg"><i data-i="send"></i>Contact the team<i data-i="chev"></i></button></div>
+<div class="foot"><b>Powered by H'es</b><div>© 2026 H'es – All Rights Reserved</div></div></div></section>
+
+<section class="screen" id="help"><button class="sq bk" data-back aria-label="Back"><i data-i="back"></i></button><div class="wrap">
+<div class="hd"><i data-i="head"></i></div><h2>WE'RE HERE TO HELP</h2><p>Contact our support team on these platforms</p>
 <div class="g">
-<button class="sc rv" data-link="tg" style="--c:#29a9eb"><span><i data-i="tg"></i></span><b>TELEGRAM</b><small>@PRIME_PURGE</small></button>
-<button class="sc rv" data-link="wa" style="--c:#25d366"><span><i data-i="wa"></i></span><b>WHATSAPP</b><small>Channel</small></button>
-<button class="sc rv" data-link="yt" style="--c:#ff1a1a"><span><i data-i="yt"></i></span><b>YOUTUBE</b><small>@no-name-officiel</small></button>
-<button class="sc rv" data-link="ig" style="--c:#e1306c"><span><i data-i="ig"></i></span><b>INSTAGRAM</b><small>@yourhandle</small></button>
-<button class="sc rv" data-link="tt" style="--c:#dfe6f5"><span><i data-i="tt"></i></span><b>TIKTOK</b><small>@yourhandle</small></button>
-<button class="sc rv" data-link="gh" style="--c:#c5cbe0"><span><i data-i="gh"></i></span><b>GITHUB</b><small>@yourhandle</small></button>
-</div>
-<div class="note rv"><i data-i="clock"></i>Response time: within 24 hours. Our support team is ready to help.</div>
-<div class="big-t rv">H'es</div></div></section>
-<div class="nav"><button data-go="dash" aria-label="Home"><i data-i="grid"></i></button><button data-go="comments" aria-label="Comments"><i data-i="wa"></i></button><button data-go="help" aria-label="Support"><i data-i="tool"></i></button><button data-go="files" aria-label="Files"><i data-i="phone"></i></button></div>
+<button class="sc" data-link="tg" style="--c:#29a9eb"><span><i data-i="send"></i></span><b>TELEGRAM</b><small>@PRIME_PURGE</small></button>
+<button class="sc" data-link="wa" style="--c:#25d366"><span><i data-i="wa"></i></span><b>WHATSAPP</b><small>Channel</small></button>
+<button class="sc" data-link="yt" style="--c:#ff1a1a"><span><i data-i="yt"></i></span><b>YOUTUBE</b><small>@no-name-officiel</small></button>
+<button class="sc" data-link="ig" style="--c:#e1306c"><span><i data-i="ig"></i></span><b>INSTAGRAM</b><small>@yourhandle</small></button>
+<button class="sc" data-link="tt" style="--c:#dfe6f5"><span><i data-i="tt"></i></span><b>TIKTOK</b><small>@yourhandle</small></button>
+<button class="sc" data-link="gh" style="--c:#c5cbe0"><span><i data-i="gh"></i></span><b>GITHUB</b><small>@yourhandle</small></button>
+</div></div></section>
+
+<div class="nav"><button data-go="dash" aria-label="Home"><i data-i="grid"></i></button><button data-go="files" aria-label="Files"><i data-i="phone"></i></button><button data-go="comments" aria-label="Comments"><i data-i="wa"></i></button><button data-go="chat" aria-label="Chat"><i data-i="chat"></i></button><button data-go="help" aria-label="Support"><i data-i="tool"></i></button></div>
 <div class="ov" id="ov"><div class="dr"><h2 data-name></h2><small>2026 – All rights reserved</small><hr>
 <h4>Store</h4>
 <button class="it" data-go="files"><span style="background:#1c2650;color:#5b7dff"><i data-i="phone"></i></span>Files &amp; APK<i data-i="chev"></i></button>
 <button class="it" data-go="comments"><span style="background:#173a2a;color:#3ddc84"><i data-i="wa"></i></span>Comments<i data-i="chev"></i></button>
+<button class="it" data-go="chat"><span style="background:#2a1a4a;color:#b98bff"><i data-i="chat"></i></span>Chat<i data-i="chev"></i></button>
 <button class="it" data-go="about"><span style="background:#3a3216;color:#ffd21f"><i data-i="info"></i></span>About<i data-i="chev"></i></button>
 <h4>Community</h4>
 <button class="it" data-link="wa"><span style="background:#173a2a;color:#3ddc84"><i data-i="wa"></i></span>WhatsApp Channel<i data-i="chev"></i></button>
-<button class="it" data-link="ch"><span style="background:#12324a;color:#29a9eb"><i data-i="tg"></i></span>Telegram Channel<i data-i="chev"></i></button>
+<button class="it" data-link="ch"><span style="background:#12324a;color:#29a9eb"><i data-i="send"></i></span>Telegram Channel<i data-i="chev"></i></button>
 <h4>Help</h4>
 <button class="it" data-go="help"><span style="background:#3a1a25;color:#ff4d5e"><i data-i="help"></i></span>Customer Service<i data-i="chev"></i></button>
-<button class="it" data-link="tg"><span style="background:#3a3216;color:#ffd21f"><i data-i="bag"></i></span>Upgrade role<i data-i="chev"></i></button>
+<button class="it" data-link="tg"><span style="background:#3a3216;color:#ffd21f"><i data-i="user"></i></span>Upgrade role<i data-i="chev"></i></button>
 </div></div>
-</div>
-<template id="t-aboutCard"><div class="card rv"><h3><i data-i="info"></i>About <span data-name></span></h3><p><b data-name></b> is a shop and store created by the company <b>Prime Purge</b> and <b>A+purge</b>, to share resources and APK files. The team publishes every file here so you can find and download it in one place.</p></div></template>
-<template id="t-aboutMore">
-<div class="sec rv">WHAT YOU WILL FIND</div>
-<div class="tiles">
-<div class="card tile rv"><i data-i="phone"></i><b>Files &amp; APK</b><p>Apps and ZIP packs shared by the team.</p></div>
-<div class="card tile rv"><i data-i="wa"></i><b>Updates</b><p>Follow the channel to see new releases first.</p></div>
-<div class="card tile rv"><i data-i="users"></i><b>Community</b><p>Leave a comment and share your feedback.</p></div>
-<div class="card tile rv"><i data-i="head"></i><b>Support</b><p>Reach the team on Telegram or WhatsApp.</p></div>
-</div>
-<div class="sec rv">HOW IT WORKS</div>
-<div class="card steps rv"><ol><li>Create an account and log in.</li><li>Open Files and pick an app or a pack.</li><li>Tap Download. Big files open our Telegram bot.</li></ol></div>
-<div class="sec rv">MADE BY</div>
-<div class="card rv"><h3><i data-i="shield"></i>Prime Purge &amp; A+purge</h3><p>The companies behind <span data-name></span>. Every file is published by the team.</p><button class="btn" data-link="tg"><i data-i="tg"></i>Contact the team<i data-i="chev"></i></button></div>
-</template>
-<div id="toast"></div>
-<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="igg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#feda75"/><stop offset=".3" stop-color="#fa7e1e"/><stop offset=".55" stop-color="#d62976"/><stop offset=".8" stop-color="#962fbf"/><stop offset="1" stop-color="#4f5bd5"/></linearGradient></defs></svg>
-
+<div class="ov2" id="pm"><div class="pb"><h3>Profile photo</h3><img class="pv" id="pp" alt=""><label class="btn" style="margin:0">Choose from gallery<input type="file" accept="image/*" id="pf" hidden></label><input class="ta" id="pw" type="password" placeholder="Your password" autocomplete="current-password"><button class="btn c" id="ps">Save</button><button class="btn" id="pr">Use a default photo</button><small id="pn"></small></div></div>
+</div><div id="toast"></div>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
-const SITE_NAME="H'es Store";   // <- the site name: shown in the Settings button, the menu and the page title
-const LINKS={tg:'https://t.me/PRIME_PURGE',ch:'https://t.me/PRlME_PURGE_TECH',wa:'https://whatsapp.com/channel/0029Vb7Ibg5002T79MWH2r1p',yt:'https://www.youtube.com/@no-name-officiel',ig:'',tt:'',gh:''};   // put your real URLs here
-const VIDEO_SRC='https://ganga--link--ghhzdp9sv8hk.code.run/i/6tsywrtc.mp4';                                    // optional: video URL for the 5s splash background
+const SITE_NAME="H'es Store";
+const LINKS={tg:'https://t.me/PRIME_PURGE',ch:'https://t.me/PRlME_PURGE_TECH',wa:'https://whatsapp.com/channel/0029Vb7Ibg5002T79MWH2r1p',yt:'https://www.youtube.com/@no-name-officiel',ig:'',tt:'',gh:''};
 const S=d=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
-const IC={menu:'<path d="M3 6h18M3 12h18M3 18h18"/>',sl:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',login:'<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>',wa:'<path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/>',yt:'<path d="M22.5 6.4a2.8 2.8 0 0 0-2-2C18.8 4 12 4 12 4s-6.8 0-8.5.4a2.8 2.8 0 0 0-2 2C1 8.1 1 12 1 12s0 3.9.5 5.6a2.8 2.8 0 0 0 2 2C5.2 20 12 20 12 20s6.8 0 8.5-.4a2.8 2.8 0 0 0 2-2c.5-1.7.5-5.6.5-5.6s0-3.9-.5-5.6z"/><path d="m9.7 15.5 5.8-3.5-5.8-3.5z"/>',tt:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>',eyeoff:'<path d="M17.9 17.9A10.1 10.1 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.1-5.9M9.9 4.2A9.1 9.1 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.2 3.2M1 1l22 22"/>',users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',link:'<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',cloud:'<path d="M18 10h-1.3A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>',pin:'<path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',grid:'<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>',tool:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z"/>',phone:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>',head:'<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>',send:'<path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/>',ig:'<rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/>',gh:'<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-.9-2.6c3.1-.3 6.4-1.5 6.4-7A5.4 5.4 0 0 0 20 4.8 5 5 0 0 0 19.9 1S18.7.7 16 2.5a13.4 13.4 0 0 0-7 0C6.3.7 5.1 1 5.1 1A5 5 0 0 0 5 4.8a5.4 5.4 0 0 0-1.5 3.7c0 5.5 3.3 6.7 6.4 7a3.4 3.4 0 0 0-.9 2.6V22"/>',clock:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',chev:'<path d="m9 18 6-6-6-6"/>',back:'<path d="M19 12H5M12 19l-7-7 7-7"/>',bag:'<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>',help:'<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>'};
+const IC={menu:'<path d="M3 6h18M3 12h18M3 18h18"/>',sl:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',login:'<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>',wa:'<path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/>',yt:'<path d="M22.5 6.4a2.8 2.8 0 0 0-2-2C18.8 4 12 4 12 4s-6.8 0-8.5.4a2.8 2.8 0 0 0-2 2C1 8.1 1 12 1 12s0 3.9.5 5.6a2.8 2.8 0 0 0 2 2C5.2 20 12 20 12 20s6.8 0 8.5-.4a2.8 2.8 0 0 0 2-2c.5-1.7.5-5.6.5-5.6s0-3.9-.5-5.6z"/><path d="m9.7 15.5 5.8-3.5-5.8-3.5z"/>',tt:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>',eyeoff:'<path d="M17.9 17.9A10.1 10.1 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.1-5.9M9.9 4.2A9.1 9.1 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.2 3.2M1 1l22 22"/>',users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',cloud:'<path d="M18 10h-1.3A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>',shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',grid:'<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>',tool:'<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>',phone:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>',head:'<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>',send:'<path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/>',ig:'<rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/>',gh:'<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-.9-2.6c3.1-.3 6.4-1.5 6.4-7A5.4 5.4 0 0 0 20 4.8 5 5 0 0 0 19.9 1S18.7.7 16 2.5a13.4 13.4 0 0 0-7 0C6.3.7 5.1 1 5.1 1A5 5 0 0 0 5 4.8a5.4 5.4 0 0 0-1.5 3.7c0 5.5 3.3 6.7 6.4 7a3.4 3.4 0 0 0-.9 2.6V22"/>',chev:'<path d="m9 18 6-6-6-6"/>',back:'<path d="M19 12H5M12 19l-7-7 7-7"/>',help:'<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>',search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',chat:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'};
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
-const BR={wa:['#25D366','M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z'],
-yt:['#FF0000','M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z'],
-tt:['#fff','M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z'],
-tg:['#29A9EB','M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z'],
-gh:['#fff','M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12'],ig:['','']};
-const SB=(s,c)=>s==='ig'?'<svg class="ic" viewBox="0 0 24 24"><rect x="1.5" y="1.5" width="21" height="21" rx="6" fill="url(#igg)"/><circle cx="12" cy="12" r="4.6" fill="none" stroke="#fff" stroke-width="2"/><circle cx="17.6" cy="6.4" r="1.3" fill="#fff"/></svg>':`<svg class="ic" viewBox="0 0 24 24" fill="${c||BR[s][0]}"><path d="${BR[s][1]}"/></svg>`;
-const icons=()=>$$('i[data-i]').forEach(e=>{const s=e.dataset.i,c=e.className;e.outerHTML=(BR[s]?SB(s,e.dataset.c):S(IC[s])).replace('class="ic"',`class="ic ${c}"`)});
-$$('[data-slot]').forEach(x=>x.appendChild($('#t-'+x.dataset.slot).content.cloneNode(true)));
-$$('[data-name]').forEach(x=>x.textContent=SITE_NAME);document.title=SITE_NAME;
-icons();
-let toastT;const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2200)};
-let user='',exp=0,timer,raf;
-const NAV=['dash','files','comments','about'];
-let cur='home',prev='home',io;
-function reveal(id){io&&io.disconnect();io=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('in',e.isIntersecting)),{rootMargin:'0px 0px -6% 0px'});
- $$('#'+id+' .rv').forEach(r=>{r.classList.remove('in');io.observe(r)})}
+const icons=()=>$$('i[data-i]').forEach(e=>{e.outerHTML=S(IC[e.dataset.i])});
+$$('[data-name]').forEach(x=>x.textContent=SITE_NAME);icons();
+let tt;const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2400)};
+const post=(u,b)=>fetch(u,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(b)});
+const sz=n=>n?' · '+(n/1048576).toFixed(1)+' MB':'';
+const tgw=()=>window.Telegram&&window.Telegram.WebApp;
+try{tgw().ready();tgw().expand()}catch{}
+let user='',exp=0,cur='home',prev='home',timer,raf,ck,PROF={},LIST=[],BOT='',pend=null,last='';
+const NAV=['dash','files','comments','chat','about'];
 function show(id){if(id!==cur){prev=cur;cur=id}
- $$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));const s=$('#'+id);s.scrollTop=0;
- const w=s.querySelector('.wrap');if(w){w.style.animation='none';w.offsetWidth;w.style.animation=''}
+ $$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));$('#'+id).scrollTop=0;
  $('#ov').classList.remove('on');$('#app').classList.toggle('nv',NAV.includes(id));
  $$('.nav button').forEach(b=>b.classList.toggle('a',b.dataset.go===id));
- if(id!=='splash'){try{vid.pause()}catch{}}
- if(id==='splash')splash();if(id==='dash')dash();if(id==='files')loadFiles();if(id==='comments')loadComments();
- reveal(id)}
-const openLink=k=>LINKS[k]?window.open(LINKS[k],'_blank','noopener'):toast('This link is coming soon');
-document.addEventListener('click',e=>{const t=e.target.closest('[data-go],[data-link],[data-mode],[data-back],[data-prof],[data-dl]');if(!t)return;
- if(t.dataset.go){if(t.dataset.go==='login'||t.dataset.go==='help'||user||t.dataset.go==='home')show(t.dataset.go)}
- else if(t.dataset.link){e.preventDefault();openLink(t.dataset.link)}
- else if(t.dataset.back!==undefined)show(prev)
- else if(t.dataset.prof!==undefined){const m=$('#dash .me');m&&m.scrollIntoView({behavior:'smooth',block:'center'})}
- else if(t.dataset.dl!==undefined){e.preventDefault();download(t)}
+ if(id!=='splash'){try{$('#bgv').pause()}catch{}}
+ if(id==='splash')splash();if(id==='dash')dash();if(id==='files')loadFiles();if(id==='comments')loadComments();if(id==='chat')chat(true)}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-go],[data-link],[data-mode],[data-back]');if(!t)return;
+ if(t.dataset.go){if(['login','help','home'].includes(t.dataset.go)||user)show(t.dataset.go)}
+ else if(t.dataset.link){e.preventDefault();const u=LINKS[t.dataset.link];u?window.open(u,'_blank','noopener'):toast('This link is coming soon')}
+ else if(t.dataset.back!==undefined)show(prev);
  else if(t.dataset.mode)mode(t.dataset.mode)});
-/* auth (accounts are stored on the server) */
+$$('[data-link]').forEach(b=>{if(!LINKS[b.dataset.link])b.hidden=true});
+$$('.mn').forEach(b=>b.onclick=()=>$('#ov').classList.add('on'));
+$('#ov').onclick=e=>{if(e.target.id==='ov')$('#ov').classList.remove('on')};
+/* auth */
 let reg=false;
-const post=(url,body)=>fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
 function mode(m){reg=m==='reg';$('#cbox').style.display=reg?'flex':'none';$('#lk1').style.display=reg?'none':'';$('#lk2').style.display=reg?'':'none';$('#sub span').textContent=reg?'Create Account':'Login Now';$('#frm').reset()}
 $('#eye').onclick=()=>{const p=$('#p'),h=p.type==='password';p.type=h?'text':'password';$('#eye').innerHTML=S(IC[h?'eye':'eyeoff'])};
 $('#frm').onsubmit=async e=>{e.preventDefault();const n=$('#u').value.trim().toLowerCase(),p=$('#p').value;
@@ -312,85 +233,71 @@ $('#frm').onsubmit=async e=>{e.preventDefault();const n=$('#u').value.trim().toL
   if(reg){toast('Account created, you can log in');mode('log');return}
   user=j.name;exp=j.exp;show('splash')
  }catch{toast('Server unreachable, try again')}finally{b.disabled=false}};
-/* splash: 5 s */
-const vid=$('#bgv'),bar=$('#splash .bar');let started=false;
-(async()=>{try{const r=await fetch(VIDEO_SRC);if(!r.ok)throw 0;vid.src=URL.createObjectURL(new Blob([await r.blob()],{type:'video/mp4'}))}catch{vid.src=VIDEO_SRC}})();
-function clock(ms){clearTimeout(timer);bar.classList.remove('go');void bar.offsetWidth;bar.classList.add('go');timer=setTimeout(()=>show('dash'),ms)}
-function go(){if(started)return;started=true;clock(5000)}
-vid.onplaying=()=>{if($('#splash').classList.contains('on'))go()};
-vid.onerror=()=>{vid.style.display='none'};
-vid.oncanplay=()=>{if($('#splash').classList.contains('on')&&vid.paused)vid.play().catch(()=>{})};
-function splash(){clearTimeout(timer);cancelAnimationFrame(raf);started=false;bar.classList.remove('go');
- vid.style.display='block';try{vid.currentTime=0}catch{}vid.play().catch(()=>{});timer=setTimeout(go,3500);
+/* splash 5 s */
+function splash(){clearTimeout(timer);cancelAnimationFrame(raf);const bar=$('#splash .bar');bar.classList.remove('go');void bar.offsetWidth;bar.classList.add('go');
+ timer=setTimeout(()=>show('dash'),5000);const v=$('#bgv');v.currentTime=0;v.play().catch(()=>{});v.onerror=()=>v.style.display='none';
  const c=$('#cv'),x=c.getContext('2d');c.width=360;c.height=780;
  const B=[...Array(9)].map(()=>({x:Math.random()*360,y:Math.random()*780,r:90+Math.random()*120,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.3}));
  (function f(){x.fillStyle='#050505';x.fillRect(0,0,360,780);B.forEach(b=>{b.x+=b.vx;b.y+=b.vy;if(b.x<-100||b.x>460)b.vx*=-1;if(b.y<-100||b.y>880)b.vy*=-1;
   const g=x.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);g.addColorStop(0,'rgba(90,100,130,.28)');g.addColorStop(1,'transparent');x.fillStyle=g;x.fillRect(0,0,360,780)});
-  if($('#splash').classList.contains('on'))raf=requestAnimationFrame(f)})()}
+  if(cur==='splash')raf=requestAnimationFrame(f)})()}
 $('#skip').onclick=()=>{clearTimeout(timer);show('dash')};
-/* dashboard */
-let ck;
-async function stats(){try{const r=await fetch('/api/stats');if(!r.ok)throw 0;const j=await r.json();$('#stA').textContent=j.accounts??'–';$('#stF').textContent=j.files??'–'}catch{$('#stA').textContent=$('#stF').textContent='–'}}
-function dash(){const h=new Date().getHours();$('#gr').textContent=h<5?'Good night':h<12?'Good morning':h<18?'Good afternoon':'Good evening';
+/* dashboard + profile */
+async function dash(){const h=new Date().getHours();$('#gr').textContent=h<5?'Good night':h<12?'Good morning':h<18?'Good afternoon':'Good evening';
  $('#nm').textContent=user;$('#ex').textContent='Expired: '+new Date(exp||Date.now()).toISOString().slice(0,10);
- stats();
- const tick=()=>{const d=new Date();$('#clk').textContent=d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});$('#dt').textContent=d.toLocaleDateString([], {weekday:'long',day:'numeric',month:'long'})};
- tick();clearInterval(ck);ck=setInterval(tick,15000)}
-/* files (APK / ZIP) */
-const sz=n=>n?' · '+(n/1048576).toFixed(1)+' MB':'';
-async function loadFiles(){const box=$('#fl');box.innerHTML='<p class="sub" style="margin:0">Loading…</p>';
- try{const r=await fetch('/api/items');if(!r.ok)throw 0;const {bot,items}=await r.json();
-  box.innerHTML=items.length?items.map(i=>{
-   const big=i.size>19e6&&bot,id=encodeURIComponent(i.id),ext=((i.name||'').split('.').pop()||'FILE').toUpperCase().slice(0,4),
-   img=i.hasImg?`<img src="/api/file?k=img&id=${id}" alt="" loading="lazy" onerror="this.remove()">`:'',
-   btn=big?`<a class="btn c" href="https://t.me/${encodeURIComponent(bot)}?start=f_${id}" target="_blank" rel="noopener">Download${sz(i.size)}</a>`
-          :`<a class="btn c" href="/api/file?k=dl&id=${id}" data-dl="1" data-chk="/api/file?k=chk&id=${id}">Download${sz(i.size)}</a>`;
-   return `<article class="card fc rv">${img}<div class="tx"><span class="tag">${esc(ext)}</span><h3>${esc(i.title)}</h3><p>${esc(i.desc)}</p>${btn}</div></article>`
-  }).join(''):'<p class="sub" style="margin:0">No files yet.</p>';
-  reveal('files')
- }catch{box.innerHTML='<p class="sub" style="margin:0">Could not load the files. Try again later.</p>'}}
-async function download(a){if(a.dataset.busy)return;a.dataset.busy='1';const old=a.textContent;a.textContent='Preparing…';
- try{const r=await fetch(a.dataset.chk);if(!r.ok)throw 0;location.href=a.getAttribute('href');toast('Download started')}
- catch{toast('This file is not available right now. Try again later.')}
- finally{a.textContent=old;delete a.dataset.busy}}
-/* comments */
+ const tick=()=>{const d=new Date();$('#clk').textContent=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});$('#dt').textContent=d.toLocaleDateString([],{weekday:'long',day:'numeric',month:'long'})};
+ tick();clearInterval(ck);ck=setInterval(tick,15000);
+ try{const j=await (await fetch('/api/stats')).json();$('#stA').textContent=j.accounts??'–';$('#stF').textContent=j.files??'–'}catch{}
+ try{PROF=await (await fetch('/api/profile?u='+encodeURIComponent(user))).json();const a=`<img class="av2" src="${esc(PROF.photo)}" alt="" onerror="this.remove()">`;$('#mp').innerHTML=a;$('#tp').innerHTML=a}catch{}}
+const shrink=f=>new Promise((ok,ko)=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas'),m=Math.min(im.width,im.height);c.width=c.height=256;
+ c.getContext('2d').drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,256,256);URL.revokeObjectURL(im.src);ok(c.toDataURL('image/jpeg',.8))};im.onerror=ko;im.src=URL.createObjectURL(f)});
+const openP=()=>{pend=null;$('#pp').src=PROF.photo||'';$('#pw').value='';$('#pn').textContent=PROF.next>Date.now()?'Next change possible on '+new Date(PROF.next).toLocaleDateString():'You can change your profile once a week.';$('#pm').classList.add('on')};
+$('#mp').onclick=openP;$('#tp').onclick=openP;
+$('#pm').onclick=e=>{if(e.target.id==='pm')$('#pm').classList.remove('on')};
+$('#pf').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{pend=await shrink(f);$('#pp').src=pend}catch{toast('Invalid image')}};
+const saveP=async reset=>{const pw=$('#pw').value;if(!pw)return toast('Enter your password');if(!reset&&!pend)return toast('Choose a photo first');
+ const r=await post('/api/profile',{u:user,p:pw,photo:pend,reset}).catch(()=>null);if(!r)return toast('Server unreachable, try again');
+ const j=await r.json().catch(()=>({}));if(!r.ok)return toast(j.error||'Something went wrong');$('#pm').classList.remove('on');toast('Profile updated');dash()};
+$('#ps').onclick=()=>saveP(false);$('#pr').onclick=()=>saveP(true);
+/* files : style Play Store */
+const DLI=S('<path d="M12 5v14M5 12l7 7 7-7"/>');
+const ext=i=>((i.name||'').split('.').pop()||'FILE').toUpperCase().slice(0,4);
+const render=()=>{const q=$('#q').value.trim().toLowerCase(),rows=LIST.filter(i=>!q||(i.title+' '+i.desc).toLowerCase().includes(q));
+ $('#fl').innerHTML=rows.map(i=>`<div class="app"><div class="r1"><img class="ic2" src="${i.hasImg?'/api/file?k=img&id='+encodeURIComponent(i.id):''}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3>${esc(i.title)}</h3><small>${esc(ext(i))}${sz(i.size)}</small><div class="mt"><span>⬇ ${i.dls}</span><button class="lk${i.mine?' on':''}" data-id="${esc(i.id)}" aria-label="Like">❤ <span>${i.likes}</span></button></div></div></div><p class="ds">${esc(i.desc)}</p><button class="dl" data-id="${esc(i.id)}"><div class="c">${DLI}</div><span>Download</span></button></div>`).join('')
+ ||`<p class="sub" style="margin:0">${LIST.length?'Nothing found.':'No files yet.'}</p>`};
+async function loadFiles(){$('#fl').innerHTML='<p class="sub" style="margin:0">Loading…</p>';
+ try{const [d,m]=await Promise.all([fetch('/api/items').then(r=>r.json()),fetch('/api/like?v='+encodeURIComponent(user)).then(r=>r.json())]);
+  BOT=d.bot;LIST=d.items.map(i=>({...i,mine:m.includes(i.id)}));render()}
+ catch{$('#fl').innerHTML='<p class="sub" style="margin:0">Could not load the files. Try again later.</p>'}}
+$('#sb').onclick=()=>{const o=$('#files .top').classList.toggle('s');if(o)$('#q').focus();else{$('#q').value='';render()}};$('#q').oninput=render;
+async function start(d){const i=LIST.find(x=>x.id===d.dataset.id),sp=d.querySelector('span');if(!i||d.classList.contains('go'))return;
+ const w=tgw(),id=encodeURIComponent(i.id),deep=`https://t.me/${BOT}?start=f_${i.id}`,url='/api/file?k=dl&id='+id;
+ const fin=ok=>{sp.textContent=ok?'Done ✓':'Failed';d.classList.add(ok?'done':'err');setTimeout(()=>{d.classList.remove('go','done','err');sp.textContent='Download'},2500)};
+ d.classList.add('go');sp.textContent='Downloading…';
+ try{if(i.size>19e6||!(await fetch('/api/file?k=chk&id='+id)).ok){w&&w.openTelegramLink?w.openTelegramLink(deep):window.open(deep,'_blank');return fin(true)}
+  if(w&&w.initData){if(w.isVersionAtLeast&&w.isVersionAtLeast('8.0')&&w.downloadFile)w.downloadFile({url:location.origin+url,file_name:i.name||'file'});else w.openTelegramLink(deep)}
+  else location.href=url;fin(true)}
+ catch{fin(false);toast('Not available right now. Try again later.')}}
+$('#fl').addEventListener('click',async e=>{const d=e.target.closest('.dl');if(d)return start(d);
+ const p=e.target.closest('.ds');if(p)return p.classList.toggle('open');
+ const b=e.target.closest('.lk');if(!b)return;const on=!b.classList.contains('on');
+ const r=await post('/api/like',{id:b.dataset.id,v:user,on}).catch(()=>null);if(!r||!r.ok)return toast('Try again in a moment');
+ const n=(await r.json()).n,i=LIST.find(x=>x.id===b.dataset.id);if(i){i.mine=on;i.likes=n}b.classList.toggle('on',on);b.querySelector('span').textContent=n});
+/* comments + réponses admin */
 async function loadComments(){const box=$('#cl');
  try{const r=await fetch('/api/comments');if(!r.ok)throw 0;const c=await r.json();
-  box.innerHTML=c.length?c.map(x=>`<div class="cm"><b>${esc(x.name)}</b><small>${new Date(x.ts).toLocaleDateString()}</small><p>${esc(x.text)}</p></div>`).join(''):'<div class="cm"><p>No comments yet. Write the first one.</p></div>'
+  box.innerHTML=c.length?c.map(x=>`<div class="cm"><b>${esc(x.name)}</b><small>${new Date(x.ts).toLocaleDateString()}</small><p>${esc(x.text)}</p>${x.reply?`<div class="rp"><b>Admin ✔</b> ${esc(x.reply)}</div>`:''}</div>`).join(''):'<div class="cm"><p>No comments yet. Write the first one.</p></div>'
  }catch{box.innerHTML='<div class="cm"><p>Could not load the comments.</p></div>'}}
 $('#cf').onsubmit=async e=>{e.preventDefault();const t=$('#ct').value.trim();if(!t)return;const b=$('#csub');b.disabled=true;
- try{const r=await post('/api/comments',{name:user,text:t}),j=await r.json().catch(()=>({}));
-  if(!r.ok)return toast(j.error||'Something went wrong');
-  $('#ct').value='';toast('Comment sent');loadComments()
- }catch{toast('Server unreachable, try again')}finally{b.disabled=false}};
-const PH=['https://ganga--link--ghhzdp9sv8hk.code.run/i/3lr2zpwk.jpg','https://ganga--link--ghhzdp9sv8hk.code.run/i/hsbi5ni4.jpg','https://ganga--link--ghhzdp9sv8hk.code.run/i/blch37l0.jpg','https://ganga--link--ghhzdp9sv8hk.code.run/i/qp6npe1n.jpg','https://ganga--link--ghhzdp9sv8hk.code.run/i/vup2d9yt.jpg'];
-const TT=[["H'es","Creator @PRIME_PURGE"],['New release','Version 1.5 is live'],['Community','Join the Telegram channel'],['Updates','What is new'],['Support','We are here to help']];
-$('#car').innerHTML=PH.map((u,i)=>`<div class="sl"${i===2?' data-link="ch"':''}><img src="${u}" alt="" loading="lazy" onerror="this.remove()"><h3>${TT[i][0]}</h3><p>${TT[i][1]}</p></div>`).join('');
-$('#dots').innerHTML=PH.map((_,i)=>`<i class="${i?'':'a'}"></i>`).join('');
-const car=$('#car');car.onscroll=()=>{const i=Math.round(car.scrollLeft/(car.firstElementChild.offsetWidth+16));$$('#dots i').forEach((d,k)=>d.classList.toggle('a',k===i))};
-$$('[data-link]').forEach(b=>{if(!LINKS[b.dataset.link])b.hidden=true});   // a button with no link yet stays hidden
-const openDr=()=>$('#ov').classList.add('on');
-$$('.mn').forEach(b=>b.onclick=openDr);$('#set').onclick=openDr;
-$('#ov').onclick=e=>{if(e.target.id==='ov')$('#ov').classList.remove('on')};
-reveal('home');
-const AV='https://ganga--link--ghhzdp9sv8hk.code.run/i/jtn1l7jk.jpg';
-(async()=>{const im=$('#avi');
- try{const bm=await createImageBitmap(await (await fetch(AV)).blob());
-  const W=Math.min(640,bm.width),H=Math.round(bm.height*W/bm.width),c=document.createElement('canvas');c.width=W;c.height=H;
-  const cx=c.getContext('2d',{willReadFrequently:true});cx.drawImage(bm,0,0,W,H);
-  const d=cx.getImageData(0,0,W,H),p=d.data,n=W*H,bs=[];
-  for(let i=0;i<W;i++)bs.push(i,(H-1)*W+i);for(let j=0;j<H;j++)bs.push(j*W,j*W+W-1);
-  const med=k=>{const a=bs.map(i=>p[i*4+k]).sort((a,b)=>a-b);return a[a.length>>1]};
-  const R=med(0),G=med(1),B=med(2),dist=i=>Math.hypot(p[i*4]-R,p[i*4+1]-G,p[i*4+2]-B);
-  const T=55,seen=new Uint8Array(n),st=[];
-  bs.forEach(i=>{if(!seen[i]&&dist(i)<T){seen[i]=1;st.push(i)}});
-  while(st.length){const i=st.pop(),x0=i%W,y0=(i/W)|0;
-   for(const j of [x0>0&&i-1,x0<W-1&&i+1,y0>0&&i-W,y0<H-1&&i+W]){if(j!==false&&!seen[j]&&dist(j)<T){seen[j]=1;st.push(j)}}}
-  let cnt=0;for(let i=0;i<n;i++)if(seen[i])cnt++;
-  if(cnt<n*.06)throw 0;
-  for(let i=0;i<n;i++){if(seen[i]){p[i*4+3]=0;continue}
-   const x1=i%W,y1=(i/W)|0;
-   if((x1>0&&seen[i-1])||(x1<W-1&&seen[i+1])||(y1>0&&seen[i-W])||(y1<H-1&&seen[i+W]))p[i*4+3]=Math.min(255,Math.max(60,(dist(i)-T)*5))}
-  cx.putImageData(d,0,0);im.src=c.toDataURL('image/png')
- }catch{im.src=AV}})();
+ try{const r=await post('/api/comments',{name:user,text:t}),j=await r.json().catch(()=>({}));if(!r.ok)return toast(j.error||'Something went wrong');$('#ct').value='';toast('Comment sent');loadComments()}
+ catch{toast('Server unreachable, try again')}finally{b.disabled=false}};
+/* chat public */
+async function chat(force){try{const c=await (await fetch('/api/comments?k=chat'+(force?'&t='+Date.now():''))).json(),k=JSON.stringify(c);if(!force&&k===last)return;last=k;
+ const box=$('#ch'),end=box.scrollTop+box.clientHeight>=box.scrollHeight-40;
+ box.innerHTML=c.map(x=>`<div class="ms${x.admin?' ad':x.name===user?' me':''}"><b>${esc(x.name)}${x.admin?' ✔':''}</b><p>${esc(x.text)}</p></div>`).join('')||'<div class="ms"><p>No messages yet. Start the chat.</p></div>';
+ if(end||force)box.scrollTop=box.scrollHeight}catch{}}
+$('#chf').onsubmit=async e=>{e.preventDefault();const i=$('#cx'),t=i.value.trim();if(!t)return;
+ const r=await post('/api/comments?k=chat',{name:user,text:t}).catch(()=>null);if(!r)return toast('Server unreachable, try again');
+ if(!r.ok)return toast((await r.json().catch(()=>({}))).error||'Something went wrong');i.value='';chat(true)};
+setInterval(()=>{if(cur==='chat'&&!document.hidden)chat()},5000);
 </script></body></html>
