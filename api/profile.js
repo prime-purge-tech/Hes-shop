@@ -1,13 +1,16 @@
 import { redis, checkPw, limit, ip } from '../lib/db.js';
-import { PICS, WELCOME_PIC } from '../lib/pics.js';
-const DEF = [...PICS, WELCOME_PIC];
-const def = n => DEF[[...n].reduce((a, c) => a * 31 + c.charCodeAt(0) >>> 0, 7) % DEF.length];
+import { defPic as def } from '../lib/pics.js';
 const WEEK = 7 * 864e5;
 
 export default async (req, res) => {
   if (req.method === 'GET') {
     const n = String(req.query.u || '').toLowerCase(), u = await redis.hget('users', n);
     if (!u) return res.status(404).end();
+    if (req.query.img) {   // image seule (chat), mise en cache
+      if (!u.photo) return res.redirect(302, def(n));
+      res.setHeader('Content-Type', 'image/jpeg'); res.setHeader('Cache-Control', 'public, max-age=120, s-maxage=120');
+      return res.end(Buffer.from(u.photo.split(',')[1], 'base64'));
+    }
     return res.json({ photo: u.photo || def(n), next: u.pt ? u.pt + WEEK : 0 });
   }
   if (await limit('rl:p:' + ip(req), 10, 600)) return res.status(429).json({ error: 'Too many attempts, try again later' });
@@ -22,4 +25,3 @@ export default async (req, res) => {
   await redis.hset('users', { [n]: nu });
   res.json({ ok: true, photo: nu.photo || def(n), next: nu.pt + WEEK });
 };
-
