@@ -20,5 +20,7 @@ export default async (req, res) => {
   const u = await redis.hget('users', n);
   const h = u && await kdf(p, u.salt, 32);
   if (!u || !timingSafeEqual(h, Buffer.from(u.h, 'hex'))) return res.status(401).json({ error: 'Wrong username or password' });
-  res.json({ name: n, exp: u.exp });
+  const token = randomBytes(24).toString('hex');
+  await redis.set('sess:' + token, n, { ex: 30 * 86400 });
+  res.json({ name: n, exp: u.exp, token });
 };
