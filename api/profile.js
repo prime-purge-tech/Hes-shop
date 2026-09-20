@@ -11,7 +11,7 @@ export default async (req, res) => {
       res.setHeader('Content-Type', 'image/jpeg'); res.setHeader('Cache-Control', 'public, max-age=120, s-maxage=120');
       return res.end(Buffer.from(u.photo.split(',')[1], 'base64'));
     }
-    return res.json({ photo: u.photo || def(n), next: u.pt ? u.pt + WEEK : 0 });
+    return res.json({ photo: u.photo || def(n), next: u.pt ? u.pt + WEEK : 0, badge: (await redis.hget('badges', n)) || '' });
   }
   if (await limit('rl:p:' + ip(req), 10, 600)) return res.status(429).json({ error: 'Too many attempts, try again later' });
   const { u: n0, p, photo, reset } = req.body || {}, n = String(n0 || '').toLowerCase();
