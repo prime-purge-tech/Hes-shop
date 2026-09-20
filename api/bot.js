@@ -1,4 +1,6 @@
 import { redis, tg, admins, isAdmin } from '../lib/db.js';
+import { PICS, WELCOME_PIC } from '../lib/pics.js';
+export const config = { maxDuration: 60 };
 
 const HELP = `📥 Ajouter : envoie une photo avec en légende le titre (ligne 1) puis la description, puis le fichier / APK.
 
@@ -6,6 +8,8 @@ const HELP = `📥 Ajouter : envoie une photo avec en légende le titre (ligne 1
 /del ID — supprimer une publication
 /chat texte — écrire dans le chat du site
 /clearchat — vider le chat
+/pub [lien] [texte bouton] — en réponse à un message : l'envoyer à tous les utilisateurs du bot
+/users — nombre d'utilisateurs
 /admins — voir les admins
 /addadmin ID · /rmadmin ID (propriétaire)
 
@@ -13,13 +17,6 @@ const HELP = `📥 Ajouter : envoie une photo avec en légende le titre (ligne 1
 
 const SHOP = 'https://t.me/Hessbbot/hes_shop';
 const BTN = { inline_keyboard: [[{ text: "𝙃'𝙀𝙎 𝙎𝙃𝙊𝙋", url: SHOP }]] };
-const WELCOME_PIC = 'https://ganga--link--ghhzdp9sv8hk.code.run/i/xy6if8fs.jpg';
-// images du /start : une au hasard à chaque fois (.gif / .mp4 = animation)
-const PICS = [
-  'wvz1thzx', 'o2fj6hix', 'gafdfod1', 'fplrpby1', 'h9i8jy21',
-  'bgtfa3t0', 'vqein3sw', 'kfwqxcds', 'jx2md37u', 'b8kmu9y4',
-  's3o26slw', '3ja15rn2', 'l1kots7k', 'jnk025hg', 'ugbla3cl',
-].map(k => `https://ganga--link--ghhzdp9sv8hk.code.run/i/${k}.jpg`);
 
 const esc = s => String(s ?? '').replace(/[&<>]/g, c => '&#' + c.charCodeAt(0) + ';');
 const nm = u => `<a href="tg://user?id=${u.id}">${esc(u.first_name || 'Membre')}</a>`;
@@ -47,13 +44,28 @@ async function handle(m) {
   // gros fichiers (>20 Mo) : lien du site -> /start f_<id>
   if (cmd === '/start') {
     const it = arg?.startsWith('f_') && await redis.hget('items', arg.slice(2));
-    if (it) return tg('sendDocument', { chat_id: chat, document: it.file, caption: it.title });
+    await redis.sadd('bu', String(id));   // utilisateurs du bot (pour les pubs)
+    if (it) { await redis.hincrby('dls', it.id, 1); return tg('sendDocument', { chat_id: chat, document: it.file, caption: it.title }); }
     await send(chat, PICS[Math.floor(Math.random() * PICS.length)],
       `👋 Bienvenue ${nm(m.from)} sur <b>H'es chop</b> !\n\nApps, fichiers et discussions : tout est dans la mini app ci-dessous.`);
     return (await isAdmin(id)) ? say(HELP) : undefined;
   }
   if (!await isAdmin(id)) return;
   const owner = String(id) === String(process.env.OWNER_ID);
+
+  // pub : réponds à un message (photo + texte) avec /pub [lien] [texte du bouton]
+  if (cmd === '/pub' && m.reply_to_message) {
+    const users = await redis.smembers('bu');
+    const kb = /^https?:\/\//.test(arg || '') ? { inline_keyboard: [[{ text: text.split(/\s+/).slice(2).join(' ') || 'Ouvrir', url: arg }]] } : undefined;
+    let ok = 0;
+    for (let i = 0; i < users.length; i += 25) {
+      const r = await Promise.all(users.slice(i, i + 25).map(u => tg('copyMessage', { chat_id: u, from_chat_id: chat, message_id: m.reply_to_message.message_id, reply_markup: kb }).then(x => x.ok).catch(() => false)));
+      ok += r.filter(Boolean).length;
+      await new Promise(r => setTimeout(r, 1000));
+    }
+    return say(`📣 Pub envoyée à ${ok}/${users.length} utilisateurs`);
+  }
+  if (cmd === '/users') return say(`👥 ${await redis.scard('bu')} utilisateurs du bot`);
 
   // réponse à un commentaire reçu
   const rp = m.reply_to_message;
@@ -112,3 +124,4 @@ export default async (req, res) => {
   });
   res.status(200).end();
 };
+
