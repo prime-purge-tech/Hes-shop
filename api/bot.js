@@ -92,11 +92,11 @@ async function handle(m) {
     return say(n ? '🗑 Publication supprimée' : '❌ ID introuvable (voir /list)');
   }
   if (cmd === '/chat' && text.length > 6) {
-    await redis.lpush('chat', { id: Date.now().toString(36), name: 'Admin', text: text.slice(6).trim().slice(0, 500), ts: Date.now(), admin: true });
-    await redis.ltrim('chat', 0, 99);
+    const cid = Date.now().toString(36);
+    await redis.hset('chm', { [cid]: { id: cid, name: 'Admin', text: text.slice(6).trim().slice(0, 300), ts: Date.now(), admin: true } });
     return say('✅ Envoyé dans le chat');
   }
-  if (cmd === '/clearchat') return redis.del('chat').then(() => say('🧹 Chat vidé'));
+  if (cmd === '/clearchat') return redis.del('chm').then(() => say('🧹 Chat vidé'));
 
   if (m.photo) {
     const [title, ...desc] = (m.caption || '').split('\n');
@@ -124,4 +124,3 @@ export default async (req, res) => {
   });
   res.status(200).end();
 };
-
