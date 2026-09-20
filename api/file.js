@@ -9,6 +9,7 @@ export default async (req, res) => {
   const g = await tg('getFile', { file_id: k === 'img' ? it.photo : it.file });
   if (!g.ok) return res.status(404).end();
   if (k === 'chk') return res.json({ ok: true });   // simple vérification, sans envoyer le fichier
+  if (k === 'dl') await redis.hincrby('dls', String(id), 1);
   const r = await fetch(`https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${g.result.file_path}`);
   if (k === 'img') {
     res.setHeader('Content-Type', 'image/jpeg');
