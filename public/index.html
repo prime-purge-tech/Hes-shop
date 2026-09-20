@@ -107,6 +107,30 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 .sc b{display:block;font:600 14px 'Orbitron'}.sc small{color:var(--c);font-size:13px}
 #toast{position:fixed;left:50%;bottom:110px;transform:translate(-50%,20px);background:#10182d;border:1px solid var(--cy);padding:12px 20px;border-radius:16px;opacity:0;transition:.3s;z-index:50;max-width:88%;text-align:center;pointer-events:none}#toast.on{opacity:1;transform:translate(-50%,0)}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+
+.rv{opacity:0;transform:translateY(34px);filter:blur(10px);transition:opacity .7s,transform .7s,filter .7s}.rv.in{opacity:1;transform:none;filter:none}
+.hs{display:flex;align-items:center;margin:26px 0 12px}.hs h3{font-size:16px}
+.hc{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}.hc::-webkit-scrollbar{display:none}
+.tc{flex:0 0 104px;cursor:pointer}.tc img{display:block;width:104px;height:104px;border-radius:24px;object-fit:cover;background:#111524}
+.tc b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font:600 12px 'Orbitron',sans-serif;margin-top:8px}.tc small{color:var(--mut)}
+.pr{display:flex;gap:16px;align-items:center;padding:12px 0;cursor:pointer}
+.ic2{width:84px;height:84px;border-radius:20px}.pr .inf{display:flex;flex-direction:column;gap:3px}.pr .inf h3{font-size:16px}
+.stats{display:flex;margin:20px 0;text-align:center}.stats div{flex:1;border-left:1px solid var(--line)}.stats div:first-child{border:0}
+.stats b{display:block;font:600 15px 'Orbitron',sans-serif}.stats small{color:var(--mut)}
+.au{color:var(--cy);font-weight:600}.pv2{height:210px;border-radius:18px;object-fit:cover}
+.chips{display:flex;gap:10px;margin-top:14px}.chips span{border:1px solid var(--line);border-radius:12px;padding:8px 14px;color:#aab5cf}
+.kv{padding:6px 20px}.kv div{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);color:#aab5cf}.kv div:last-child{border:0}.kv b{color:var(--tx)}
+.mg{display:flex;gap:8px;align-items:flex-end;margin-bottom:10px}.mg.me{flex-direction:row-reverse}.mg .ms{margin:0}
+.mg.me .ms{background:#0e3a55;border-color:#2a5b8f;border-radius:18px 18px 6px 18px}
+.ava{width:34px;height:34px;border-radius:50%;object-fit:cover;background:#14263f;flex:none}
+.ed{background:none;border:0;color:var(--mut);padding:0 0 0 6px}.ms small{color:var(--mut);font-size:11px}
+.stk{display:block;width:120px;height:120px;object-fit:contain;margin-top:6px;cursor:pointer}
+#ed{padding:8px 18px;background:#0e3a55;color:#aab5cf;display:flex;justify-content:space-between}#ed button{background:none;border:0}
+#sp .pb{max-height:80vh;overflow-y:auto;text-align:left}
+.tabs{display:flex;gap:8px;margin-bottom:14px}.tabs button{flex:1;border:1px solid var(--line);background:none;border-radius:14px;padding:10px;font:600 12px 'Orbitron',sans-serif}.tabs .a{background:#0e3a55;border-color:var(--cy);color:var(--cy)}
+#sc h4{margin:14px 0 8px;font:600 12px 'Orbitron',sans-serif;color:#9fb3d8}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.sti{width:100%;aspect-ratio:1;object-fit:contain;background:#111524;border-radius:12px;cursor:pointer}
+.pk{display:flex;align-items:center;gap:12px;padding:8px 0}.pk img{width:52px;height:52px;border-radius:12px;object-fit:cover}.pk div{flex:1;min-width:0}.pk b{display:block}.pk small{color:var(--mut)}.pk .btn{width:auto;margin:0;padding:10px 16px;font-size:11px}
 </style></head><body><div id="app">
 
 <section class="screen on" id="home"><div class="wrap">
@@ -141,7 +165,7 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 <div class="card hero"><img src="https://ganga--link--ghhzdp9sv8hk.code.run/i/hikuwux5.jpg" alt="" onerror="this.parentNode.style.display='none'"></div>
 <div class="two"><div class="card st"><small>Accounts</small><div><i data-i="users"></i><span id="stA">…</span></div></div><div class="card st"><small>APK &amp; ZIP</small><div><i data-i="phone"></i><span id="stF">…</span></div></div></div>
 <div class="sec">FEATURE NEWS</div>
-<button class="feat" data-link="wa"><div class="bx"><i data-i="wa"></i></div><div><h3>WhatsApp Hub</h3><p>Maximizing potential, boundless performance</p></div></button>
+<button class="feat" data-link="wa"><div class="bx"><i data-i="wa" data-c="#fff"></i></div><div><h3>WhatsApp Hub</h3><p>Maximizing potential, boundless performance</p></div></button>
 <div class="card wth"><i data-i="cloud"></i><div><h3 id="clk">--:--</h3><p id="dt">--</p></div></div>
 <div class="card me"><div class="sh" id="mp"><i data-i="shield"></i></div><div><small id="gr">Hello</small><h3 id="nm">user</h3><span class="mb">MEMBER</span><br><small id="ex">Expired: --</small></div></div>
 <div class="pill">✦ Stars don't shine without darkness ✦</div>
@@ -156,16 +180,17 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 <div class="body"><form class="card cf" id="cf"><textarea class="ta" id="ct" rows="3" maxlength="500" placeholder="Write your comment" aria-label="Your comment" required></textarea><button class="btn c" id="csub"><i data-i="send"></i><span>Send</span></button></form><div class="card cl" id="cl"></div></div></section>
 
 <section class="screen" id="chat"><div class="top"><button class="sq mn" aria-label="Menu"><i data-i="menu"></i></button><h2>CHAT</h2></div><div id="ch"></div>
-<form class="cfm" id="chf"><input class="ta" id="cx" maxlength="300" placeholder="Write a message…" aria-label="Chat message" autocomplete="off" required><button class="btn c" aria-label="Send"><i data-i="send"></i></button></form></section>
+<div id="ed" hidden>Editing your message <button type="button" id="ec" aria-label="Cancel">✕</button></div>
+<form class="cfm" id="chf"><button type="button" class="btn" id="sk" aria-label="Stickers">😊</button><input class="ta" id="cx" maxlength="300" placeholder="Write a message…" aria-label="Chat message" autocomplete="off" required><button class="btn c" aria-label="Send"><i data-i="send"></i></button></form></section>
 
 <section class="screen" id="about"><div class="top"><button class="sq mn" aria-label="Menu"><i data-i="menu"></i></button><h2>ABOUT</h2></div>
-<div class="body"><div class="card"><h3><i data-i="info"></i>About <span data-name></span></h3><p>Apps and ZIP packs shared by <b>Prime Purge</b> and <b>A+purge</b>. Create an account, open Files, tap Download. Big files open our Telegram bot. Leave a comment or join the chat with the community.</p><button class="btn" data-link="tg"><i data-i="send"></i>Contact the team<i data-i="chev"></i></button></div>
+<div class="body"><div class="card"><h3><i data-i="info"></i>About <span data-name></span></h3><p>Apps and ZIP packs shared by <b>Prime Purge</b> and <b>A+purge</b>. Create an account, open Files, tap Download. Big files open our Telegram bot. Leave a comment or join the chat with the community.</p><button class="btn" data-link="tg"><i data-i="tg"></i>Contact the team<i data-i="chev"></i></button></div>
 <div class="foot"><b>Powered by H'es</b><div>© 2026 H'es – All Rights Reserved</div></div></div></section>
 
 <section class="screen" id="help"><button class="sq bk" data-back aria-label="Back"><i data-i="back"></i></button><div class="wrap">
 <div class="hd"><i data-i="head"></i></div><h2>WE'RE HERE TO HELP</h2><p>Contact our support team on these platforms</p>
 <div class="g">
-<button class="sc" data-link="tg" style="--c:#29a9eb"><span><i data-i="send"></i></span><b>TELEGRAM</b><small>@PRIME_PURGE</small></button>
+<button class="sc" data-link="tg" style="--c:#29a9eb"><span><i data-i="tg"></i></span><b>TELEGRAM</b><small>@PRIME_PURGE</small></button>
 <button class="sc" data-link="wa" style="--c:#25d366"><span><i data-i="wa"></i></span><b>WHATSAPP</b><small>Channel</small></button>
 <button class="sc" data-link="yt" style="--c:#ff1a1a"><span><i data-i="yt"></i></span><b>YOUTUBE</b><small>@no-name-officiel</small></button>
 <button class="sc" data-link="ig" style="--c:#e1306c"><span><i data-i="ig"></i></span><b>INSTAGRAM</b><small>@yourhandle</small></button>
@@ -173,6 +198,7 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 <button class="sc" data-link="gh" style="--c:#c5cbe0"><span><i data-i="gh"></i></span><b>GITHUB</b><small>@yourhandle</small></button>
 </div></div></section>
 
+<section class="screen" id="detail"><div class="top"><button class="sq" data-back aria-label="Back"><i data-i="back"></i></button><h2>APP</h2></div><div class="body" id="db"></div></section>
 <div class="nav"><button data-go="dash" aria-label="Home"><i data-i="grid"></i></button><button data-go="files" aria-label="Files"><i data-i="phone"></i></button><button data-go="comments" aria-label="Comments"><i data-i="wa"></i></button><button data-go="chat" aria-label="Chat"><i data-i="chat"></i></button><button data-go="help" aria-label="Support"><i data-i="tool"></i></button></div>
 <div class="ov" id="ov"><div class="dr"><h2 data-name></h2><small>2026 – All rights reserved</small><hr>
 <h4>Store</h4>
@@ -182,13 +208,14 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 <button class="it" data-go="about"><span style="background:#3a3216;color:#ffd21f"><i data-i="info"></i></span>About<i data-i="chev"></i></button>
 <h4>Community</h4>
 <button class="it" data-link="wa"><span style="background:#173a2a;color:#3ddc84"><i data-i="wa"></i></span>WhatsApp Channel<i data-i="chev"></i></button>
-<button class="it" data-link="ch"><span style="background:#12324a;color:#29a9eb"><i data-i="send"></i></span>Telegram Channel<i data-i="chev"></i></button>
+<button class="it" data-link="ch"><span style="background:#12324a;color:#29a9eb"><i data-i="tg"></i></span>Telegram Channel<i data-i="chev"></i></button>
 <h4>Help</h4>
 <button class="it" data-go="help"><span style="background:#3a1a25;color:#ff4d5e"><i data-i="help"></i></span>Customer Service<i data-i="chev"></i></button>
 <button class="it" data-link="tg"><span style="background:#3a3216;color:#ffd21f"><i data-i="user"></i></span>Upgrade role<i data-i="chev"></i></button>
 </div></div>
+<div class="ov2" id="sp"><div class="pb"><div class="tabs"><button data-t="my" class="a">My</button><button data-t="all">Packs</button><button data-t="new">Create</button></div><div id="sc"></div></div></div>
 <div class="ov2" id="pm"><div class="pb"><h3>Profile photo</h3><img class="pv" id="pp" alt=""><label class="btn" style="margin:0">Choose from gallery<input type="file" accept="image/*" id="pf" hidden></label><input class="ta" id="pw" type="password" placeholder="Your password" autocomplete="current-password"><button class="btn c" id="ps">Save</button><button class="btn" id="pr">Use a default photo</button><small id="pn"></small></div></div>
-</div><div id="toast"></div>
+</div><svg width="0" height="0" style="position:absolute"><defs><linearGradient id="igg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#feda75"/><stop offset=".3" stop-color="#fa7e1e"/><stop offset=".55" stop-color="#d62976"/><stop offset=".8" stop-color="#962fbf"/><stop offset="1" stop-color="#4f5bd5"/></linearGradient></defs></svg><div id="toast"></div>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
 const SITE_NAME="H'es Store";
@@ -197,21 +224,27 @@ const S=d=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor
 const IC={menu:'<path d="M3 6h18M3 12h18M3 18h18"/>',sl:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',login:'<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>',wa:'<path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/>',yt:'<path d="M22.5 6.4a2.8 2.8 0 0 0-2-2C18.8 4 12 4 12 4s-6.8 0-8.5.4a2.8 2.8 0 0 0-2 2C1 8.1 1 12 1 12s0 3.9.5 5.6a2.8 2.8 0 0 0 2 2C5.2 20 12 20 12 20s6.8 0 8.5-.4a2.8 2.8 0 0 0 2-2c.5-1.7.5-5.6.5-5.6s0-3.9-.5-5.6z"/><path d="m9.7 15.5 5.8-3.5-5.8-3.5z"/>',tt:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>',eyeoff:'<path d="M17.9 17.9A10.1 10.1 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.1-5.9M9.9 4.2A9.1 9.1 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.2 3.2M1 1l22 22"/>',users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',cloud:'<path d="M18 10h-1.3A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>',shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',grid:'<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>',tool:'<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>',phone:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>',head:'<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>',send:'<path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/>',ig:'<rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/>',gh:'<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-.9-2.6c3.1-.3 6.4-1.5 6.4-7A5.4 5.4 0 0 0 20 4.8 5 5 0 0 0 19.9 1S18.7.7 16 2.5a13.4 13.4 0 0 0-7 0C6.3.7 5.1 1 5.1 1A5 5 0 0 0 5 4.8a5.4 5.4 0 0 0-1.5 3.7c0 5.5 3.3 6.7 6.4 7a3.4 3.4 0 0 0-.9 2.6V22"/>',chev:'<path d="m9 18 6-6-6-6"/>',back:'<path d="M19 12H5M12 19l-7-7 7-7"/>',help:'<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>',search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',chat:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'};
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
-const icons=()=>$$('i[data-i]').forEach(e=>{e.outerHTML=S(IC[e.dataset.i])});
+const BR={wa:['#25D366','M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z'],
+yt:['#FF0000','M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z'],
+tt:['#fff','M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z'],
+tg:['#29A9EB','M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z'],
+gh:['#fff','M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12'],ig:['','']};
+const SB=(s,c)=>s==='ig'?'<svg class="ic" viewBox="0 0 24 24"><rect x="1.5" y="1.5" width="21" height="21" rx="6" fill="url(#igg)"/><circle cx="12" cy="12" r="4.6" fill="none" stroke="#fff" stroke-width="2"/><circle cx="17.6" cy="6.4" r="1.3" fill="#fff"/></svg>':`<svg class="ic" viewBox="0 0 24 24" fill="${c||BR[s][0]}"><path d="${BR[s][1]}"/></svg>`;
+const icons=()=>$$('i[data-i]').forEach(e=>{const s=e.dataset.i,c=e.className;e.outerHTML=(BR[s]?SB(s,e.dataset.c):S(IC[s])).replace('class="ic"',`class="ic ${c}"`)});
 $$('[data-name]').forEach(x=>x.textContent=SITE_NAME);icons();
 let tt;const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2400)};
-const post=(u,b)=>fetch(u,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(b)});
+const post=(u,b,m)=>fetch(u,{method:m||'POST',headers:{'content-type':'application/json',authorization:'Bearer '+TOKEN},body:JSON.stringify(b)});
 const sz=n=>n?' · '+(n/1048576).toFixed(1)+' MB':'';
 const tgw=()=>window.Telegram&&window.Telegram.WebApp;
 try{tgw().ready();tgw().expand()}catch{}
-let user='',exp=0,cur='home',prev='home',timer,raf,ck,PROF={},LIST=[],BOT='',pend=null,last='';
+let user='',exp=0,cur='home',prev='home',timer,raf,ck,PROF={},LIST=[],BOT='',pend=null,last='',TOKEN='',CHAT=[],editId=null,PACKS=[],MINE=[],sf=[];
 const NAV=['dash','files','comments','chat','about'];
 function show(id){if(id!==cur){prev=cur;cur=id}
  $$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));$('#'+id).scrollTop=0;
  $('#ov').classList.remove('on');$('#app').classList.toggle('nv',NAV.includes(id));
  $$('.nav button').forEach(b=>b.classList.toggle('a',b.dataset.go===id));
  if(id!=='splash'){try{$('#bgv').pause()}catch{}}
- if(id==='splash')splash();if(id==='dash')dash();if(id==='files')loadFiles();if(id==='comments')loadComments();if(id==='chat')chat(true)}
+ if(id==='splash')splash();if(id==='dash')dash();if(id==='files')loadFiles();if(id==='comments')loadComments();if(id==='chat')chat(true);reveal(id)}
 document.addEventListener('click',e=>{const t=e.target.closest('[data-go],[data-link],[data-mode],[data-back]');if(!t)return;
  if(t.dataset.go){if(['login','help','home'].includes(t.dataset.go)||user)show(t.dataset.go)}
  else if(t.dataset.link){e.preventDefault();const u=LINKS[t.dataset.link];u?window.open(u,'_blank','noopener'):toast('This link is coming soon')}
@@ -231,7 +264,7 @@ $('#frm').onsubmit=async e=>{e.preventDefault();const n=$('#u').value.trim().toL
  try{const r=await post('/api/auth',{action:reg?'register':'login',username:n,password:p}),j=await r.json().catch(()=>({}));
   if(!r.ok)return toast(j.error||'Something went wrong');
   if(reg){toast('Account created, you can log in');mode('log');return}
-  user=j.name;exp=j.exp;show('splash')
+  user=j.name;exp=j.exp;TOKEN=j.token;show('splash')
  }catch{toast('Server unreachable, try again')}finally{b.disabled=false}};
 /* splash 5 s */
 function splash(){clearTimeout(timer);cancelAnimationFrame(raf);const bar=$('#splash .bar');bar.classList.remove('go');void bar.offsetWidth;bar.classList.add('go');
@@ -249,8 +282,8 @@ async function dash(){const h=new Date().getHours();$('#gr').textContent=h<5?'Go
  tick();clearInterval(ck);ck=setInterval(tick,15000);
  try{const j=await (await fetch('/api/stats')).json();$('#stA').textContent=j.accounts??'–';$('#stF').textContent=j.files??'–'}catch{}
  try{PROF=await (await fetch('/api/profile?u='+encodeURIComponent(user))).json();const a=`<img class="av2" src="${esc(PROF.photo)}" alt="" onerror="this.remove()">`;$('#mp').innerHTML=a;$('#tp').innerHTML=a}catch{}}
-const shrink=f=>new Promise((ok,ko)=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas'),m=Math.min(im.width,im.height);c.width=c.height=256;
- c.getContext('2d').drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,256,256);URL.revokeObjectURL(im.src);ok(c.toDataURL('image/jpeg',.8))};im.onerror=ko;im.src=URL.createObjectURL(f)});
+const shrink=(f,ty='image/jpeg')=>new Promise((ok,ko)=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas'),m=Math.min(im.width,im.height);c.width=c.height=256;
+ c.getContext('2d').drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,256,256);URL.revokeObjectURL(im.src);ok(c.toDataURL(ty,.8))};im.onerror=ko;im.src=URL.createObjectURL(f)});
 const openP=()=>{pend=null;$('#pp').src=PROF.photo||'';$('#pw').value='';$('#pn').textContent=PROF.next>Date.now()?'Next change possible on '+new Date(PROF.next).toLocaleDateString():'You can change your profile once a week.';$('#pm').classList.add('on')};
 $('#mp').onclick=openP;$('#tp').onclick=openP;
 $('#pm').onclick=e=>{if(e.target.id==='pm')$('#pm').classList.remove('on')};
@@ -262,14 +295,12 @@ $('#ps').onclick=()=>saveP(false);$('#pr').onclick=()=>saveP(true);
 /* files : style Play Store */
 const DLI=S('<path d="M12 5v14M5 12l7 7 7-7"/>');
 const ext=i=>((i.name||'').split('.').pop()||'FILE').toUpperCase().slice(0,4);
-const render=()=>{const q=$('#q').value.trim().toLowerCase(),rows=LIST.filter(i=>!q||(i.title+' '+i.desc).toLowerCase().includes(q));
- $('#fl').innerHTML=rows.map(i=>`<div class="app"><div class="r1"><img class="ic2" src="${i.hasImg?'/api/file?k=img&id='+encodeURIComponent(i.id):''}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3>${esc(i.title)}</h3><small>${esc(ext(i))}${sz(i.size)}</small><div class="mt"><span>⬇ ${i.dls}</span><button class="lk${i.mine?' on':''}" data-id="${esc(i.id)}" aria-label="Like">❤ <span>${i.likes}</span></button></div></div></div><p class="ds">${esc(i.desc)}</p><button class="dl" data-id="${esc(i.id)}"><div class="c">${DLI}</div><span>Download</span></button></div>`).join('')
- ||`<p class="sub" style="margin:0">${LIST.length?'Nothing found.':'No files yet.'}</p>`};
+let render=()=>{};
 async function loadFiles(){$('#fl').innerHTML='<p class="sub" style="margin:0">Loading…</p>';
  try{const [d,m]=await Promise.all([fetch('/api/items').then(r=>r.json()),fetch('/api/like?v='+encodeURIComponent(user)).then(r=>r.json())]);
   BOT=d.bot;LIST=d.items.map(i=>({...i,mine:m.includes(i.id)}));render()}
  catch{$('#fl').innerHTML='<p class="sub" style="margin:0">Could not load the files. Try again later.</p>'}}
-$('#sb').onclick=()=>{const o=$('#files .top').classList.toggle('s');if(o)$('#q').focus();else{$('#q').value='';render()}};$('#q').oninput=render;
+$('#sb').onclick=()=>{const o=$('#files .top').classList.toggle('s');if(o)$('#q').focus();else{$('#q').value='';render()}};$('#q').oninput=()=>render();
 async function start(d){const i=LIST.find(x=>x.id===d.dataset.id),sp=d.querySelector('span');if(!i||d.classList.contains('go'))return;
  const w=tgw(),id=encodeURIComponent(i.id),deep=`https://t.me/${BOT}?start=f_${i.id}`,url='/api/file?k=dl&id='+id;
  const fin=ok=>{sp.textContent=ok?'Done ✓':'Failed';d.classList.add(ok?'done':'err');setTimeout(()=>{d.classList.remove('go','done','err');sp.textContent='Download'},2500)};
@@ -278,7 +309,7 @@ async function start(d){const i=LIST.find(x=>x.id===d.dataset.id),sp=d.querySele
   if(w&&w.initData){if(w.isVersionAtLeast&&w.isVersionAtLeast('8.0')&&w.downloadFile)w.downloadFile({url:location.origin+url,file_name:i.name||'file'});else w.openTelegramLink(deep)}
   else location.href=url;fin(true)}
  catch{fin(false);toast('Not available right now. Try again later.')}}
-$('#fl').addEventListener('click',async e=>{const d=e.target.closest('.dl');if(d)return start(d);
+$('#app').addEventListener('click',async e=>{const o=e.target.closest('[data-o]');if(o)return openDetail(o.dataset.o);const d=e.target.closest('.dl');if(d)return start(d);
  const p=e.target.closest('.ds');if(p)return p.classList.toggle('open');
  const b=e.target.closest('.lk');if(!b)return;const on=!b.classList.contains('on');
  const r=await post('/api/like',{id:b.dataset.id,v:user,on}).catch(()=>null);if(!r||!r.ok)return toast('Try again in a moment');
@@ -292,12 +323,55 @@ $('#cf').onsubmit=async e=>{e.preventDefault();const t=$('#ct').value.trim();if(
  try{const r=await post('/api/comments',{name:user,text:t}),j=await r.json().catch(()=>({}));if(!r.ok)return toast(j.error||'Something went wrong');$('#ct').value='';toast('Comment sent');loadComments()}
  catch{toast('Server unreachable, try again')}finally{b.disabled=false}};
 /* chat public */
-async function chat(force){try{const c=await (await fetch('/api/comments?k=chat'+(force?'&t='+Date.now():''))).json(),k=JSON.stringify(c);if(!force&&k===last)return;last=k;
+setInterval(()=>{if(cur==='chat'&&!document.hidden)chat()},5000);
+
+/* ---- liste Play Store + page détail ---- */
+const ico=i=>i.hasImg?'/api/file?k=img&id='+encodeURIComponent(i.id):'';
+const tc=i=>`<div class="tc" data-o="${esc(i.id)}"><img src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><b>${esc(i.title)}</b><small>⬇ ${i.dls} · ❤ ${i.likes}</small></div>`;
+render=()=>{const q=$('#q').value.trim().toLowerCase(),rows=LIST.filter(i=>!q||(i.title+' '+i.desc).toLowerCase().includes(q)),pop=[...LIST].sort((a,b)=>b.dls-a.dls).slice(0,8);
+ $('#fl').innerHTML=(q||!LIST.length?'':`<div class="hs"><h3>Popular</h3></div><div class="hc">${pop.map(tc).join('')}</div><div class="hs"><h3>All apps</h3></div>`)
+ +(rows.map(i=>`<div class="pr rv" data-o="${esc(i.id)}"><img class="ic2" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3>${esc(i.title)}</h3><small>${esc(ext(i))}${sz(i.size)}</small><small>⬇ ${i.dls} &nbsp; ❤ ${i.likes}</small></div></div>`).join('')||`<p class="sub" style="margin:0">${LIST.length?'Nothing found.':'No files yet.'}</p>`);
+ reveal('files')};
+function openDetail(id){const i=LIST.find(x=>x.id===id);if(!i)return;const mb=i.size?(i.size/1048576).toFixed(1)+' MB':'—',e=esc(ext(i));
+ $('#db').innerHTML=`<div class="r1 rv"><img class="ic2" style="width:96px;height:96px" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3 style="white-space:normal;font-size:19px">${esc(i.title)}</h3><small class="au">H'es Team</small></div></div>
+ <div class="stats rv"><div><b>❤ ${i.likes}</b><small>Likes</small></div><div><b>${i.dls}</b><small>Downloads</small></div><div><b>${e}</b><small>${mb}</small></div></div>
+ <button class="dl rv" data-id="${esc(i.id)}"><div class="c">${DLI}</div><span>Download</span></button>
+ <button class="lk rv${i.mine?' on':''}" data-id="${esc(i.id)}" style="margin-top:14px">❤ <span>${i.likes}</span>&nbsp; Like</button>
+ ${i.hasImg?`<div class="hc rv" style="margin-top:18px"><img class="pv2" src="${ico(i)}" alt=""></div>`:''}
+ <div class="hs rv"><h3>About this app</h3></div><p class="ds open rv">${esc(i.desc)}</p><div class="chips rv"><span>${e}</span><span>H'es Store</span></div>
+ <div class="hs rv"><h3>Details</h3></div><div class="card kv rv"><div><span>Type</span><b>${e}</b></div><div><span>Size</span><b>${mb}</b></div><div><span>Downloads</span><b>${i.dls}</b></div><div><span>Published</span><b>${new Date(i.ts).toLocaleDateString()}</b></div></div>
+ <div class="hs rv"><h3>Similar apps</h3></div><div class="hc rv">${LIST.filter(x=>x.id!==i.id).slice(0,8).map(tc).join('')||'<small class="sub">No other files yet.</small>'}</div>`;
+ show('detail')}
+/* ---- chat : avatars, modifier son message, stickers ---- */
+const sImg=(p,s)=>`/api/stickers?p=${encodeURIComponent(p)}&s=${encodeURIComponent(s)}`,auth=()=>({authorization:'Bearer '+TOKEN});
+async function chat(force){try{const c=await (await fetch('/api/comments?k=chat'+(force?'&t='+Date.now():''))).json(),k=JSON.stringify(c);if(!force&&k===last)return;last=k;CHAT=c;
  const box=$('#ch'),end=box.scrollTop+box.clientHeight>=box.scrollHeight-40;
- box.innerHTML=c.map(x=>`<div class="ms${x.admin?' ad':x.name===user?' me':''}"><b>${esc(x.name)}${x.admin?' ✔':''}</b><p>${esc(x.text)}</p></div>`).join('')||'<div class="ms"><p>No messages yet. Start the chat.</p></div>';
+ box.innerHTML=c.map(x=>{const me=x.name===user;return `<div class="mg${me?' me':''}"><img class="ava" src="/api/profile?img=1&u=${encodeURIComponent(x.name)}" alt="" onerror="this.style.visibility='hidden'"><div class="ms${x.admin?' ad':''}"><b>${esc(x.name)}${x.admin?' ✔':''}${me&&!x.sticker?` <button class="ed" data-e="${esc(x.id)}" aria-label="Edit">✎</button>`:''}</b>${x.sticker?`<img class="stk" data-p="${esc(x.sticker.p)}" src="${sImg(x.sticker.p,x.sticker.s)}" alt="sticker">`:`<p>${esc(x.text)}</p>`}${x.edited?'<small>edited</small>':''}</div></div>`}).join('')||'<div class="ms"><p>No messages yet. Start the chat.</p></div>';
  if(end||force)box.scrollTop=box.scrollHeight}catch{}}
 $('#chf').onsubmit=async e=>{e.preventDefault();const i=$('#cx'),t=i.value.trim();if(!t)return;
- const r=await post('/api/comments?k=chat',{name:user,text:t}).catch(()=>null);if(!r)return toast('Server unreachable, try again');
- if(!r.ok)return toast((await r.json().catch(()=>({}))).error||'Something went wrong');i.value='';chat(true)};
-setInterval(()=>{if(cur==='chat'&&!document.hidden)chat()},5000);
+ const r=await (editId?post('/api/comments?k=chat',{id:editId,text:t},'PATCH'):post('/api/comments?k=chat',{text:t})).catch(()=>null);
+ if(!r)return toast('Server unreachable, try again');
+ if(!r.ok)return toast((await r.json().catch(()=>({}))).error||'Something went wrong');
+ i.value='';editId=null;$('#ed').hidden=true;chat(true)};
+$('#ec').onclick=()=>{editId=null;$('#cx').value='';$('#ed').hidden=true};
+document.addEventListener('click',async e=>{const k=e.target.closest('.stk');
+ if(k){await post('/api/stickers',{add:k.dataset.p}).catch(()=>{});return toast('Pack added to your stickers 😊')}
+ const b=e.target.closest('.ed');if(b){const m=CHAT.find(x=>x.id===b.dataset.e);if(m){editId=m.id;$('#cx').value=m.text;$('#cx').focus();$('#ed').hidden=false}}});
+async function sheet(t){try{const d=await (await fetch('/api/stickers',{headers:auth()})).json();PACKS=d.packs||[];MINE=d.mine||[]}catch{}
+ $$('#sp .tabs button').forEach(b=>b.classList.toggle('a',b.dataset.t===t));const box=$('#sc');
+ if(t==='my')box.innerHTML=PACKS.filter(p=>MINE.includes(p.id)).map(p=>`<h4>${esc(p.name)}</h4><div class="sg">${p.ids.map(s=>`<img class="sti" data-p="${esc(p.id)}" data-s="${esc(s)}" src="${sImg(p.id,s)}" alt="">`).join('')}</div>`).join('')||'<p class="sub">No stickers yet. Open Packs to add some, or create yours.</p>';
+ else if(t==='all')box.innerHTML=PACKS.map(p=>{const on=MINE.includes(p.id);return `<div class="pk"><img src="${sImg(p.id,p.ids[0])}" alt=""><div><b>${esc(p.name)}</b><small>by ${esc(p.owner)} · ${p.ids.length}</small></div><button class="btn" data-${on?'rm':'ad'}="${esc(p.id)}">${on?'Remove':'Add'}</button></div>`}).join('')||'<p class="sub">No packs yet.</p>';
+ else{sf=[];box.innerHTML='<input class="ta" id="pn2" maxlength="24" placeholder="Pack name" autocomplete="off"><label class="btn" style="margin-top:12px">Choose photos (up to 20)<input type="file" accept="image/*" id="pi" multiple hidden></label><small class="sub" id="pc" style="display:block;margin:10px 0 0">0 photos</small><button class="btn c" id="pmk">Create pack</button>'}}
+document.addEventListener('change',async e=>{if(e.target.id!=='pi')return;sf=[];for(const f of [...e.target.files].slice(0,20)){try{sf.push(await shrink(f,'image/webp'))}catch{}}$('#pc').textContent=sf.length+' photos'});
+$('#sk').onclick=()=>{$('#sp').classList.add('on');sheet('my')};
+$('#sp').addEventListener('click',async e=>{const t=e.target;if(t.id==='sp')return $('#sp').classList.remove('on');
+ const tb=t.closest('.tabs button');if(tb)return sheet(tb.dataset.t);
+ const st=t.closest('.sti');if(st){$('#sp').classList.remove('on');const r=await post('/api/comments?k=chat',{sticker:{p:st.dataset.p,s:st.dataset.s}}).catch(()=>null);return r&&r.ok?chat(true):toast('Could not send')}
+ const ad=t.closest('[data-ad]'),rm=t.closest('[data-rm]');if(ad||rm){await post('/api/stickers',ad?{add:ad.dataset.ad}:{rm:rm.dataset.rm}).catch(()=>{});return sheet('all')}
+ if(t.closest('#pmk')){const n=$('#pn2').value.trim();if(!n||!sf.length)return toast('Add a name and photos');
+  const r=await post('/api/stickers',{name:n,imgs:sf}).catch(()=>null),j=r?await r.json().catch(()=>({})):{};
+  if(!r||!r.ok)return toast(j.error||'Could not create the pack');toast('Pack created');sheet('my')}});
+/* ---- effet d'apparition au scroll ---- */
+let io;function reveal(id){io&&io.disconnect();io=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('in',e.isIntersecting)),{rootMargin:'0px 0px -6% 0px'});$$('#'+id+' .rv').forEach(r=>{r.classList.remove('in');io.observe(r)})}
+$$('.body>*,.wrap>*:not(.bk),.sc,.st').forEach(e=>e.classList.add('rv'));reveal('home');
 </script></body></html>
