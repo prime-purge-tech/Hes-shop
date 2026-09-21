@@ -174,6 +174,30 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 .em{position:relative;min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:none;overflow:hidden}.em img{max-width:200px}.em p{color:var(--mut)}
 .cur{position:absolute;width:25px;height:25px;border-radius:50%;background:#fff782;pointer-events:none;animation:mo .5s infinite ease-in-out alternate}.cur.cl{animation:mo .5s infinite ease-in-out alternate,fo 1.5s forwards}
 @keyframes mo{from{width:25px;height:25px}to{width:15px;height:15px}}@keyframes fo{to{opacity:0}}
+
+.bd{position:absolute;left:85.4%;top:14.6%;width:20px;height:20px;margin:0;border-radius:0;background:none!important;box-shadow:none;display:block;filter:drop-shadow(0 0 4px var(--g));animation:bds 2s ease-in-out infinite}
+.bd svg{width:100%;height:100%;display:block;stroke:none;stroke-width:0}.bd .s{fill:var(--f)}.bd .ck{fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.bd.blue{--g:#1d9bf0;--f:#1d9bf0}.bd.gold{--g:#ffd21f;--f:#f0b400}.avw.big .bd{width:32px;height:32px}
+@keyframes bds{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.15) rotate(10deg)}}
+.pc{position:relative;max-width:330px;margin:18px auto 0;border-radius:28px;overflow:hidden;box-shadow:0 20px 50px #0009;text-align:center}
+.pc-t{background:linear-gradient(160deg,#0d47a1,#1e88e5);padding:26px 18px 20px}
+.pc-ic{position:absolute;top:14px;background:none;border:0;color:#fff;font-size:20px;z-index:3}.pc-ic.l{left:16px}.pc-ic.r{right:16px}
+.pc .avw{display:inline-block}.pc .sh{width:104px;height:104px;border:4px solid #fff;box-shadow:0 0 0 7px #ffffff33;background:#14263f;margin:0 auto}
+.pc h3{font-size:19px;letter-spacing:1px;margin:16px 0 4px;text-transform:uppercase;color:#fff;word-break:break-all}.pc small{color:#dbe9ff;display:block}.pc .mb{margin:8px 0 6px}
+.soc{display:flex;gap:14px;justify-content:center;margin:12px 0 4px;font-size:20px}.soc button{background:#ffffff26;border:0;border-radius:50%;width:38px;height:38px;display:grid;place-items:center}
+.fol{margin-top:10px;padding:9px 36px;border:0;border-radius:18px;background:#fff;color:#0d47a1;font:700 13px 'Orbitron',sans-serif;box-shadow:0 6px 14px #0004}
+.pc-b{background:#cfe6ff;padding:18px;text-align:center}.pc-b p{margin:0 0 12px;color:#0d3b6e;font-size:15px}
+.arr{width:40px;height:40px;border-radius:50%;border:0;background:#1e88e5;color:#fff;display:grid;place-items:center;margin:0 auto;font-size:20px}.arr .ic{transform:rotate(90deg)}
+.hb{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin-bottom:6px}.hb::-webkit-scrollbar{display:none}
+.bn{flex:0 0 88%;height:270px;border-radius:26px;position:relative;overflow:hidden;scroll-snap-align:center;cursor:pointer;background:linear-gradient(160deg,#2c3f9c,#0f1a4a)}
+.bimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.bn::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 25%,#000d)}
+.bo{position:absolute;left:0;right:0;bottom:0;padding:18px;z-index:2}.bo h3{font-size:19px}.bo p{margin:4px 0 12px;color:#dbe3f5;font-size:14px}
+.bl{display:flex;align-items:center;gap:12px}.bl>div{flex:1;min-width:0}.bl b{display:block;font:600 13px 'Orbitron',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bl small{color:#cbd6ee}
+.ic3{width:52px;height:52px;border-radius:14px;object-fit:cover;background:#111524}.gt{background:#ffffff33;border-radius:20px;padding:9px 20px;font:600 13px 'Orbitron',sans-serif}
+.tc small{display:block}.hc.auto{scroll-snap-type:x proximity}
+.rsum{display:flex;gap:22px;align-items:center;margin:8px 0 16px}.rsum .big{font:700 46px 'Orbitron',sans-serif;line-height:1}
+.bars{flex:1}.bars div{display:flex;align-items:center;gap:8px;font-size:13px;margin:5px 0}.bars i{flex:1;height:8px;border-radius:4px;background:#ffffff1a;overflow:hidden}.bars u{display:block;height:100%;background:var(--b2);border-radius:4px}
+.wrt{margin:14px 0}.wrt .stz{justify-content:center;font-size:36px;margin:8px 0 12px}.wrt .btn{margin-top:12px;padding:14px;font-size:12px}
 </style></head><body><div id="app">
 
 <section class="screen on" id="home"><div class="wrap">
@@ -210,7 +234,12 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 <div class="sec">FEATURE NEWS</div>
 <button class="feat" data-link="wa"><div class="bx"><i data-i="wa" data-c="#fff"></i></div><div><h3>WhatsApp Hub</h3><p>Maximizing potential, boundless performance</p></div></button>
 <div class="card wth"><i data-i="cloud"></i><div><h3 id="clk">--:--</h3><p id="dt">--</p></div></div>
-<div class="card me"><div class="avw" style="flex:none"><div class="sh" id="mp"><i data-i="shield"></i></div><span class="bd" id="mb" hidden></span></div><div><small id="gr">Hello</small><h3 id="nm">user</h3><span class="mb">MEMBER</span><br><small id="ex">Expired: --</small></div></div>
+<div class="pc"><button class="pc-ic l mn" aria-label="Menu"><i data-i="menu"></i></button><button class="pc-ic r" id="pg" aria-label="Edit profile"><i data-i="sl"></i></button>
+<div class="pc-t"><div class="avw big"><div class="sh" id="mp"><i data-i="shield"></i></div><span class="bd" id="mb" hidden></span></div>
+<h3 id="nm">user</h3><small id="gr">Hello</small><span class="mb">MEMBER</span><small id="ex">Expired: --</small>
+<div class="soc"><button data-link="tg" aria-label="Telegram"><i data-i="tg"></i></button><button data-link="wa" aria-label="WhatsApp"><i data-i="wa"></i></button><button data-link="yt" aria-label="YouTube"><i data-i="yt"></i></button></div>
+<button class="fol" data-link="ch">Follow</button></div>
+<div class="pc-b"><p>Learn more about <span data-name></span></p><button class="arr" data-go="about" aria-label="About"><i data-i="chev"></i></button></div></div>
 <div class="pill">✦ Stars don't shine without darkness ✦</div>
 <div class="up">Upgrade role? Chat creator <a href="#" data-link="tg">@PRIME_PURGE</a></div>
 <div class="foot"><b>Powered by H'es</b><div>© 2026 H'es – All Rights Reserved</div></div>
@@ -330,7 +359,7 @@ async function dash(){const h=new Date().getHours();$('#gr').textContent=h<5?'Go
 const shrink=(f,ty='image/jpeg')=>new Promise((ok,ko)=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas'),m=Math.min(im.width,im.height);c.width=c.height=256;
  c.getContext('2d').drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,256,256);URL.revokeObjectURL(im.src);ok(c.toDataURL(ty,.8))};im.onerror=ko;im.src=URL.createObjectURL(f)});
 const openP=()=>{pend=null;$('#pp').src=PROF.photo||'';$('#pw').value='';$('#pn').textContent=PROF.next>Date.now()?'Next change possible on '+new Date(PROF.next).toLocaleDateString():'You can change your profile once a week.';$('#pm').classList.add('on')};
-$('#mp').onclick=openP;$('#tp').onclick=openP;
+$('#mp').onclick=openP;$('#pg').onclick=openP;$('#tp').onclick=openP;
 $('#pm').onclick=e=>{if(e.target.id==='pm')$('#pm').classList.remove('on')};
 $('#pf').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{pend=await shrink(f);$('#pp').src=pend}catch{toast('Invalid image')}};
 const saveP=async reset=>{const pw=$('#pw').value;if(!pw)return toast('Enter your password');if(!reset&&!pend)return toast('Choose a photo first');
@@ -368,21 +397,23 @@ setInterval(()=>{if(cur==='chat'&&!document.hidden)chat()},5000);
 
 /* ---- liste Play Store + page détail ---- */
 const ico=i=>i.hasImg?'/api/file?k=img&id='+encodeURIComponent(i.id):'';
-const tc=i=>`<div class="tc" data-o="${esc(i.id)}"><img src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><b>${esc(i.title)}</b><small>⬇ ${i.dls} · ❤ ${i.likes}</small></div>`;
-render=()=>{const q=$('#q').value.trim().toLowerCase(),rows=LIST.filter(i=>!q||(i.title+' '+i.desc).toLowerCase().includes(q)),pop=[...LIST].sort((a,b)=>b.dls-a.dls).slice(0,8);
- $('#fl').innerHTML=(q||!LIST.length?'':`<div class="hs"><h3>Popular</h3></div><div class="hc">${pop.map(tc).join('')}</div><div class="hs"><h3>All apps</h3></div>`)
- +(rows.map(i=>`<div class="pr rv" data-o="${esc(i.id)}"><img class="ic2" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3>${esc(i.title)}</h3><small>${esc(ext(i))}${sz(i.size)}</small><small>⬇ ${i.dls} &nbsp; ❤ ${i.likes}</small></div></div>`).join('')||emptyHTML);
+const tc=i=>`<div class="tc" data-o="${esc(i.id)}"><img src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><b>${esc(i.title)}</b><small>${i.rn?i.rt+' ★':'New'} · ⬇ ${i.dls}</small></div>`;
+render=()=>{const q=$('#q').value.trim().toLowerCase(),rows=LIST.filter(i=>!q||(i.title+' '+i.desc).toLowerCase().includes(q));
+ const feat=[...LIST].sort((a,b)=>b.dls-a.dls||b.ts-a.ts).slice(0,5),rec=[...LIST].sort((a,b)=>b.ts-a.ts).slice(0,12);
+ const bn=i=>`<div class="bn" data-o="${esc(i.id)}"><img class="bimg" src="${ico(i)}" alt="" onerror="this.remove()"><div class="bo"><h3>${esc(i.title)}</h3><p>${esc((i.desc||'').split('\n')[0].slice(0,60))}</p><div class="bl"><img class="ic3" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div><b>${esc(i.title)}</b><small>${i.rn?i.rt+' ★ · ':''}⬇ ${i.dls}</small></div><span class="gt">Get</span></div></div></div>`;
+ $('#fl').innerHTML=(q||!LIST.length?'':`<div class="hb">${feat.map(bn).join('')}</div><div class="hs"><h3>Recommended</h3></div><div class="hc auto">${rec.map(tc).join('')}</div><div class="hs"><h3>All apps</h3></div>`)
+ +(rows.map(i=>`<div class="pr rv" data-o="${esc(i.id)}"><img class="ic2" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3>${esc(i.title)}</h3><small>${esc(ext(i))}${sz(i.size)}</small><small>${i.rn?i.rt+' ★':'New'} &nbsp; ⬇ ${i.dls} &nbsp; ❤ ${i.likes}</small></div></div>`).join('')||emptyHTML);
  reveal('files')};
 function openDetail(id){const i=LIST.find(x=>x.id===id);if(!i)return;const mb=i.size?(i.size/1048576).toFixed(1)+' MB':'—',e=esc(ext(i));
  $('#db').innerHTML=`<div class="r1 rv"><img class="ic2" style="width:96px;height:96px" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3 style="white-space:normal;font-size:19px">${esc(i.title)}</h3><small class="au">H'es Team</small></div></div>
- <div class="stats rv"><div><b>❤ ${i.likes}</b><small>Likes</small></div><div><b>${i.dls}</b><small>Downloads</small></div><div><b>${e}</b><small>${mb}</small></div></div>
+ <div class="stats rv"><div><b>${i.rn?i.rt+' ★':'—'}</b><small>${i.rn||0} ratings</small></div><div><b>${i.dls}</b><small>Downloads</small></div><div><b>${e}</b><small>${mb}</small></div></div>
  <button class="cb rv" data-id="${esc(i.id)}"><span class="cb__eyes"><span class="cb__eye"><span class="cb__pupil"></span></span><span class="cb__eye"><span class="cb__pupil"></span></span></span><span class="cb__cover tx2">Download</span></button>
  <button class="lk rv${i.mine?' on':''}" data-id="${esc(i.id)}" style="margin-top:14px">❤ <span>${i.likes}</span>&nbsp; Like</button>
  ${i.ns?`<div class="hc rv" style="margin-top:18px">${Array.from({length:i.ns},(_,n)=>`<img class="pv2" src="/api/file?k=img&id=${encodeURIComponent(i.id)}&n=${n}" alt="" loading="lazy">`).join('')}</div>`:i.hasImg?`<div class="hc rv" style="margin-top:18px"><img class="pv2" src="${ico(i)}" alt=""></div>`:''}
  <div class="hs rv"><h3>About this app</h3></div><p class="ds open rv">${esc(i.desc)}</p><div class="chips rv"><span>${e}</span><span>H'es Store</span></div>
  <div class="hs rv"><h3>Details</h3></div><div class="card kv rv"><div><span>Type</span><b>${e}</b></div><div><span>Size</span><b>${mb}</b></div><div><span>Downloads</span><b>${i.dls}</b></div><div><span>Published</span><b>${new Date(i.ts).toLocaleDateString()}</b></div></div>
- <div class="hs rv"><h3>Similar apps</h3></div><div class="hc rv">${LIST.filter(x=>x.id!==i.id).slice(0,8).map(tc).join('')||'<small class="sub">No other files yet.</small>'}</div>`;
- show('detail')}
+ <div class="hs rv"><h3>Ratings &amp; reviews</h3></div><div id="rvbox"></div><div class="hs rv"><h3>Similar apps</h3></div><div class="hc rv">${LIST.filter(x=>x.id!==i.id).slice(0,8).map(tc).join('')||'<small class="sub">No other files yet.</small>'}</div>`;
+ show('detail');loadReviews(i.id)}
 /* ---- chat : avatars, modifier son message, stickers ---- */
 const sImg=(p,s)=>`/api/stickers?p=${encodeURIComponent(p)}&s=${encodeURIComponent(s)}`,auth=()=>({authorization:'Bearer '+TOKEN});
 async function sheet(t){try{const d=await (await fetch('/api/stickers',{headers:auth()})).json();PACKS=d.packs||[];MINE=d.mine||[]}catch{}
@@ -401,7 +432,7 @@ $('#sp').addEventListener('click',async e=>{const t=e.target;if(t.id==='sp')retu
   if(!r||!r.ok)return toast(j.error||'Could not create the pack');toast('Pack created');sheet('my')}});
 
 /* ===== chat v3 : réponses, vocaux, photos/vidéos, badges ===== */
-const BD=S('<path d="m5 13 4 4L19 7"/>'),fmt=s=>{s=Math.round(s||0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')},tm=t=>new Date(t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+const SEAL=(()=>{let d='';for(let i=0;i<72;i++){const a=i/72*6.2832,r=11.5*(1+.07*Math.cos(12*a));d+=(i?'L':'M')+(12+r*Math.cos(a)).toFixed(2)+' '+(12+r*Math.sin(a)).toFixed(2)}return d+'Z'})(),BD=`<svg viewBox="0 0 24 24"><path class="s" d="${SEAL}"/><path class="ck" d="m7.5 12.5 3 3 6-6.5"/></svg>`,fmt=s=>{s=Math.round(s||0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')},tm=t=>new Date(t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 const mUrl=(k,dl)=>`/api/media?k=${encodeURIComponent(k)}${dl?'&dl=1':''}`;
 const avw=(n,b)=>`<div class="avw"><img class="ava" src="/api/profile?img=1&u=${encodeURIComponent(n)}" alt="" onerror="this.style.visibility='hidden'">${b?`<span class="bd ${b}">${BD}</span>`:''}</div>`;
 const saveFile=(url,name)=>{const w=tgw();if(w&&w.initData&&w.isVersionAtLeast&&w.isVersionAtLeast('8.0')&&w.downloadFile)w.downloadFile({url:location.origin+url,file_name:name});else location.href=url};
@@ -474,7 +505,26 @@ document.addEventListener('pointermove',eyes);document.addEventListener('touchmo
 const dot=(m,e,cl)=>{const r=m.getBoundingClientRect();let d=cl?null:m.querySelector('.cur:not(.cl)');if(!d){d=document.createElement('i');d.className='cur'+(cl?' cl':'');m.appendChild(d)}d.style.left=e.clientX-r.left-12+'px';d.style.top=e.clientY-r.top-12+'px';if(cl)setTimeout(()=>d.remove(),1500)};
 $('#fl').addEventListener('pointermove',e=>{const m=e.target.closest('.em');if(m)dot(m,e)});
 $('#fl').addEventListener('click',e=>{const m=e.target.closest('.em');if(m)dot(m,e,1)});
+
+/* ===== défilement automatique + notes et avis ===== */
+$('#fl').addEventListener('pointerdown',e=>{const c=e.target.closest('.hb,.auto');if(c)c.dataset.p=Date.now()+7000});
+setInterval(()=>{if(cur!=='files'||document.hidden)return;$$('#fl .hb,#fl .auto').forEach(el=>{if(+el.dataset.p>Date.now())return;const c=el.firstElementChild;if(!c)return;
+ const w=c.offsetWidth+14,max=el.scrollWidth-el.clientWidth;el.scrollTo({left:el.scrollLeft+w>=max-4?0:el.scrollLeft+w,behavior:'smooth'})})},3500);
+let RSTAR=0;
+const rz=()=>{const z=$('#rz');if(z)z.innerHTML=[1,2,3,4,5].map(n=>`<button type="button" data-rs="${n}" aria-label="${n} stars">${n<=RSTAR?'★':'☆'}</button>`).join('')};
+async function loadReviews(id){const box=$('#rvbox');box.innerHTML='<small class="sub">Loading…</small>';
+ try{const d=await (await fetch('/api/comments?k=rev&id='+encodeURIComponent(id),{headers:auth()})).json(),mx=Math.max(1,...d.dist),rr=Math.round(d.avg);RSTAR=d.mine?d.mine.stars:0;
+  box.innerHTML=`<div class="rsum"><div><div class="big">${d.n?d.avg:'—'}</div><div class="stars">${'★'.repeat(rr)}${'☆'.repeat(5-rr)}</div><small>${d.n} ratings</small></div><div class="bars">${[5,4,3,2,1].map(s=>`<div><span>${s}</span><i><u style="width:${d.dist[s-1]/mx*100}%"></u></i></div>`).join('')}</div></div>
+  <div class="card wrt"><small>Rate this app</small><div class="stz" id="rz"></div><textarea class="ta" id="rt2" rows="2" maxlength="300" placeholder="Write a review (optional)">${d.mine?esc(d.mine.text):''}</textarea><button class="btn c" id="rs" data-id="${esc(id)}"><span>${d.mine?'Update review':'Submit review'}</span></button></div>
+  ${d.list.map(x=>`<div class="rvb"><div class="rvh">${avw(x.name,x.badge)}<div><div class="rn">${esc(x.name)}</div><div class="stars">${'★'.repeat(x.stars)}${'☆'.repeat(5-x.stars)} <small>${new Date(x.ts).toLocaleDateString()}</small></div></div></div>${x.text?`<div class="rm">${esc(x.text)}</div>`:''}</div>`).join('')}`;rz()
+ }catch{box.innerHTML='<small class="sub">Could not load the reviews.</small>'}}
+$('#db').addEventListener('click',async e=>{const s=e.target.closest('[data-rs]');if(s){RSTAR=+s.dataset.rs;return rz()}
+ const b=e.target.closest('#rs');if(!b)return;if(!RSTAR)return toast('Choose 1 to 5 stars');
+ const r=await post('/api/comments?k=rev',{id:b.dataset.id,stars:RSTAR,text:$('#rt2').value}).catch(()=>null),j=r?await r.json().catch(()=>({})):{};
+ if(!r||!r.ok)return toast(j.error||'Could not send your review');
+ const i=LIST.find(x=>x.id===b.dataset.id);if(i){i.rt=j.avg;i.rn=j.n}toast('Thanks for your review ★');loadReviews(b.dataset.id)});
 /* ---- effet d'apparition au scroll ---- */
 let io;function reveal(id){io&&io.disconnect();io=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('in',e.isIntersecting)),{rootMargin:'0px 0px -6% 0px'});$$('#'+id+' .rv').forEach(r=>{r.classList.remove('in');io.observe(r)})}
 $$('.body>*,.wrap>*:not(.bk),.sc,.st').forEach(e=>e.classList.add('rv'));reveal('home');
 </script></body></html>
+
