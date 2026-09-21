@@ -48,6 +48,37 @@ export default async (req, res) => {
     return res.json({ ok: true });
   }
 
+  /* ---------- notes (1 à 5 étoiles) et avis d'une publication ---------- */
+  if (req.query.k === 'rev') {
+    const id = String(req.query.id || req.body?.id || '');
+    if (!id || !await redis.hexists('items', id)) return res.status(404).end();
+    if (req.method === 'POST') {
+      const me = await whoami(req);
+      if (!me) return res.status(401).json({ error: 'Log in again' });
+      if (await limit('rl:v:' + me, 10, 600)) return res.status(429).json({ error: 'Too many reviews, wait a moment.' });
+      const stars = parseInt(req.body?.stars);
+      if (!(stars >= 1 && stars <= 5)) return res.status(400).json({ error: 'Choose 1 to 5 stars' });
+      const text = String(req.body?.text || '').trim().slice(0, 300);
+      const old = await redis.hget('rv:' + id, me), agg = (await redis.hget('rat', id)) || { s: 0, n: 0 };
+      agg.s += stars - (old ? old.stars : 0);
+      if (!old) agg.n++;
+      await redis.hset('rv:' + id, { [me]: { name: me, stars, text, ts: Date.now() } });
+      await redis.hset('rat', { [id]: agg });
+      if (!old) {
+        const it = await redis.hget('items', id);
+        await Promise.all((await admins()).map(a => tg('sendMessage', { chat_id: a, text: `⭐ ${me} : ${stars}/5 — ${it?.title}${text ? '\n' + text : ''}` }).catch(() => {})));
+      }
+      return res.json({ ok: true, avg: +(agg.s / agg.n).toFixed(1), n: agg.n });
+    }
+    const all = Object.values(await redis.hgetall('rv:' + id) || {}), who = await whoami(req), b = await bg();
+    const n = all.length, dist = [1, 2, 3, 4, 5].map(v => all.filter(x => x.stars === v).length);
+    return res.json({
+      n, dist, avg: n ? +(all.reduce((a, x) => a + x.stars, 0) / n).toFixed(1) : 0,
+      mine: all.find(x => x.name === who) || null,
+      list: all.sort((a, c) => c.ts - a.ts).slice(0, 30).map(x => ({ ...x, badge: b[x.name] || '' })),
+    });
+  }
+
   /* ---------- commentaires (notifiés aux admins) ---------- */
   if (req.method === 'POST') {
     if (await limit('rl:m:' + ip(req), 5, 600)) return res.status(429).json({ error: 'Too many messages, try again later.' });
