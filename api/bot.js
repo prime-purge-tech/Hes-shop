@@ -120,7 +120,7 @@ async function handle(m) {
   }
   if (cmd === '/del' && arg) {
     const n = await redis.hdel('items', arg);
-    await redis.hdel('likes', arg); await redis.del('lk:' + arg);
+    await redis.hdel('likes', arg); await redis.del('lk:' + arg); await redis.hdel('rat', arg); await redis.del('rv:' + arg);
     return say(n ? '🗑 Publication supprimée' : '❌ ID introuvable (voir /list)');
   }
   if (cmd === '/chat' && text.length > 6) {
