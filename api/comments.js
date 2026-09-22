@@ -21,6 +21,12 @@ export default async (req, res) => {
       await redis.hset('chm', { [m.id]: { ...m, text, edited: true } });
       return res.json({ ok: true });
     }
+    if (req.method === 'DELETE') {   // supprimer son propre message
+      const m = await redis.hget('chm', String(b.id));
+      if (!m || m.name !== me) return res.status(403).json({ error: 'Not allowed' });
+      await redis.hdel('chm', m.id);
+      return res.json({ ok: true });
+    }
     if (await limit('rl:c:' + me, 20, 60)) return res.status(429).json({ error: 'Too many messages, wait a moment.' });
     const msg = { id: uid(), name: me, ts: Date.now() };
     if (b.sticker) {
@@ -46,6 +52,21 @@ export default async (req, res) => {
       await redis.hdel('chm', ...old.map(x => x.id));
     }
     return res.json({ ok: true });
+  }
+
+  /* ---------- pub du site (page ou média), gérée par le bot ---------- */
+  if (req.query.k === 'ad') {
+    if (req.method !== 'GET') return res.status(405).end();
+    const ad = await redis.get('ad');
+    res.setHeader('Cache-Control', 's-maxage=20');
+    return res.json(ad || null);
+  }
+
+  /* ---------- notifications (envoyées par les admins depuis le bot) ---------- */
+  if (req.query.k === 'notif') {
+    if (req.method !== 'GET') return res.status(405).end();
+    res.setHeader('Cache-Control', 's-maxage=10');
+    return res.json(Object.values(await redis.hgetall('notifs') || {}).sort((a, c) => c.ts - a.ts).slice(0, 20));
   }
 
   /* ---------- notes (1 à 5 étoiles) et avis d'une publication ---------- */
