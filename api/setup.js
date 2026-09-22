@@ -8,4 +8,3 @@ export default async (req, res) => {
   const set = await tg('setWebhook', { url, secret_token: s, allowed_updates: ['message'], drop_pending_updates: true });
   res.json({ url, set, info: (await tg('getWebhookInfo', {})).result });
 };
-
