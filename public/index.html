@@ -607,6 +607,8 @@ history.pushState({h:1},'');
 window.addEventListener('popstate',()=>{history.pushState({h:1},'');if(confirm('Leave H\'es Store?'))history.go(-2)});
 window.addEventListener('beforeunload',e=>{e.preventDefault();e.returnValue=''});
 /* ---- effet d'apparition au scroll ---- */
-let io;function reveal(id){io&&io.disconnect();io=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('in',e.isIntersecting)),{rootMargin:'0px 0px -6% 0px'});$$('#'+id+' .rv').forEach(r=>{r.classList.remove('in');io.observe(r)})}
+let io;function reveal(id){const els=$$('#'+id+' .rv');if(!els.length)return;
+ try{io&&io.disconnect();io=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('in',e.isIntersecting)),{rootMargin:'0px 0px -6% 0px'});els.forEach(r=>{r.classList.remove('in');io.observe(r)})}catch{els.forEach(r=>r.classList.add('in'))}
+ setTimeout(()=>els.forEach(r=>r.classList.add('in')),700)}
 $$('.body>*,.wrap>*:not(.bk),.sc,.st').forEach(e=>e.classList.add('rv'));reveal('home');
 </script></body></html>
