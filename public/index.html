@@ -199,13 +199,10 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 .bars{flex:1}.bars div{display:flex;align-items:center;gap:8px;font-size:13px;margin:5px 0}.bars i{flex:1;height:8px;border-radius:4px;background:#ffffff1a;overflow:hidden}.bars u{display:block;height:100%;background:var(--b2);border-radius:4px}
 .wrt{margin:14px 0}.wrt .stz{justify-content:center;font-size:36px;margin:8px 0 12px}.wrt .btn{margin-top:12px;padding:14px;font-size:12px}
 
-.nav2{position:absolute;left:14px;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:6;display:none;justify-content:space-around;align-items:flex-end;padding:10px 6px 8px;border-radius:30px;background:#0c0f18ee;border:1px solid #ffffff10;box-shadow:0 10px 40px #000a}
+.nav2{position:absolute;left:16px;right:16px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:6;display:none;justify-content:space-between;align-items:center;padding:9px 20px;border-radius:40px;background:#04060cf5;border:1px solid #ffffff10;box-shadow:0 10px 40px #000a}
 #app.nv .nav2{display:flex}
-.nav2 button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:4px;color:#8b98b5;font-size:20px;width:52px}
-.nav2 button span{font-size:10px;font-weight:600;color:#8b98b5;position:relative;padding-bottom:6px}
-.nav2 button.a span::after{content:"";position:absolute;left:50%;bottom:0;width:16px;height:2px;background:#2ee86e;transform:translateX(-50%);border-radius:2px}
-.nav2 button.a{color:var(--tx)}
-.nav2 .raise{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1e88e5,#39c0ff);color:#fff;display:grid;place-items:center;font-size:24px;margin-top:-30px;box-shadow:0 10px 24px #1e88e588}
+.nav2 button{background:none;border:0;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#8b98b5;font-size:21px;position:relative;transition:transform .32s cubic-bezier(.34,1.56,.64,1),background-color .32s,color .32s,box-shadow .32s}
+.nav2 button.a{background:#fff;color:var(--b1);font-size:23px;transform:translateY(-20px);box-shadow:0 0 0 6px #04060cf5,0 10px 22px #000a}
 .au2{position:relative;padding:0}
 .au2 img{width:150px;height:150px;border-radius:50%;object-fit:cover;background:#111524}
 .au h1{font-size:22px;margin-top:14px}.au small{color:#7fd0ff}.au p{color:#aab5cf;line-height:1.75;margin-top:14px}
@@ -307,7 +304,7 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 </div></section>
 
 <section class="screen" id="detail"><div class="top"><button class="sq" data-back aria-label="Back"><i data-i="back"></i></button><h2>APP</h2></div><div class="body" id="db"></div></section>
-<div class="nav2"><button data-go="dash" aria-label="Home"><i data-i="grid"></i><span>Home</span></button><button data-go="files" aria-label="Files"><i data-i="phone"></i><span>Files</span></button><button class="raise" data-go="chat" aria-label="Chat"><i data-i="chat"></i></button><button data-go="comments" aria-label="Reviews"><i data-i="wa"></i><span>Reviews</span></button><button data-go="help" aria-label="About"><i data-i="user"></i><span>About</span></button></div>
+<div class="nav2"><button data-go="dash" aria-label="Home"><i data-i="grid"></i></button><button data-go="files" aria-label="Files"><i data-i="phone"></i></button><button data-go="chat" aria-label="Chat"><i data-i="chat"></i></button><button data-go="comments" aria-label="Reviews"><i data-i="wa"></i></button><button data-go="help" aria-label="About"><i data-i="user"></i></button></div>
 <div class="zm" id="zm"><img id="zi" alt=""></div>
 <div class="ov" id="ov"><div class="dr"><h2 data-name></h2><small>2026 – All rights reserved</small><hr>
 <h4>Store</h4>
@@ -325,6 +322,7 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 </div></div>
 <div class="ov2" id="sp"><div class="pb"><div class="tabs"><button data-t="my" class="a">My</button><button data-t="all">Packs</button><button data-t="new">Create</button></div><div id="sc"></div></div></div>
 <div class="ov2" id="pm"><div class="pb"><h3>Profile photo</h3><img class="pv" id="pp" alt=""><label class="btn" style="margin:0">Choose from gallery<input type="file" accept="image/*" id="pf" hidden></label><input class="ta" id="pw" type="password" placeholder="Your password" autocomplete="current-password"><button class="btn c" id="ps">Save</button><button class="btn" id="pr">Use a default photo</button><small id="pn"></small></div></div>
+<div class="adm" id="adm"><div class="adc" id="adbox"><button class="adx" id="adx" aria-label="Close ad"><i data-i="back" style="display:none"></i>✕</button></div></div>
 </div><svg width="0" height="0" style="position:absolute"><defs><linearGradient id="igg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#feda75"/><stop offset=".3" stop-color="#fa7e1e"/><stop offset=".55" stop-color="#d62976"/><stop offset=".8" stop-color="#962fbf"/><stop offset="1" stop-color="#4f5bd5"/></linearGradient></defs></svg><div id="toast"></div>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
