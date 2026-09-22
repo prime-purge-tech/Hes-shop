@@ -427,7 +427,10 @@ async function start(d){const i=LIST.find(x=>x.id===d.dataset.id),sp=d.querySele
   if(i.size>19e6){   // gros fichier : passe par le bot Telegram
    if(w&&w.openTelegramLink)w.openTelegramLink(deep);else window.open(deep,'_blank');return fin(true)}
   if(w&&w.initData&&w.isVersionAtLeast&&w.isVersionAtLeast('8.0')&&w.downloadFile)w.downloadFile({url:location.origin+url,file_name:i.dn||i.name||'file'});
-  else location.href=url+'&t='+encodeURIComponent(TOKEN);
+  else{   // navigateur normal : téléchargement sans quitter la page (pas de popup "Quitter ce site ?")
+   const a=document.createElement('a');a.href=url+'&t='+encodeURIComponent(TOKEN);a.download=i.dn||i.name||'file';
+   document.body.appendChild(a);a.click();a.remove();
+  }
   fin(true)
  }catch{fin(false);toast('Not available right now. Try again later.')}}
 $('#app').addEventListener('click',async e=>{const zi=e.target.closest('.pv2');if(zi){$('#zi').src=zi.src;$('#zm').classList.add('on');return}const o=e.target.closest('[data-o]');if(o)return openDetail(o.dataset.o);const d=e.target.closest('.cb');if(d)return start(d);
@@ -509,7 +512,7 @@ $('#sp').addEventListener('click',async e=>{const t=e.target;if(t.id==='sp')retu
 const SEAL=(()=>{let d='';for(let i=0;i<72;i++){const a=i/72*6.2832,r=11.5*(1+.07*Math.cos(12*a));d+=(i?'L':'M')+(12+r*Math.cos(a)).toFixed(2)+' '+(12+r*Math.sin(a)).toFixed(2)}return d+'Z'})(),BD=`<svg viewBox="0 0 24 24"><path class="s" d="${SEAL}"/><path class="ck" d="m7.5 12.5 3 3 6-6.5"/></svg>`,fmt=s=>{s=Math.round(s||0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')},tm=t=>new Date(t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 const mUrl=(k,dl)=>`/api/media?k=${encodeURIComponent(k)}${dl?'&dl=1':''}`;
 const avw=(n,b)=>`<div class="avw"><img class="ava" src="/api/profile?img=1&u=${encodeURIComponent(n)}" alt="" onerror="this.style.visibility='hidden'">${b?`<span class="bd ${b}">${BD}</span>`:''}</div>`;
-const saveFile=(url,name)=>{const w=tgw();if(w&&w.initData&&w.isVersionAtLeast&&w.isVersionAtLeast('8.0')&&w.downloadFile)w.downloadFile({url:location.origin+url,file_name:name});else location.href=url};
+const saveFile=(url,name)=>{const w=tgw();if(w&&w.initData&&w.isVersionAtLeast&&w.isVersionAtLeast('8.0')&&w.downloadFile)w.downloadFile({url:location.origin+url,file_name:name});else{const a=document.createElement('a');a.href=url;a.download=name||'file';document.body.appendChild(a);a.click();a.remove()}};
 const emptyHTML=`<div class="em"><img src="https://a.top4top.net/p_1990j031.gif" alt="" onerror="this.remove()"><p>No apps or files found</p></div>`;
 function mediaHTML(x){const m=x.media,u=mUrl(m.k),sv=`<button class="dlm" data-sv="${esc(m.k)}" data-n="${esc("H'ES SHOP - "+(m.n||'file'))}">⬇ Save</button>`;
  if(m.type==='photo')return `<img class="mi" src="${u}" alt="photo" loading="lazy">${sv}`;
@@ -603,7 +606,7 @@ $('#db').addEventListener('click',async e=>{const s=e.target.closest('[data-rs]'
 /* ---- quitter le site : confirmation solide ---- */
 history.pushState({h:1},'');
 window.addEventListener('popstate',()=>{history.pushState({h:1},'');if(confirm('Leave H\'es Store?'))history.go(-2)});
-window.addEventListener('beforeunload',e=>{e.preventDefault();e.returnValue=''});
+window.addEventListener('beforeunload',e=>{if(document.querySelector('.cb.go'))return;e.preventDefault();e.returnValue=''});
 /* ---- effet d'apparition au scroll ---- */
 let io;function reveal(id){const els=$$('#'+id+' .rv');if(!els.length)return;
  try{io&&io.disconnect();io=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('in',e.isIntersecting)),{rootMargin:'0px 0px -6% 0px'});els.forEach(r=>{r.classList.remove('in');io.observe(r)})}catch{els.forEach(r=>r.classList.add('in'))}
