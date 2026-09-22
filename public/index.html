@@ -198,6 +198,33 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 .rsum{display:flex;gap:22px;align-items:center;margin:8px 0 16px}.rsum .big{font:700 46px 'Orbitron',sans-serif;line-height:1}
 .bars{flex:1}.bars div{display:flex;align-items:center;gap:8px;font-size:13px;margin:5px 0}.bars i{flex:1;height:8px;border-radius:4px;background:#ffffff1a;overflow:hidden}.bars u{display:block;height:100%;background:var(--b2);border-radius:4px}
 .wrt{margin:14px 0}.wrt .stz{justify-content:center;font-size:36px;margin:8px 0 12px}.wrt .btn{margin-top:12px;padding:14px;font-size:12px}
+
+.nav2{position:absolute;left:14px;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:6;display:none;justify-content:space-around;align-items:flex-end;padding:10px 6px 8px;border-radius:30px;background:#0c0f18ee;border:1px solid #ffffff10;box-shadow:0 10px 40px #000a}
+#app.nv .nav2{display:flex}
+.nav2 button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:4px;color:#8b98b5;font-size:20px;width:52px}
+.nav2 button span{font-size:10px;font-weight:600;color:#8b98b5;position:relative;padding-bottom:6px}
+.nav2 button.a span::after{content:"";position:absolute;left:50%;bottom:0;width:16px;height:2px;background:#2ee86e;transform:translateX(-50%);border-radius:2px}
+.nav2 button.a{color:var(--tx)}
+.nav2 .raise{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1e88e5,#39c0ff);color:#fff;display:grid;place-items:center;font-size:24px;margin-top:-30px;box-shadow:0 10px 24px #1e88e588}
+.au2{position:relative;padding:0}
+.au2 img{width:150px;height:150px;border-radius:50%;object-fit:cover;background:#111524}
+.au h1{font-size:22px;margin-top:14px}.au small{color:#7fd0ff}.au p{color:#aab5cf;line-height:1.75;margin-top:14px}
+.abtn{margin-top:16px;padding:12px 22px;border:1px solid #fff;border-radius:30px;background:none;color:#fff;font:600 12px 'Orbitron',sans-serif}
+.astats{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:26px 0}.astats div{text-align:center}.astats b{font:700 26px 'Orbitron',sans-serif;display:block}.astats small{color:var(--mut)}
+.acta{position:relative;border-radius:22px;overflow:hidden;padding:26px 18px;text-align:center;background:linear-gradient(160deg,#0d47a1,#1e88e5)}.acta small{color:#dbe9ff}.acta h3{margin:6px 0 16px}.acta button{background:#fff;color:#0d47a1;border:0;border-radius:20px;padding:10px 24px;font:700 12px 'Orbitron',sans-serif}
+.sfoot{margin-top:30px;padding:24px 16px;border-top:1px solid var(--line);text-align:center}
+.sfoot .row2{display:flex;justify-content:center;gap:14px;margin-bottom:10px}.sfoot .row2 button{width:38px;height:38px;border-radius:50%;background:#ffffff0a;border:1px solid var(--line);display:grid;place-items:center}
+.sfoot small{color:var(--mut);display:block;letter-spacing:1px}
+.acsec .inp{margin-bottom:14px}.acsec .btn{padding:14px}
+.zm{position:fixed;inset:0;z-index:60;background:#000d;display:none;align-items:center;justify-content:center;padding:20px}.zm.on{display:flex}
+.zm img{max-width:100%;max-height:90vh;border-radius:12px}
+.adm{position:absolute;inset:0;z-index:40;background:#000e;display:none;align-items:center;justify-content:center;padding:18px}.adm.on{display:flex}
+.adc{position:relative;width:100%;max-width:420px;background:#000;border-radius:20px;overflow:hidden}
+.adc iframe,.adc video,.adc img{width:100%;height:min(70vh,520px);object-fit:contain;background:#000;border:0;display:block}
+.adx{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;background:#000a;color:#fff;border:1px solid #ffffff44;display:none;place-items:center;font-size:16px;z-index:2}
+.adx.on{display:grid}.adt{position:absolute;top:10px;left:10px;background:#000a;color:#fff;border-radius:14px;padding:6px 12px;font-size:12px;z-index:2}
+.adcap{padding:14px;color:#fff;background:#0b0f1c}.adcap a{color:var(--cy);font-weight:600}
+#ntf{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%) translateY(-140%);width:min(92%,420px);background:#10182d;border:1px solid var(--cy);border-radius:16px;padding:12px 16px;z-index:70;transition:transform .4s}#ntf.on{transform:translateX(-50%) translateY(0)}
 </style></head><body><div id="app">
 
 <section class="screen on" id="home"><div class="wrap">
@@ -239,7 +266,7 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 <h3 id="nm">user</h3><small id="gr">Hello</small><span class="mb">MEMBER</span><small id="ex">Expired: --</small>
 <div class="soc"><button data-link="tg" aria-label="Telegram"><i data-i="tg"></i></button><button data-link="wa" aria-label="WhatsApp"><i data-i="wa"></i></button><button data-link="yt" aria-label="YouTube"><i data-i="yt"></i></button></div>
 <button class="fol" data-link="ch">Follow</button></div>
-<div class="pc-b"><p>Learn more about <span data-name></span></p><button class="arr" data-go="about" aria-label="About"><i data-i="chev"></i></button></div></div>
+<div class="pc-b"><p>Learn more about <span data-name></span></p><button class="arr" data-go="help" aria-label="About"><i data-i="chev"></i></button></div></div>
 <div class="pill">✦ Stars don't shine without darkness ✦</div>
 <div class="up">Upgrade role? Chat creator <a href="#" data-link="tg">@PRIME_PURGE</a></div>
 <div class="foot"><b>Powered by H'es</b><div>© 2026 H'es – All Rights Reserved</div></div>
@@ -256,29 +283,38 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 <div id="rb" hidden><span id="rt"></span><button type="button" id="rc" aria-label="Cancel">✕</button></div>
 <form class="cfm" id="chf"><div class="pl"><button type="button" id="at" aria-label="Attach"><i data-i="plus"></i></button><input class="ta" id="cx" maxlength="300" placeholder="Your message…" aria-label="Chat message" autocomplete="off"><button type="button" id="sk" aria-label="Stickers">😊</button></div><button type="button" class="go" id="go" aria-label="Send or record"><i data-i="mic"></i></button><input type="file" id="mf" accept="image/*,video/*" hidden></form></section>
 
-<section class="screen" id="about"><div class="top"><button class="sq mn" aria-label="Menu"><i data-i="menu"></i></button><h2>ABOUT</h2></div>
-<div class="body"><div class="card"><h3><i data-i="info"></i>About <span data-name></span></h3><p>Apps and ZIP packs shared by <b>Prime Purge</b> and <b>A+purge</b>. Create an account, open Files, tap Download. Big files open our Telegram bot. Leave a comment or join the chat with the community.</p><button class="btn" data-link="tg"><i data-i="tg"></i>Contact the team<i data-i="chev"></i></button></div>
-<div class="foot"><b>Powered by H'es</b><div>© 2026 H'es – All Rights Reserved</div></div></div></section>
 
-<section class="screen" id="help"><button class="sq bk" data-back aria-label="Back"><i data-i="back"></i></button><div class="wrap">
-<div class="hd"><i data-i="head"></i></div><h2>WE'RE HERE TO HELP</h2><p>Contact our support team on these platforms</p>
-<div class="g">
+<section class="screen" id="help"><div class="top"><button class="sq mn" aria-label="Menu"><i data-i="menu"></i></button><h2>ABOUT</h2></div>
+<div class="body">
+<div class="card au2 rv" style="text-align:center"><img src="https://ganga--link--ghhzdp9sv8hk.code.run/i/jtn1l7jk.jpg" alt="" onerror="this.remove()">
+<div class="au"><small>ABOUT US</small><h1>We Always Bring<br>The Best Files</h1><p><span data-name></span> is built by <b>Prime Purge</b> and <b>A+purge</b> to share apps, ZIP packs and community updates in one place, with a team that keeps adding new content.</p>
+<button class="abtn" data-link="tg">Contact Us</button></div></div>
+<div class="astats rv"><div><b id="a1">–</b><small>Accounts</small></div><div><b id="a2">–</b><small>Files &amp; APK</small></div><div><b id="a3">–</b><small>Downloads</small></div><div><b id="a4">–</b><small>Likes</small></div></div>
+<div class="card acta rv"><small>JOIN THE COMMUNITY</small><h3>Never Miss An Update</h3><button data-link="ch">Follow the channel</button></div>
+<div class="sec rv" style="margin-top:28px">OUR CHANNELS</div>
+<div class="g rv">
 <button class="sc" data-link="tg" style="--c:#29a9eb"><span><i data-i="tg"></i></span><b>TELEGRAM</b><small>@PRIME_PURGE</small></button>
 <button class="sc" data-link="wa" style="--c:#25d366"><span><i data-i="wa"></i></span><b>WHATSAPP</b><small>Channel</small></button>
 <button class="sc" data-link="yt" style="--c:#ff1a1a"><span><i data-i="yt"></i></span><b>YOUTUBE</b><small>@no-name-officiel</small></button>
-<button class="sc" data-link="ig" style="--c:#e1306c"><span><i data-i="ig"></i></span><b>INSTAGRAM</b><small>@yourhandle</small></button>
-<button class="sc" data-link="tt" style="--c:#dfe6f5"><span><i data-i="tt"></i></span><b>TIKTOK</b><small>@yourhandle</small></button>
-<button class="sc" data-link="gh" style="--c:#c5cbe0"><span><i data-i="gh"></i></span><b>GITHUB</b><small>@yourhandle</small></button>
-</div></div></section>
+<button class="sc" data-link="bc" style="--c:#ff8a3d"><span><i data-i="phone"></i></span><b>BANチェック</b><small>Check a number</small></button>
+</div>
+<div class="card acsec rv" style="margin-top:26px"><h3><i data-i="sl"></i>Account settings</h3>
+<div style="margin-top:16px"><label>New username</label><div class="inp"><i data-i="user"></i><input id="anu" placeholder="Leave empty to keep it" autocapitalize="off"></div>
+<label>New password</label><div class="inp"><i data-i="lock"></i><input id="anp" type="password" placeholder="Leave empty to keep it"></div>
+<label>Current password</label><div class="inp"><i data-i="lock"></i><input id="acp" type="password" placeholder="Required to confirm"></div>
+<button class="btn c" id="asv"><span>Save changes</span></button></div></div>
+<div class="sfoot rv"><div class="row2"><button data-link="tg" aria-label="Telegram"><i data-i="tg"></i></button><button data-link="wa" aria-label="WhatsApp"><i data-i="wa"></i></button><button data-link="yt" aria-label="YouTube"><i data-i="yt"></i></button><button data-link="bc" aria-label="BANチェック"><i data-i="phone"></i></button></div><small><span data-name></span> · Prime Purge Tech</small></div>
+</div></section>
 
 <section class="screen" id="detail"><div class="top"><button class="sq" data-back aria-label="Back"><i data-i="back"></i></button><h2>APP</h2></div><div class="body" id="db"></div></section>
-<div class="nav"><button data-go="dash" aria-label="Home"><i data-i="grid"></i></button><button data-go="files" aria-label="Files"><i data-i="phone"></i></button><button data-go="comments" aria-label="Comments"><i data-i="wa"></i></button><button data-go="chat" aria-label="Chat"><i data-i="chat"></i></button><button data-go="help" aria-label="Support"><i data-i="tool"></i></button></div>
+<div class="nav2"><button data-go="dash" aria-label="Home"><i data-i="grid"></i><span>Home</span></button><button data-go="files" aria-label="Files"><i data-i="phone"></i><span>Files</span></button><button class="raise" data-go="chat" aria-label="Chat"><i data-i="chat"></i></button><button data-go="comments" aria-label="Reviews"><i data-i="wa"></i><span>Reviews</span></button><button data-go="help" aria-label="About"><i data-i="user"></i><span>About</span></button></div>
+<div class="zm" id="zm"><img id="zi" alt=""></div>
 <div class="ov" id="ov"><div class="dr"><h2 data-name></h2><small>2026 – All rights reserved</small><hr>
 <h4>Store</h4>
 <button class="it" data-go="files"><span style="background:#1c2650;color:#5b7dff"><i data-i="phone"></i></span>Files &amp; APK<i data-i="chev"></i></button>
 <button class="it" data-go="comments"><span style="background:#173a2a;color:#3ddc84"><i data-i="wa"></i></span>Comments<i data-i="chev"></i></button>
 <button class="it" data-go="chat"><span style="background:#2a1a4a;color:#b98bff"><i data-i="chat"></i></span>Chat<i data-i="chev"></i></button>
-<button class="it" data-go="about"><span style="background:#3a3216;color:#ffd21f"><i data-i="info"></i></span>About<i data-i="chev"></i></button>
+<button class="it" data-go="help"><span style="background:#3a3216;color:#ffd21f"><i data-i="info"></i></span>About<i data-i="chev"></i></button>
 <h4>Community</h4>
 <button class="it" data-link="wa"><span style="background:#173a2a;color:#3ddc84"><i data-i="wa"></i></span>WhatsApp Channel<i data-i="chev"></i></button>
 <button class="it" data-link="bc"><span style="background:#3a1a25;color:#ff4d5e"><i data-i="phone"></i></span>BANチェック<i data-i="chev"></i></button>
@@ -311,14 +347,15 @@ const post=(u,b,m)=>fetch(u,{method:m||'POST',headers:{'content-type':'applicati
 const sz=n=>n?' · '+(n/1048576).toFixed(1)+' MB':'';
 const tgw=()=>window.Telegram&&window.Telegram.WebApp;
 try{tgw().ready();tgw().expand()}catch{}
-let user='',exp=0,cur='home',prev='home',timer,raf,ck,PROF={},LIST=[],BOT='',pend=null,last='',TOKEN='',CHAT=[],editId=null,PACKS=[],MINE=[],sf=[],replyTo=null,rec=null,recT=0,recI=null,STARS=0;
-const NAV=['dash','files','comments','chat','about'];
+let user='',exp=0,cur='home',prev='home',timer,raf,ck,PROF={},LIST=[],BOT='',pend=null,last='',TOKEN='',CHAT=[],editId=null,PACKS=[],MINE=[],sf=[],replyTo=null,rec=null,recT=0,recI=null,STARS=0,ADSHOWN=false;
+(async()=>{try{const tk=localStorage.getItem('hesTok');if(tk){TOKEN=tk;const r=await fetch('/api/auth',{headers:{authorization:'Bearer '+tk}});if(r.ok){const j=await r.json();user=j.name;exp=j.exp;show('dash');pollNotif();showAd();return}localStorage.removeItem('hesTok')}}catch{}})();
+const NAV=['dash','files','comments','chat','help'];
 function show(id){if(id!==cur){prev=cur;cur=id}
  $$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));$('#'+id).scrollTop=0;
  $('#ov').classList.remove('on');$('#app').classList.toggle('nv',NAV.includes(id));
- $$('.nav button').forEach(b=>b.classList.toggle('a',b.dataset.go===id));
+ $$('.nav2 button').forEach(b=>b.classList.toggle('a',b.dataset.go===id));
  if(id!=='splash'){try{$('#bgv').pause()}catch{}}
- if(id==='splash')splash();if(id==='dash')dash();if(id==='files')loadFiles();if(id==='comments')loadComments();if(id==='chat')chat(true);reveal(id)}
+ if(id==='splash')splash();if(id==='dash')dash();if(id==='files')loadFiles();if(id==='comments')loadComments();if(id==='chat')chat(true);if(id==='help')aboutStats();reveal(id)}
 document.addEventListener('click',e=>{const t=e.target.closest('[data-go],[data-link],[data-mode],[data-back]');if(!t)return;
  if(t.dataset.go){if(['login','help','home'].includes(t.dataset.go)||user)show(t.dataset.go)}
  else if(t.dataset.link){e.preventDefault();const u=LINKS[t.dataset.link];u?window.open(u,'_blank','noopener'):toast('This link is coming soon')}
@@ -338,7 +375,7 @@ $('#frm').onsubmit=async e=>{e.preventDefault();const n=$('#u').value.trim().toL
  try{const r=await post('/api/auth',{action:reg?'register':'login',username:n,password:p}),j=await r.json().catch(()=>({}));
   if(!r.ok)return toast(j.error||'Something went wrong');
   if(reg){toast('Account created, you can log in');mode('log');return}
-  user=j.name;exp=j.exp;TOKEN=j.token;show('splash')
+  user=j.name;exp=j.exp;TOKEN=j.token;try{localStorage.setItem('hesTok',TOKEN)}catch{}pollNotif();showAd();show('splash')
  }catch{toast('Server unreachable, try again')}finally{b.disabled=false}};
 /* splash 5 s */
 function splash(){clearTimeout(timer);cancelAnimationFrame(raf);const bar=$('#splash .bar');bar.classList.remove('go');void bar.offsetWidth;bar.classList.add('go');
@@ -350,6 +387,11 @@ function splash(){clearTimeout(timer);cancelAnimationFrame(raf);const bar=$('#sp
   if(cur==='splash')raf=requestAnimationFrame(f)})()}
 $('#skip').onclick=()=>{clearTimeout(timer);show('dash')};
 /* dashboard + profile */
+$('#asv').onclick=async()=>{const nu=$('#anu').value.trim().toLowerCase(),np=$('#anp').value,cp=$('#acp').value;
+ if(!nu&&!np)return toast('Nothing to change');if(!cp)return toast('Enter your current password');
+ const r=await post('/api/auth',{action:'update',username:user,password:cp,newUsername:nu,newPassword:np}).catch(()=>null),j=r?await r.json().catch(()=>({})):{};
+ if(!r||!r.ok)return toast(j.error||'Could not update your account');
+ user=j.name;TOKEN=j.token;try{localStorage.setItem('hesTok',TOKEN)}catch{};$('#anu').value='';$('#anp').value='';$('#acp').value='';toast('Account updated');dash()};
 async function dash(){const h=new Date().getHours();$('#gr').textContent=h<5?'Good night':h<12?'Good morning':h<18?'Good afternoon':'Good evening';
  $('#nm').textContent=user;$('#ex').textContent='Expired: '+new Date(exp||Date.now()).toISOString().slice(0,10);
  const tick=()=>{const d=new Date();$('#clk').textContent=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});$('#dt').textContent=d.toLocaleDateString([],{weekday:'long',day:'numeric',month:'long'})};
@@ -366,6 +408,7 @@ const saveP=async reset=>{const pw=$('#pw').value;if(!pw)return toast('Enter you
  const r=await post('/api/profile',{u:user,p:pw,photo:pend,reset}).catch(()=>null);if(!r)return toast('Server unreachable, try again');
  const j=await r.json().catch(()=>({}));if(!r.ok)return toast(j.error||'Something went wrong');$('#pm').classList.remove('on');toast('Profile updated');dash()};
 $('#ps').onclick=()=>saveP(false);$('#pr').onclick=()=>saveP(true);
+$('#zm').onclick=()=>$('#zm').classList.remove('on');
 /* files : style Play Store */
 const DLI=S('<path d="M12 5v14M5 12l7 7 7-7"/>');
 const ext=i=>((i.name||'').split('.').pop()||'FILE').toUpperCase().slice(0,4);
@@ -376,14 +419,20 @@ async function loadFiles(){$('#fl').innerHTML='<p class="sub" style="margin:0">L
  catch{$('#fl').innerHTML='<p class="sub" style="margin:0">Could not load the files. Try again later.</p>'}}
 $('#sb').onclick=()=>{const o=$('#files .top').classList.toggle('s');if(o)$('#q').focus();else{$('#q').value='';render()}};$('#q').oninput=()=>render();
 async function start(d){const i=LIST.find(x=>x.id===d.dataset.id),sp=d.querySelector('.tx2');if(!i||d.classList.contains('go'))return;
+ if(d.dataset.need&&PROF.badge!==d.dataset.need)return toast('This file needs the '+d.dataset.need+' badge');
  const w=tgw(),id=encodeURIComponent(i.id),deep=`https://t.me/${BOT}?start=f_${i.id}`,url='/api/file?k=dl&id='+id;
  const fin=ok=>{sp.textContent=ok?'Done ✓':'Failed';d.classList.add(ok?'done':'err');setTimeout(()=>{d.classList.remove('go','done','err');sp.textContent='Download'},2500)};
  d.classList.add('go');sp.textContent='Downloading…';
- try{if(i.size>19e6||!(await fetch('/api/file?k=chk&id='+id)).ok){w&&w.openTelegramLink?w.openTelegramLink(deep):window.open(deep,'_blank');return fin(true)}
-  if(w&&w.initData){if(w.isVersionAtLeast&&w.isVersionAtLeast('8.0')&&w.downloadFile)w.downloadFile({url:location.origin+url,file_name:i.dn||i.name||'file'});else w.openTelegramLink(deep)}
-  else location.href=url;fin(true)}
- catch{fin(false);toast('Not available right now. Try again later.')}}
-$('#app').addEventListener('click',async e=>{const o=e.target.closest('[data-o]');if(o)return openDetail(o.dataset.o);const d=e.target.closest('.cb');if(d)return start(d);
+ try{
+  const chk=await fetch('/api/file?k=chk&id='+id,{headers:auth()});
+  if(!chk.ok){const j=await chk.json().catch(()=>({}));toast(j.error||'Not available right now. Try again later.');return fin(false)}
+  if(i.size>19e6){   // gros fichier : passe par le bot Telegram
+   if(w&&w.openTelegramLink)w.openTelegramLink(deep);else window.open(deep,'_blank');return fin(true)}
+  if(w&&w.initData&&w.isVersionAtLeast&&w.isVersionAtLeast('8.0')&&w.downloadFile)w.downloadFile({url:location.origin+url,file_name:i.dn||i.name||'file'});
+  else location.href=url+'&t='+encodeURIComponent(TOKEN);
+  fin(true)
+ }catch{fin(false);toast('Not available right now. Try again later.')}}
+$('#app').addEventListener('click',async e=>{const zi=e.target.closest('.pv2');if(zi){$('#zi').src=zi.src;$('#zm').classList.add('on');return}const o=e.target.closest('[data-o]');if(o)return openDetail(o.dataset.o);const d=e.target.closest('.cb');if(d)return start(d);
  const p=e.target.closest('.ds');if(p)return p.classList.toggle('open');
  const b=e.target.closest('.lk');if(!b)return;const on=!b.classList.contains('on');
  const r=await post('/api/like',{id:b.dataset.id,v:user,on}).catch(()=>null);if(!r||!r.ok)return toast('Try again in a moment');
@@ -394,6 +443,33 @@ $('#cf').onsubmit=async e=>{e.preventDefault();const t=$('#ct').value.trim();if(
  catch{toast('Server unreachable, try again')}finally{b.disabled=false}};
 /* chat public */
 setInterval(()=>{if(cur==='chat'&&!document.hidden)chat()},5000);
+
+/* ---- pub du site (page ou média), une fois par session ---- */
+async function showAd(){if(ADSHOWN)return;ADSHOWN=true;
+ try{const ad=await (await fetch('/api/comments?k=ad')).json();if(!ad)return;
+  const box=$('#adbox'),x=$('#adx');box.querySelectorAll(':scope > *:not(.adx)').forEach(n=>n.remove());x.classList.remove('on');
+  const closeIn=s=>{x.classList.remove('on');clearTimeout(showAd._t);showAd._t=setTimeout(()=>x.classList.add('on'),Math.max(0,Math.min(20,s||5))*1000)};
+  if(ad.type==='page'){const f=document.createElement('iframe');f.src=ad.url;box.insertBefore(f,x);closeIn(ad.delay)}
+  else if(ad.type==='media'){
+   const cap=document.createElement('div');cap.className='adcap';cap.innerHTML=(ad.text?`<p>${esc(ad.text)}</p>`:'')+(ad.link?`<a href="${esc(ad.link)}" target="_blank" rel="noopener">Open link →</a>`:'');
+   if(ad.video){const v=document.createElement('video');v.src='/api/media?k='+encodeURIComponent(ad.video);v.autoplay=true;v.muted=true;v.playsInline=true;v.controls=true;
+    box.insertBefore(v,x);box.appendChild(cap);
+    if(ad.photo)v.onended=()=>{v.remove();const im=document.createElement('img');im.src='/api/media?k='+encodeURIComponent(ad.photo);box.insertBefore(im,x)};
+    closeIn(ad.delay)}
+   else if(ad.photo){const im=document.createElement('img');im.src='/api/media?k='+encodeURIComponent(ad.photo);box.insertBefore(im,x);box.appendChild(cap);closeIn(ad.delay)}
+  } else return;
+  $('#adm').classList.add('on')
+ }catch{}}
+$('#adx').onclick=()=>$('#adm').classList.remove('on');
+/* ---- notifications envoyées par les admins ---- */
+let lastNotif=localStorage.getItem('hesNotif')||'';
+async function pollNotif(){if(!user)return;try{const l=await (await fetch('/api/comments?k=notif')).json();const n=l[0];
+ if(n&&n.id!==lastNotif){lastNotif=n.id;try{localStorage.setItem('hesNotif',n.id)}catch{}
+  const box=$('#ntf');box.textContent='🔔 '+n.text;box.classList.add('on');setTimeout(()=>box.classList.remove('on'),5000);
+  if('Notification' in window){if(Notification.permission==='default')Notification.requestPermission();if(Notification.permission==='granted')new Notification("H'es Store",{body:n.text})}}
+ }catch{}}
+setInterval(()=>{if(!document.hidden)pollNotif()},15000);
+
 
 /* ---- liste Play Store + page détail ---- */
 const ico=i=>i.hasImg?'/api/file?k=img&id='+encodeURIComponent(i.id):'';
@@ -407,7 +483,7 @@ render=()=>{const q=$('#q').value.trim().toLowerCase(),rows=LIST.filter(i=>!q||(
 function openDetail(id){const i=LIST.find(x=>x.id===id);if(!i)return;const mb=i.size?(i.size/1048576).toFixed(1)+' MB':'—',e=esc(ext(i));
  $('#db').innerHTML=`<div class="r1 rv"><img class="ic2" style="width:96px;height:96px" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3 style="white-space:normal;font-size:19px">${esc(i.title)}</h3><small class="au">H'es Team</small></div></div>
  <div class="stats rv"><div><b>${i.rn?i.rt+' ★':'—'}</b><small>${i.rn||0} ratings</small></div><div><b>${i.dls}</b><small>Downloads</small></div><div><b>${e}</b><small>${mb}</small></div></div>
- <button class="cb rv" data-id="${esc(i.id)}"><span class="cb__eyes"><span class="cb__eye"><span class="cb__pupil"></span></span><span class="cb__eye"><span class="cb__pupil"></span></span></span><span class="cb__cover tx2">Download</span></button>
+ <button class="cb rv" data-id="${esc(i.id)}" ${i.badge?`data-need="${i.badge}"`:""}><span class="cb__eyes"><span class="cb__eye"><span class="cb__pupil"></span></span><span class="cb__eye"><span class="cb__pupil"></span></span></span><span class="cb__cover tx2">Download</span></button>
  <button class="lk rv${i.mine?' on':''}" data-id="${esc(i.id)}" style="margin-top:14px">❤ <span>${i.likes}</span>&nbsp; Like</button>
  ${i.ns?`<div class="hc rv" style="margin-top:18px">${Array.from({length:i.ns},(_,n)=>`<img class="pv2" src="/api/file?k=img&id=${encodeURIComponent(i.id)}&n=${n}" alt="" loading="lazy">`).join('')}</div>`:i.hasImg?`<div class="hc rv" style="margin-top:18px"><img class="pv2" src="${ico(i)}" alt=""></div>`:''}
  <div class="hs rv"><h3>About this app</h3></div><p class="ds open rv">${esc(i.desc)}</p><div class="chips rv"><span>${e}</span><span>H'es Store</span></div>
@@ -444,7 +520,7 @@ function mediaHTML(x){const m=x.media,u=mUrl(m.k),sv=`<button class="dlm" data-s
 function msgHTML(x){const me=x.name===user,sk=x.sticker,md=x.media;
  const inner=sk?`<img class="stk" data-p="${esc(sk.p)}" src="${sImg(sk.p,sk.s)}" alt="sticker">`:md?mediaHTML(x):`<p>${esc(x.text)}</p>`;
  const q=x.re?`<div class="qt"><b>${esc(x.re.name)}</b> ${esc(x.re.t)}</div>`:'';
- return `<div class="mg${me?' me':''}">${avw(x.name,x.badge)}<div class="bb${x.admin?' ad':''}${sk||md?' nb':''}"><b class="nm">${esc(x.name)}${x.admin?' ✔':''}</b>${q}${inner}${x.edited?'<small>edited</small>':''}<div class="ac-row"><button class="ac" data-r="${esc(x.id)}" aria-label="Reply">↩</button>${me&&!sk&&!md?`<button class="ac" data-e="${esc(x.id)}" aria-label="Edit">✎</button>`:''}</div></div><span class="tm">${tm(x.ts)}</span></div>`}
+ return `<div class="mg${me?' me':''}">${avw(x.name,x.badge)}<div class="bb${x.admin?' ad':''}${sk||md?' nb':''}"><b class="nm">${esc(x.name)}${x.admin?' ✔':''}</b>${q}${inner}${x.edited?'<small>edited</small>':''}<div class="ac-row"><button class="ac" data-r="${esc(x.id)}" aria-label="Reply">↩</button>${me&&!sk&&!md?`<button class="ac" data-e="${esc(x.id)}" aria-label="Edit">✎</button>`:''}${me?`<button class="ac" data-del="${esc(x.id)}" aria-label="Delete">🗑</button>`:''}</div></div><span class="tm">${tm(x.ts)}</span></div>`}
 async function chat(force){try{if(!force&&$$('#ch audio,#ch video').some(a=>!a.paused))return;
  const c=await (await fetch('/api/comments?k=chat'+(force?'&t='+Date.now():''))).json(),k=JSON.stringify(c);if(!force&&k===last)return;last=k;CHAT=c;
  const box=$('#ch'),end=box.scrollTop+box.clientHeight>=box.scrollHeight-40;
@@ -472,6 +548,7 @@ async function toggleRec(){if(rec){rec.stop();return}
   rc.start();$('#go').classList.add('rec');
   recI=setInterval(()=>{const s=Math.round((Date.now()-recT)/1000);$('#cx').placeholder='● Recording '+s+'s — tap to send';if(s>=60)rc.stop()},500);
  }catch{toast('Microphone not available')}}
+async function aboutStats(){try{const j=await (await fetch('/api/stats')).json();$('#a1').textContent=j.accounts??'–';$('#a2').textContent=j.files??'–';$('#a3').textContent=j.downloads??'–';$('#a4').textContent=j.likes??'–'}catch{}}
 $('#chf').onsubmit=e=>{e.preventDefault();sendText()};
 $('#go').onclick=()=>$('#cx').value.trim()?sendText():toggleRec();
 $('#cx').oninput=goIcon;
@@ -485,6 +562,7 @@ document.addEventListener('click',async e=>{const t=e.target;
  const k=t.closest('.stk');if(k){await post('/api/stickers',{add:k.dataset.p}).catch(()=>{});return toast('Pack added to your stickers 😊')}
  const r=t.closest('[data-r]');if(r){const m=CHAT.find(x=>x.id===r.dataset.r);if(m){replyTo=m;$('#rt').textContent='↩ '+m.name+': '+(m.text||(m.sticker?'😊 Sticker':'📎 Media')).slice(0,50);$('#rb').hidden=false;$('#cx').focus()}return}
  const ed=t.closest('[data-e]');if(ed){const m=CHAT.find(x=>x.id===ed.dataset.e);if(m){editId=m.id;$('#cx').value=m.text;$('#cx').focus();$('#ed').hidden=false;goIcon()}return}
+ const dl2=t.closest('[data-del]');if(dl2){if(!confirm('Delete this message?'))return;const r=await fetch('/api/comments?k=chat',{method:'DELETE',headers:{'content-type':'application/json',...auth()},body:JSON.stringify({id:dl2.dataset.del})}).catch(()=>null);if(r&&r.ok)chat(true);return}
  const sv=t.closest('[data-sv]');if(sv)saveFile(mUrl(sv.dataset.sv,1),sv.dataset.n)});
 const ch=$('#ch');
 ch.addEventListener('click',e=>{const b=e.target.closest('.pp2');if(!b)return;const a=b.parentNode.querySelector('audio');$$('#ch audio').forEach(x=>{if(x!==a)x.pause()});a.paused?a.play():a.pause()});
@@ -523,8 +601,12 @@ $('#db').addEventListener('click',async e=>{const s=e.target.closest('[data-rs]'
  const r=await post('/api/comments?k=rev',{id:b.dataset.id,stars:RSTAR,text:$('#rt2').value}).catch(()=>null),j=r?await r.json().catch(()=>({})):{};
  if(!r||!r.ok)return toast(j.error||'Could not send your review');
  const i=LIST.find(x=>x.id===b.dataset.id);if(i){i.rt=j.avg;i.rn=j.n}toast('Thanks for your review ★');loadReviews(b.dataset.id)});
+
+/* ---- quitter le site : confirmation solide ---- */
+history.pushState({h:1},'');
+window.addEventListener('popstate',()=>{history.pushState({h:1},'');if(confirm('Leave H\'es Store?'))history.go(-2)});
+window.addEventListener('beforeunload',e=>{e.preventDefault();e.returnValue=''});
 /* ---- effet d'apparition au scroll ---- */
 let io;function reveal(id){io&&io.disconnect();io=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('in',e.isIntersecting)),{rootMargin:'0px 0px -6% 0px'});$$('#'+id+' .rv').forEach(r=>{r.classList.remove('in');io.observe(r)})}
 $$('.body>*,.wrap>*:not(.bk),.sc,.st').forEach(e=>e.classList.add('rv'));reveal('home');
 </script></body></html>
-
