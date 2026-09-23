@@ -1,4 +1,6 @@
-import { redis, tg, admins, isAdmin, BRAND, brandName } from '../lib/db.js';
+import { randomBytes } from 'node:crypto';
+import { del } from '@vercel/blob';
+import { redis, tg, admins, isAdmin, BRAND, brandName, siteUrl } from '../lib/db.js';
 import { PICS, WELCOME_PIC } from '../lib/pics.js';
 export const config = { maxDuration: 60 };
 
@@ -13,7 +15,8 @@ const HELP = `📥 Ajouter : envoie une photo avec en légende le titre (ligne 1
 /badge pseudo blue|gold|off — donner un badge
 /badges — voir les badges
 /edit id — répondre avec /edit id, puis titre et description sur 2 lignes
-/restrict id blue|gold|off — réserver un fichier aux détenteurs d'un badge
+/restrict id blue|gold|off — réserver un fichier à un badge (gold peut tout télécharger, blue pas les fichiers gold)
+/upload id — lien pour envoyer un gros fichier (>20 Mo) sur le site : téléchargement direct
 /notify texte — notification envoyée à tous (site + Telegram)
 /ad off — désactiver la pub du site
 /ad page url délai(≤20s) — pub = ta page d'accueil, croix après le délai
@@ -41,6 +44,13 @@ async function group(m) {
   const l = m.left_chat_member;
   if (l && !l.is_bot)
     await tg('sendMessage', { chat_id: m.chat.id, parse_mode: 'HTML', text: `👋 ${nm(l)} a quitté le groupe. À bientôt !`, reply_markup: BTN });
+}
+
+// lien d'envoi (valable 1 h) d'un gros fichier vers le stockage du site pour la publication `item`
+async function upLink(item) {
+  const tok = randomBytes(16).toString('hex');
+  await redis.set('upt:' + tok, { item }, { ex: 3600 });
+  return `${siteUrl()}/upload.html?k=${tok}`;
 }
 
 // envoie le fichier sous le nom « H'ES SHOP - Titre.ext » (re-envoi si < 20 Mo, sinon file_id d'origine)
@@ -184,7 +194,13 @@ async function handle(m) {
     const a = Object.values(await redis.hgetall('items') || {});
     return say(a.map(i => `${i.id} — ${i.title}`).join('\n') || 'Aucune publication');
   }
+  if (cmd === '/upload') {
+    if (!arg || !await redis.hexists('items', arg)) return say('Usage : /upload id (voir /list)');
+    return say(`📤 Ouvre ce lien (valable 1 h) pour envoyer le fichier sur le site :\n${await upLink(arg)}`);
+  }
   if (cmd === '/del' && arg) {
+    const old = await redis.hget('items', arg);
+    if (old?.blob) await del(old.blob).catch(() => {});
     const n = await redis.hdel('items', arg);
     await redis.hdel('likes', arg); await redis.del('lk:' + arg); await redis.hdel('rat', arg); await redis.del('rv:' + arg);
     return say(n ? '🗑 Publication supprimée' : '❌ ID introuvable (voir /list)');
@@ -213,6 +229,7 @@ async function handle(m) {
     const it = { id: Date.now().toString(36), ...d, file: m.document.file_id, name: m.document.file_name, size: m.document.file_size, ts: Date.now() };
     await redis.hset('items', { [it.id]: it });
     await redis.del('draft:' + id);
+    if (it.size > 19e6) return say(`✅ Publié : ${it.title}\nID : ${it.id}\n\n⚠️ Fichier de plus de 20 Mo : pour qu'il se télécharge directement sur le site (au lieu de passer par Telegram), envoie-le ici (lien valable 1 h) :\n${await upLink(it.id)}`);
     return say(`✅ Publié sur le site : ${it.title}\nID : ${it.id}`);
   }
   return say(HELP);
