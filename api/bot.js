@@ -17,7 +17,7 @@ const HELP = `📥 Ajouter : envoie une photo avec en légende le titre (ligne 1
 /badges — voir les badges
 /edit id — répondre avec /edit id, puis titre et description sur 2 lignes
 /restrict id blue|gold|off — réserver un fichier à un badge (gold peut tout télécharger, blue pas les fichiers gold)
-/upload id — lien pour envoyer un gros fichier (>20 Mo) sur le site : téléchargement direct
+/upload — liens pour envoyer sur le site tous les gros fichiers (>20 Mo) pas encore en téléchargement direct\n/upload id — idem pour un seul fichier
 /notify texte — notification envoyée à tous (site + Telegram)
 /ad off — désactiver la pub du site
 /ad page url délai(≤20s) — pub = ta page d'accueil, croix après le délai
@@ -194,6 +194,12 @@ async function handle(m) {
   if (cmd === '/list') {
     const a = Object.values(await redis.hgetall('items') || {});
     return say(a.map(i => `${i.id} — ${i.title}`).join('\n') || 'Aucune publication');
+  }
+  if (cmd === '/upload' && !arg) {
+    const todo = Object.values(await redis.hgetall('items') || {}).filter(i => !i.blob && (Number(i.size) > 19e6 || !i.size));
+    if (!todo.length) return say('✅ Rien à envoyer : tous les fichiers sont déjà en téléchargement direct (ou font moins de 20 Mo).');
+    for (const i of todo.slice(0, 15)) await say(`📤 ${i.title} (ID ${i.id})\n${await upLink(i.id)}`);
+    return say('Ouvre chaque lien (valable 1 h) et choisis le fichier correspondant sur ton téléphone.');
   }
   if (cmd === '/upload') {
     if (!arg || !await redis.hexists('items', arg)) return say('Usage : /upload id (voir /list)');
