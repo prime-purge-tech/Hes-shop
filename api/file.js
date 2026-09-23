@@ -1,5 +1,5 @@
 import { Readable } from 'node:stream';
-import { redis, tg, brandName, cdisp, whoami } from '../lib/db.js';
+import { redis, tg, brandName, cdisp, whoami, admins } from '../lib/db.js';
 // Hiérarchie des badges : gold peut tout télécharger, blue pas les fichiers gold
 const RANK = { blue: 1, gold: 2 };
 const canGet = (need, mine) => !need || (RANK[mine] || 0) >= (RANK[need] || 99);
@@ -19,7 +19,6 @@ export default async (req, res) => {
   // img = photo principale, img&n=0.. = captures d'écran, sinon le fichier
   const fid = k === 'img' ? (n != null ? (it.shots || [])[Number(n)] : it.photo) : (it.file || it.blob);
   if (!fid) return res.status(404).end();
-  const deep = `https://t.me/${process.env.BOT_USERNAME}?start=f_${encodeURIComponent(String(id))}`;
 
   if (k === 'dl' || k === 'chk') {
     const need = await redis.hget('restrict', String(id));
@@ -36,7 +35,9 @@ export default async (req, res) => {
       big = Number(it.size) > BIG;
       if (!big) { const g = await tg('getFile', { file_id: it.file }); if (!g.ok) big = true; }
     }
-    return res.json({ ok: true, big, deep });
+    if (big && await redis.set('nb:' + id, 1, { nx: true, ex: 86400 }))   // prévient les admins (1 fois par jour et par fichier)
+      await Promise.all((await admins()).map(a => tg('sendMessage', { chat_id: a, text: `⚠️ Quelqu'un veut télécharger « ${it.title} » mais ce fichier n'est pas encore en téléchargement direct.\nEnvoie /upload ${it.id} pour l'envoyer sur le site.` }).catch(() => {})));
+    return res.json({ ok: true, big });
   }
 
   if (k === 'dl' && it.blob) {
@@ -52,13 +53,13 @@ export default async (req, res) => {
     return Readable.fromWeb(b.stream).pipe(res);
   }
 
-  if (k === 'dl' && Number(it.size) > BIG) { await redis.hincrby('dls', String(id), 1); return res.redirect(302, deep); }
+  if (k === 'dl' && Number(it.size) > BIG) return res.status(409).json({ error: 'Direct download not ready' });
 
   const g = await tg('getFile', { file_id: fid });
-  if (!g.ok) return k === 'dl' ? res.redirect(302, deep) : res.status(404).end();
+  if (!g.ok) return k === 'dl' ? res.status(409).json({ error: 'Direct download not ready' }) : res.status(404).end();
   if (k === 'dl') await redis.hincrby('dls', String(id), 1);
   const r = await fetch(`https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${g.result.file_path}`);
-  if (!r.ok || !r.body) return k === 'dl' ? res.redirect(302, deep) : res.status(502).end();
+  if (!r.ok || !r.body) return k === 'dl' ? res.status(409).json({ error: 'Direct download not ready' }) : res.status(502).end();
   if (k === 'img') {
     res.setHeader('Content-Type', 'image/jpeg');
     res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=86400');
