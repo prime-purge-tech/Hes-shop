@@ -1,6 +1,7 @@
 import { randomBytes } from 'node:crypto';
-import { del } from '@vercel/blob';
-import { redis, tg, admins, isAdmin, BRAND, brandName, siteUrl } from '../lib/db.js';
+import { redis, tg, admins, isAdmin, BRAND, brandName } from '../lib/db.js';
+const siteUrl = () => (process.env.SITE_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL ? 'https://' + process.env.VERCEL_PROJECT_PRODUCTION_URL : '')).replace(/\/$/, '');
+const delBlob = async u => { try { const { del } = await import('@vercel/blob'); await del(u); } catch {} };
 import { PICS, WELCOME_PIC } from '../lib/pics.js';
 export const config = { maxDuration: 60 };
 
@@ -200,7 +201,7 @@ async function handle(m) {
   }
   if (cmd === '/del' && arg) {
     const old = await redis.hget('items', arg);
-    if (old?.blob) await del(old.blob).catch(() => {});
+    if (old?.blob) await delBlob(old.blob);
     const n = await redis.hdel('items', arg);
     await redis.hdel('likes', arg); await redis.del('lk:' + arg); await redis.hdel('rat', arg); await redis.del('rv:' + arg);
     return say(n ? '🗑 Publication supprimée' : '❌ ID introuvable (voir /list)');
