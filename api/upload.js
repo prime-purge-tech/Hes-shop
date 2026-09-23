@@ -1,5 +1,3 @@
-import { handleUploadPresigned } from '@vercel/blob/client';
-import { del, issueSignedToken } from '@vercel/blob';
 import { redis, tg, admins } from '../lib/db.js';
 
 // Envoi de gros fichiers vers Vercel Blob, directement depuis le navigateur de l'admin.
@@ -8,6 +6,8 @@ const okHost = u => { try { const h = new URL(u); return h.protocol === 'https:'
 
 export default async (req, res) => {
   try {
+    const { handleUploadPresigned } = await import('@vercel/blob/client');
+    const { del, issueSignedToken } = await import('@vercel/blob');
     // infos sur le lien d'envoi (titre de la publication)
     if (req.method === 'GET') {
       const t = await redis.get('upt:' + String(req.query.k || ''));
