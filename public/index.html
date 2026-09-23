@@ -222,6 +222,9 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 .adx.on{display:grid}.adt{position:absolute;top:10px;left:10px;background:#000a;color:#fff;border-radius:14px;padding:6px 12px;font-size:12px;z-index:2}
 .adcap{padding:14px;color:#fff;background:#0b0f1c}.adcap a{color:var(--cy);font-weight:600}
 #ntf{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%) translateY(-140%);width:min(92%,420px);background:#10182d;border:1px solid var(--cy);border-radius:16px;padding:12px 16px;z-index:70;transition:transform .4s}#ntf.on{transform:translateX(-50%) translateY(0)}
+.nbd{display:inline-block;width:15px;height:15px;vertical-align:-2px;margin-left:5px;filter:drop-shadow(0 0 3px var(--g))}.nbd svg{width:100%;height:100%;display:block}.nbd .s{fill:var(--f)}.nbd .ck{fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}.nbd.blue{--g:#1d9bf0;--f:#1d9bf0}.nbd.gold{--g:#ffd21f;--f:#f0b400}
+.rmo{position:fixed;inset:0;z-index:99;background:rgba(3,6,14,.72);display:grid;place-items:center;padding:20px;backdrop-filter:blur(3px)}.rmb{width:100%;max-width:340px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;text-align:center}.rmb h3{margin:0 0 4px;font-size:18px;word-break:break-word}.rmb p{margin:0 0 14px;color:var(--mut);font-size:14px}
+.rms{display:flex;justify-content:center;gap:4px}.rms button{background:none;border:0;color:#ffc107;font-size:34px;line-height:1;cursor:pointer;padding:2px}.rma{display:flex;gap:10px;margin-top:18px}.rma button{flex:1;padding:12px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--tx);font:600 14px sans-serif;cursor:pointer}.rma .sd{background:linear-gradient(135deg,var(--b1),var(--b2));border:0}
 </style></head><body><div id="app">
 
 <section class="screen on" id="home"><div class="wrap">
@@ -416,17 +419,39 @@ async function loadFiles(){$('#fl').innerHTML='<p class="sub" style="margin:0">L
   BOT=d.bot;LIST=d.items.map(i=>({...i,mine:m.includes(i.id)}));render()}
  catch{$('#fl').innerHTML='<p class="sub" style="margin:0">Could not load the files. Try again later.</p>'}}
 $('#sb').onclick=()=>{const o=$('#files .top').classList.toggle('s');if(o)$('#q').focus();else{$('#q').value='';render()}};$('#q').oninput=()=>render();
+/* ---- badges : gold peut tout télécharger, blue pas les fichiers gold ---- */
+const RK={blue:1,gold:2},can=(n,m)=>!n||(RK[m]||0)>=(RK[n]||99),nb=b=>b?`<span class="nbd ${b}" title="${b==='gold'?'Gold badge only':'Blue & Gold badges'}">${BD}</span>`:'';
+/* ---- note (1 à 5 étoiles) demandée avant le téléchargement, on peut passer ---- */
+let RATED={};try{RATED=JSON.parse(localStorage.getItem('hesRated')||'{}')}catch{}
+function askRate(i){return new Promise(res=>{
+ const key=user+':'+i.id;if(!TOKEN||!user||RATED[key])return res();
+ let n=0;const m=document.createElement('div');m.className='rmo';
+ m.innerHTML=`<div class="rmb"><h3>${esc(i.title)}</h3><p>Rate this file before downloading</p><div class="rms">${[1,2,3,4,5].map(x=>`<button type="button" data-n="${x}" aria-label="${x} stars">☆</button>`).join('')}</div><div class="rma"><button type="button" class="sk">Skip</button><button type="button" class="sd">Rate &amp; download</button></div></div>`;
+ document.body.appendChild(m);
+ const end=()=>{m.remove();res()};
+ m.onclick=async e=>{
+  const s=e.target.closest('[data-n]');
+  if(s){n=+s.dataset.n;m.querySelectorAll('.rms button').forEach((b,x)=>b.textContent=x<n?'★':'☆');return}
+  if(e.target===m||e.target.closest('.sk'))return end();
+  if(e.target.closest('.sd')){
+   if(!n)return toast('Choose 1 to 5 stars');
+   const r=await post('/api/comments?k=rev',{id:i.id,stars:n,text:''}).catch(()=>null);
+   if(r&&r.ok){RATED[key]=1;try{localStorage.setItem('hesRated',JSON.stringify(RATED))}catch{}toast('Thanks for your rating!')}else toast('Could not send your rating');
+   end()}}
+})}
 async function start(d){const i=LIST.find(x=>x.id===d.dataset.id),sp=d.querySelector('.tx2');if(!i||d.classList.contains('go'))return;
- if(d.dataset.need&&PROF.badge!==d.dataset.need)return toast('This file needs the '+d.dataset.need+' badge');
+ if(!can(d.dataset.need,PROF.badge))return toast('This file needs the '+(d.dataset.need==='gold'?'gold':'blue or gold')+' badge');
  const w=tgw(),id=encodeURIComponent(i.id),deep=`https://t.me/${BOT}?start=f_${i.id}`,url='/api/file?k=dl&id='+id;
  const fin=ok=>{sp.textContent=ok?'Done ✓':'Failed';d.classList.add(ok?'done':'err');setTimeout(()=>{d.classList.remove('go','done','err');sp.textContent='Download'},2500)};
  d.classList.add('go');sp.textContent='Downloading…';
  try{
   const chk=await fetch('/api/file?k=chk&id='+id,{headers:auth()});
-  if(!chk.ok){const j=await chk.json().catch(()=>({}));toast(j.error||'Not available right now. Try again later.');return fin(false)}
-  if(i.size>19e6){   // gros fichier : passe par le bot Telegram
+  const cj=await chk.json().catch(()=>({}));
+  if(!chk.ok){toast(cj.error||'Not available right now. Try again later.');return fin(false)}
+  await askRate(i);
+  if(cj.big){   // gros fichier : passe par le bot Telegram
    if(w&&w.openTelegramLink)w.openTelegramLink(deep);else window.open(deep,'_blank');return fin(true)}
-  if(w&&w.initData&&w.isVersionAtLeast&&w.isVersionAtLeast('8.0')&&w.downloadFile)w.downloadFile({url:location.origin+url,file_name:i.dn||i.name||'file'});
+  if(w&&w.initData&&w.isVersionAtLeast&&w.isVersionAtLeast('8.0')&&w.downloadFile)w.downloadFile({url:location.origin+url+'&t='+encodeURIComponent(TOKEN),file_name:i.dn||i.name||'file'});
   else{   // navigateur normal : téléchargement sans quitter la page (pas de popup "Quitter ce site ?")
    const a=document.createElement('a');a.href=url+'&t='+encodeURIComponent(TOKEN);a.download=i.dn||i.name||'file';
    document.body.appendChild(a);a.click();a.remove();
@@ -474,15 +499,15 @@ setInterval(()=>{if(!document.hidden)pollNotif()},15000);
 
 /* ---- liste Play Store + page détail ---- */
 const ico=i=>i.hasImg?'/api/file?k=img&id='+encodeURIComponent(i.id):'';
-const tc=i=>`<div class="tc" data-o="${esc(i.id)}"><img src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><b>${esc(i.title)}</b><small>${i.rn?i.rt+' ★':'New'} · ⬇ ${i.dls}</small></div>`;
+const tc=i=>`<div class="tc" data-o="${esc(i.id)}"><img src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><b>${esc(i.title)}${nb(i.badge)}</b><small>${i.rn?i.rt+' ★':'New'} · ⬇ ${i.dls}</small></div>`;
 render=()=>{const q=$('#q').value.trim().toLowerCase(),rows=LIST.filter(i=>!q||(i.title+' '+i.desc).toLowerCase().includes(q));
  const feat=[...LIST].sort((a,b)=>b.dls-a.dls||b.ts-a.ts).slice(0,5),rec=[...LIST].sort((a,b)=>b.ts-a.ts).slice(0,12);
- const bn=i=>`<div class="bn" data-o="${esc(i.id)}"><img class="bimg" src="${ico(i)}" alt="" onerror="this.remove()"><div class="bo"><h3>${esc(i.title)}</h3><p>${esc((i.desc||'').split('\n')[0].slice(0,60))}</p><div class="bl"><img class="ic3" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div><b>${esc(i.title)}</b><small>${i.rn?i.rt+' ★ · ':''}⬇ ${i.dls}</small></div><span class="gt">Get</span></div></div></div>`;
+ const bn=i=>`<div class="bn" data-o="${esc(i.id)}"><img class="bimg" src="${ico(i)}" alt="" onerror="this.remove()"><div class="bo"><h3>${esc(i.title)}</h3><p>${esc((i.desc||'').split('\n')[0].slice(0,60))}</p><div class="bl"><img class="ic3" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div><b>${esc(i.title)}${nb(i.badge)}</b><small>${i.rn?i.rt+' ★ · ':''}⬇ ${i.dls}</small></div><span class="gt">Get</span></div></div></div>`;
  $('#fl').innerHTML=(q||!LIST.length?'':`<div class="hb">${feat.map(bn).join('')}</div><div class="hs"><h3>Recommended</h3></div><div class="hc auto">${rec.map(tc).join('')}</div><div class="hs"><h3>All apps</h3></div>`)
- +(rows.map(i=>`<div class="pr rv" data-o="${esc(i.id)}"><img class="ic2" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3>${esc(i.title)}</h3><small>${esc(ext(i))}${sz(i.size)}</small><small>${i.rn?i.rt+' ★':'New'} &nbsp; ⬇ ${i.dls} &nbsp; ❤ ${i.likes}</small></div></div>`).join('')||emptyHTML);
+ +(rows.map(i=>`<div class="pr rv" data-o="${esc(i.id)}"><img class="ic2" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3>${esc(i.title)}${nb(i.badge)}</h3><small>${esc(ext(i))}${sz(i.size)}</small><small>${i.rn?i.rt+' ★':'New'} &nbsp; ⬇ ${i.dls} &nbsp; ❤ ${i.likes}</small></div></div>`).join('')||emptyHTML);
  reveal('files')};
 function openDetail(id){const i=LIST.find(x=>x.id===id);if(!i)return;const mb=i.size?(i.size/1048576).toFixed(1)+' MB':'—',e=esc(ext(i));
- $('#db').innerHTML=`<div class="r1 rv"><img class="ic2" style="width:96px;height:96px" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3 style="white-space:normal;font-size:19px">${esc(i.title)}</h3><small class="au">H'es Team</small></div></div>
+ $('#db').innerHTML=`<div class="r1 rv"><img class="ic2" style="width:96px;height:96px" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3 style="white-space:normal;font-size:19px">${esc(i.title)}${nb(i.badge)}</h3><small class="au">H'es Team</small>${i.badge?`<small class="au">🔒 ${i.badge==='gold'?'Gold badge only':'Blue &amp; Gold badges'}</small>`:''}</div></div>
  <div class="stats rv"><div><b>${i.rn?i.rt+' ★':'—'}</b><small>${i.rn||0} ratings</small></div><div><b>${i.dls}</b><small>Downloads</small></div><div><b>${e}</b><small>${mb}</small></div></div>
  <button class="cb rv" data-id="${esc(i.id)}" ${i.badge?`data-need="${i.badge}"`:""}><span class="cb__eyes"><span class="cb__eye"><span class="cb__pupil"></span></span><span class="cb__eye"><span class="cb__pupil"></span></span></span><span class="cb__cover tx2">Download</span></button>
  <button class="lk rv${i.mine?' on':''}" data-id="${esc(i.id)}" style="margin-top:14px">❤ <span>${i.likes}</span>&nbsp; Like</button>
