@@ -1,6 +1,9 @@
 import { Readable } from 'node:stream';
-import { get } from '@vercel/blob';
-import { redis, tg, brandName, cdisp, whoami, canGet, needMsg } from '../lib/db.js';
+import { redis, tg, brandName, cdisp, whoami } from '../lib/db.js';
+// Hiérarchie des badges : gold peut tout télécharger, blue pas les fichiers gold
+const RANK = { blue: 1, gold: 2 };
+const canGet = (need, mine) => !need || (RANK[mine] || 0) >= (RANK[need] || 99);
+const needMsg = need => need === 'gold' ? 'This file needs the gold badge' : 'This file needs the blue or gold badge';
 export const config = { maxDuration: 60 };
 
 // Deux sources de fichiers :
@@ -40,6 +43,7 @@ export default async (req, res) => {
     await redis.hincrby('dls', String(id), 1);
     if (!/\.private\.blob\./.test(it.blob)) return res.redirect(302, dlUrl(it.blob));   // store public : téléchargement direct
     // store privé : le site lit le fichier et le renvoie (garde le lien secret)
+    const { get } = await import('@vercel/blob');
     const b = await get(it.blob, { access: 'private' });
     if (!b || b.statusCode !== 200) return res.status(404).end();
     res.setHeader('Content-Type', /\.apk$/i.test(it.name || '') ? 'application/vnd.android.package-archive' : 'application/octet-stream');
