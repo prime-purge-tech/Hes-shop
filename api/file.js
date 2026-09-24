@@ -1,5 +1,5 @@
 import { Readable } from 'node:stream';
-import { redis, tg, brandName, cdisp, whoami, admins } from '../lib/db.js';
+import { redis, tg, brandName, cdisp, whoami } from '../lib/db.js';
 // Hiérarchie des badges : gold peut tout télécharger, blue pas les fichiers gold
 const RANK = { blue: 1, gold: 2 };
 const canGet = (need, mine) => !need || (RANK[mine] || 0) >= (RANK[need] || 99);
@@ -10,6 +10,8 @@ export const config = { maxDuration: 60 };
 //  - it.blob : fichier stocké sur Vercel Blob (tout poids) -> redirection directe, téléchargement sur le site
 //  - it.file : file_id Telegram -> flux via le site si <= 20 Mo (limite de l'API Bot), sinon via le bot
 const BIG = 19e6;
+// lien du bot qui renvoie le fichier dans Telegram (gros fichiers > 20 Mo)
+const deepOf = id => `https://t.me/${process.env.BOT_USERNAME}?start=f_${encodeURIComponent(String(id))}`;
 const dlUrl = u => u + (u.includes('?') ? '&' : '?') + 'download=1';
 
 export default async (req, res) => {
@@ -35,9 +37,7 @@ export default async (req, res) => {
       big = Number(it.size) > BIG;
       if (!big) { const g = await tg('getFile', { file_id: it.file }); if (!g.ok) big = true; }
     }
-    if (big && await redis.set('nb:' + id, 1, { nx: true, ex: 86400 }))   // prévient les admins (1 fois par jour et par fichier)
-      await Promise.all((await admins()).map(a => tg('sendMessage', { chat_id: a, text: `⚠️ Quelqu'un veut télécharger « ${it.title} » mais ce fichier n'est pas encore en téléchargement direct.\nEnvoie /upload ${it.id} pour l'envoyer sur le site.` }).catch(() => {})));
-    return res.json({ ok: true, big });
+    return res.json({ ok: true, big, deep: deepOf(id) });
   }
 
   if (k === 'dl' && it.blob) {
@@ -53,19 +53,21 @@ export default async (req, res) => {
     return Readable.fromWeb(b.stream).pipe(res);
   }
 
-  if (k === 'dl' && Number(it.size) > BIG) return res.status(409).json({ error: 'Direct download not ready' });
+  if (k === 'dl' && Number(it.size) > BIG) return res.redirect(302, deepOf(id));
 
   const g = await tg('getFile', { file_id: fid });
-  if (!g.ok) return k === 'dl' ? res.status(409).json({ error: 'Direct download not ready' }) : res.status(404).end();
+  if (!g.ok) return k === 'dl' ? res.redirect(302, deepOf(id)) : res.status(404).end();
   if (k === 'dl') await redis.hincrby('dls', String(id), 1);
   const r = await fetch(`https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${g.result.file_path}`);
-  if (!r.ok || !r.body) return k === 'dl' ? res.status(409).json({ error: 'Direct download not ready' }) : res.status(502).end();
+  if (!r.ok || !r.body) return k === 'dl' ? res.redirect(302, deepOf(id)) : res.status(502).end();
   if (k === 'img') {
     res.setHeader('Content-Type', 'image/jpeg');
     res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=86400');
   } else {
     res.setHeader('Content-Type', /\.apk$/i.test(it.name || '') ? 'application/vnd.android.package-archive' : 'application/octet-stream');
     res.setHeader('Content-Disposition', cdisp(brandName(it.title, it.name)));
+    const len = r.headers.get('content-length') || it.size;
+    if (len) res.setHeader('Content-Length', String(len));   // le navigateur affiche la taille du fichier
   }
   Readable.fromWeb(r.body).pipe(res);
 };
