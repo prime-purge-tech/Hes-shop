@@ -26,7 +26,8 @@ export default async (req, res) => {
     const need = await redis.hget('restrict', String(id));
     if (need) {
       const me = await whoami(req), mine = me && await redis.hget('badges', me);
-      if (!canGet(need, mine)) return res.status(403).json({ error: needMsg(need) });
+      if (!me) return res.status(401).json({ error: 'Please log in again to download this file' });
+      if (!canGet(need, mine)) return res.status(403).json({ error: needMsg(need) + ' (your badge: ' + (mine || 'none') + ')' });
     }
   }
 
