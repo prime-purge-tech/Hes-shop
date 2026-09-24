@@ -16,7 +16,7 @@ const HELP = `📥 Ajouter : envoie une photo avec en légende le titre (ligne 1
 /badge pseudo blue|gold|off — donner un badge
 /badges — voir les badges
 /edit id — répondre avec /edit id, puis titre et description sur 2 lignes
-/restrict id blue|gold|off — réserver un fichier à un badge (gold peut tout télécharger, blue pas les fichiers gold)
+/restrict id blue|gold|off — réserver un fichier à un badge (gold peut tout télécharger, blue pas les fichiers gold)\n💡 Ou écris [gold] ou [blue] dans le titre (ligne 1 de la légende de la photo) : le fichier est réservé à ce badge dès la publication.
 /upload — liens pour envoyer sur le site tous les gros fichiers (>20 Mo) pas encore en téléchargement direct\n/upload id — idem pour un seul fichier
 /notify texte — notification envoyée à tous (site + Telegram)
 /ad off — désactiver la pub du site
@@ -226,18 +226,20 @@ async function handle(m) {
       await redis.set('draft:' + id, d, { ex: 3600 });
       return say(`🖼 Capture ${d.shots.length} ajoutée. Envoie d'autres photos ou le fichier / APK.`);
     }
-    const [title, ...desc] = (m.caption || '').split('\n');
-    await redis.set('draft:' + id, { photo: fid, title: title || 'Sans titre', desc: desc.join('\n'), shots: [] }, { ex: 3600 });
-    return say('📎 Photo principale reçue. Envoie des captures (photos sans légende) si tu veux, puis le fichier / APK.');
+    const [rawTitle, ...desc] = (m.caption || '').split('\n');
+    const tag = /\[(gold|blue)\]/i.exec(rawTitle || ''), title = (rawTitle || '').replace(/\s*\[(gold|blue)\]\s*/ig, ' ').trim();   // [gold] ou [blue] dans le titre = fichier réservé à ce badge
+    await redis.set('draft:' + id, { photo: fid, title: title || 'Sans titre', desc: desc.join('\n'), shots: [], ...(tag ? { need: tag[1].toLowerCase() } : {}) }, { ex: 3600 });
+    return say('📎 Photo principale reçue' + (tag ? ` (fichier réservé au badge ${tag[1].toLowerCase()})` : '') + '. Envoie des captures (photos sans légende) si tu veux, puis le fichier / APK.');
   }
   if (m.document) {
     const d = await redis.get('draft:' + id);
     if (!d) return say("Envoie d'abord une photo avec en légende : titre puis description.");
-    const it = { id: Date.now().toString(36), ...d, file: m.document.file_id, name: m.document.file_name, size: m.document.file_size, ts: Date.now() };
+    const { need, ...rest } = d;
+    const it = { id: Date.now().toString(36), ...rest, file: m.document.file_id, name: m.document.file_name, size: m.document.file_size, ts: Date.now() };
     await redis.hset('items', { [it.id]: it });
+    if (need) await redis.hset('restrict', { [it.id]: need });
     await redis.del('draft:' + id);
-    if (it.size > 19e6) return say(`✅ Publié : ${it.title}\nID : ${it.id}\n\n⚠️ Fichier de plus de 20 Mo : pour qu'il se télécharge directement sur le site (au lieu de passer par Telegram), envoie-le ici (lien valable 1 h) :\n${await upLink(it.id)}`);
-    return say(`✅ Publié sur le site : ${it.title}\nID : ${it.id}`);
+    return say(`✅ Publié sur le site : ${it.title}\nID : ${it.id}${need ? `\n🔒 Réservé au badge ${need}${need === 'blue' ? ' (les gold peuvent aussi le télécharger)' : ''}` : ''}`);
   }
   return say(HELP);
 }
