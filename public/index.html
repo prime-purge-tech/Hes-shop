@@ -448,8 +448,11 @@ async function start(d){const i=LIST.find(x=>x.id===d.dataset.id),sp=d.querySele
   const chk=await fetch('/api/file?k=chk&id='+id,{headers:auth()});
   const cj=await chk.json().catch(()=>({}));
   if(!chk.ok){toast(cj.error||'Not available right now. Try again later.');return fin(false)}
-  if(cj.big){toast('This file is being prepared for direct download. Try again soon.');return fin(false)}
   await askRate(i);
+  if(cj.big){   // gros fichier (> 20 Mo) : le bot l'envoie dans Telegram
+   toast('Big file: the bot will send it in Telegram');
+   if(w&&w.openTelegramLink)w.openTelegramLink(deep);else location.href=deep;
+   return fin(true)}
   if(w&&w.initData&&w.isVersionAtLeast&&w.isVersionAtLeast('8.0')&&w.downloadFile)w.downloadFile({url:location.origin+url+'&t='+encodeURIComponent(TOKEN),file_name:i.dn||i.name||'file'});
   else{   // navigateur normal : téléchargement sans quitter la page (pas de popup "Quitter ce site ?")
    const a=document.createElement('a');a.href=url+'&t='+encodeURIComponent(TOKEN);a.download=i.dn||i.name||'file';
