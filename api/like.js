@@ -1,14 +1,27 @@
-import { redis, limit, ip } from '../lib/db.js';
+import { redis, whoami } from '../lib/db.js';
+
 export default async (req, res) => {
-  // GET ?v=pseudo -> ids déjà likés par ce compte
-  if (req.method === 'GET') return res.json((await redis.smembers('ul:' + String(req.query.v || '').slice(0, 40))).map(String));
-  const { id, on } = req.body || {}, v = String(req.body?.v || '').slice(0, 40);
-  if (req.method !== 'POST' || !id || !v || !await redis.hexists('items', String(id))) return res.status(400).end();
-  if (await limit('rl:l:' + ip(req), 30, 60)) return res.status(429).end();
-  const changed = on ? await redis.sadd('lk:' + id, v) : await redis.srem('lk:' + id, v);
-  if (changed) {
-    await redis.hincrby('likes', String(id), on ? 1 : -1);
-    await (on ? redis.sadd('ul:' + v, String(id)) : redis.srem('ul:' + v, String(id)));
+  if (req.method === 'GET') {   // fichiers likés par cet utilisateur (pour l'état ❤ au chargement)
+    const v = String(req.query.v || '').trim().toLowerCase();
+    if (!v) return res.json([]);
+    res.setHeader('Cache-Control', 'no-store');
+    return res.json((await redis.smembers('ulikes:' + v)) || []);
   }
-  res.json({ n: Number(await redis.hget('likes', String(id))) || 0 });
+  if (req.method !== 'POST') return res.status(405).end();
+  if (req.query.k === 'view') {   // vue d'un APK : 1 par compte
+    const me = await whoami(req), vid = String(req.body?.id || '');
+    if (!me || !vid || !await redis.hexists('items', vid)) return res.status(400).json({ error: 'Invalid request' });
+    if (await redis.sadd('av:' + vid, me)) await redis.hincrby('views', vid, 1);
+    return res.json({ ok: true, n: Number(await redis.hget('views', vid)) || 0 });
+  }
+  const id = String(req.body?.id || ''), v = String(req.body?.v || '').trim().toLowerCase(), on = !!req.body?.on;
+  if (!id || !v || !await redis.hexists('items', id)) return res.status(400).json({ error: 'Invalid request' });
+  const already = await redis.sismember('ulikes:' + v, id);
+  if (on && !already) {
+    await Promise.all([redis.sadd('lk:' + id, v), redis.sadd('ulikes:' + v, id), redis.hincrby('likes', id, 1)]);
+  } else if (!on && already) {
+    await Promise.all([redis.srem('lk:' + id, v), redis.srem('ulikes:' + v, id), redis.hincrby('likes', id, -1)]);
+  }
+  const n = Math.max(0, Number(await redis.hget('likes', id)) || 0);
+  res.json({ ok: true, n });
 };
