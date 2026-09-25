@@ -16,12 +16,15 @@ const HELP = `📥 Ajouter : envoie une photo avec en légende le titre (ligne 1
 /badge pseudo blue|gold|off — donner un badge
 /badges — voir les badges
 /edit id — répondre avec /edit id, puis titre et description sur 2 lignes
-/restrict id blue|gold|off — réserver un fichier à un badge (gold peut tout télécharger, blue pas les fichiers gold)\n💡 Ou écris [gold] ou [blue] dans le titre (ligne 1 de la légende de la photo) : le fichier est réservé à ce badge dès la publication.
-/upload — liens pour envoyer sur le site tous les gros fichiers (>20 Mo) pas encore en téléchargement direct\n/upload id — idem pour un seul fichier
+/restrict id blue|gold|off — réserver un fichier à un badge (gold peut tout télécharger, blue pas les fichiers gold)
+💡 Ou écris [gold] ou [blue] dans le titre (ligne 1 de la légende de la photo) : le fichier est réservé à ce badge dès la publication.
+/upload — liens pour envoyer sur le site tous les gros fichiers (>20 Mo) pas encore en téléchargement direct
+/upload id — idem pour un seul fichier
 /notify texte — notification envoyée à tous (site + Telegram)
 /ad off — désactiver la pub du site
 /ad page url délai(≤20s) — pub = ta page d'accueil, croix après le délai
 /ad media délai lien texte — en réponse à une photo/vidéo : pub média sur le site
+/help — aide rapide (liste des commandes, sans les explications)
 /admins — voir les admins
 /addadmin ID · /rmadmin ID (propriétaire)
 
@@ -38,10 +41,75 @@ const send = (chat, url, caption) => {
     .then(r => r.ok ? r : tg('sendMessage', { chat_id: chat, text: caption, parse_mode: 'HTML', reply_markup: BTN }));
 };
 
+/* ================= cadres façon « NOUVELLE CHAÎNE » + emojis Telegram Premium ================= *
+ * compose() construit un texte + ses "entities" Telegram (liens tg://user, emojis premium) sans
+ * passer par parse_mode HTML, car Telegram interdit de mélanger parse_mode et entities manuelles.
+ * seg(texte) = texte brut · link(texte,url) = portion cliquable (mention) · pemo(emoji) = emoji
+ * remplacé par sa version Telegram Premium si son ID est renseigné dans PREMIUM_EMOJI ci-dessous. */
+const seg = t => ({ t });
+const link = (t, url) => ({ t, url });
+const pemo = t => ({ t, emoji: true });
+
+// 🔧 Colle ici les IDs de tes emojis Telegram Premium (voir l'explication envoyée à part).
+// Tant qu'un emoji n'a pas d'ID renseigné, l'emoji normal s'affiche (comportement actuel, sans risque).
+const PREMIUM_EMOJI = {
+  // '🎉': '5348396521567359331',
+  // '🛒': '5361654007111211966',
+};
+
+function compose(segments) {
+  let text = '', entities = [];
+  for (const s of segments) {
+    const start = text.length;   // JS mesure les chaînes en unités UTF-16, comme Telegram
+    text += s.t;
+    if (s.url) entities.push({ type: 'text_link', offset: start, length: s.t.length, url: s.url });
+    if (s.emoji && PREMIUM_EMOJI[s.t]) entities.push({ type: 'custom_emoji', offset: start, length: s.t.length, custom_emoji_id: PREMIUM_EMOJI[s.t] });
+  }
+  return { text, entities };
+}
+
+// envoie un message composé (segments), avec photo/gif si fourni, repli en texte simple sinon
+async function sendFramed(chat, photoRef, segments) {
+  const { text, entities } = compose(segments);
+  if (photoRef) {
+    const isAnim = /\.(gif|mp4)$/i.test(typeof photoRef === 'string' ? photoRef : '');
+    const meth = isAnim ? 'sendAnimation' : 'sendPhoto', key = isAnim ? 'animation' : 'photo';
+    const p = { chat_id: chat, [key]: photoRef, caption: text, reply_markup: BTN };
+    if (entities.length) p.caption_entities = entities;
+    const r = await tg(meth, p);
+    if (r.ok) return r;
+  }
+  const p = { chat_id: chat, text, reply_markup: BTN };
+  if (entities.length) p.entities = entities;
+  return tg('sendMessage', p);
+}
+
+const CMDS = ['/list', '/del', '/chat', '/clearchat', '/pub', '/badge', '/badges', '/edit', '/restrict', '/upload', '/notify', '/ad', '/admins', '/addadmin', '/rmadmin'];
+const welcomeSegments = u => [
+  seg("╭▱▱ 𝚆𝙴𝙻𝙲𝙾𝙼𝙴 ▱▱\n┃≫ "),
+  link(u.first_name || 'Membre', `tg://user?id=${u.id}`),
+  seg("\n╰▱▱▱▱▱▱▱▱\n≪ 𝚃𝙷𝙴 𝙷'𝙴𝚂 𝚂𝙷𝙾𝙿 "), pemo('🛒'), seg('≫'),
+];
+const helpSegments = () => [
+  seg("╭▱▱ 𝙲𝙾𝙼𝙼𝙰𝙽𝙳𝙴𝚂 ▱▱\n" + CMDS.map(c => `┃≫ ${c}`).join('\n') + "\n╰▱▱▱▱▱▱▱▱\n≪ 𝚃𝙷𝙴 𝙷'𝙴𝚂 𝚂𝙷𝙾𝙿 "), pemo('🛒'), seg('≫'),
+];
+
+// photo du nouveau membre -> sinon photo du groupe -> sinon photo du bot -> sinon null (repli sur WELCOME_PIC)
+async function memberPhotoFileId(u, chatId) {
+  try { const p = await tg('getUserProfilePhotos', { user_id: u.id, limit: 1 }); if (p.ok && p.result.total_count > 0) return p.result.photos[0].at(-1).file_id; } catch {}
+  try { const c = await tg('getChat', { chat_id: chatId }); if (c.ok && c.result.photo) return c.result.photo.big_file_id; } catch {}
+  try { const me = await tg('getMe'); if (me.ok) { const p = await tg('getUserProfilePhotos', { user_id: me.result.id, limit: 1 }); if (p.ok && p.result.total_count > 0) return p.result.photos[0].at(-1).file_id; } } catch {}
+  return null;
+}
+
 // bienvenue / au revoir dans les groupes
 async function group(m) {
-  for (const u of m.new_chat_members || [])
-    if (!u.is_bot) await send(m.chat.id, WELCOME_PIC, `🎉 Bienvenue ${nm(u)} dans <b>${esc(m.chat.title)}</b> !\nPasse par notre boutique 👇`);
+  for (const u of m.new_chat_members || []) {
+    if (u.is_bot) continue;
+    const fid = await memberPhotoFileId(u, m.chat.id);
+    const r = await sendFramed(m.chat.id, fid, welcomeSegments(u));
+    if (!r.ok) await send(m.chat.id, WELCOME_PIC, `🎉 Bienvenue ${nm(u)} dans <b>${esc(m.chat.title)}</b> !\nPasse par notre boutique 👇`);
+  }
   const l = m.left_chat_member;
   if (l && !l.is_bot)
     await tg('sendMessage', { chat_id: m.chat.id, parse_mode: 'HTML', text: `👋 ${nm(l)} a quitté le groupe. À bientôt !`, reply_markup: BTN });
@@ -90,6 +158,19 @@ async function handle(m) {
   }
   if (!await isAdmin(id)) return;
   const owner = String(id) === String(process.env.OWNER_ID);
+
+  if (cmd === '/help') return sendFramed(chat, null, helpSegments());
+
+  // liste les emojis Telegram Premium d'un pack (le nom après /addemoji/ dans son lien)
+  if (cmd === '/emojiset') {
+    if (!arg) return say("Usage : /emojiset nomDuPack\n(le nom après /addemoji/ dans le lien du pack, ex: GiftForEditfinity)");
+    const r = await tg('getStickerSet', { name: arg });
+    if (!r.ok) return say('❌ Pack introuvable : ' + arg);
+    const lines = r.result.stickers.map(s => `${s.emoji || '❔'} — ${s.custom_emoji_id}`);
+    if (!lines.length) return say('Ce pack ne contient aucun emoji');
+    for (let i = 0; i < lines.length; i += 50) await say(lines.slice(i, i + 50).join('\n'));
+    return;
+  }
 
   // pub : réponds à un message (photo + texte) avec /pub [lien] [texte du bouton]
   if (cmd === '/pub' && m.reply_to_message) {
@@ -165,12 +246,12 @@ async function handle(m) {
     if (mode === 'media') {
       const rp = m.reply_to_message;
       if (!rp) return say("Réponds à un message avec une photo et/ou une vidéo : /ad media délai lien texte");
-      const delay = Math.max(0, Math.min(20, parseInt(rest[0]) || 5)), link = rest[1] || '', adText = rest.slice(2).join(' ');
+      const delay = Math.max(0, Math.min(20, parseInt(rest[0]) || 5)), link_ = rest[1] || '', adText = rest.slice(2).join(' ');
       const put = async (file, mime, name) => { const k = Date.now().toString(36) + Math.random().toString(36).slice(2, 5); await redis.hset('media', { [k]: { k, file, mime, name, owner: 'admin' } }); return k; };
       const video = rp.video ? await put(rp.video.file_id, 'video/mp4', 'ad.mp4') : null;
       const photo = rp.photo ? await put(rp.photo.at(-1).file_id, 'image/jpeg', 'ad.jpg') : null;
       if (!video && !photo) return say('Le message ne contient ni photo ni vidéo');
-      await redis.set('ad', { type: 'media', video, photo, link, text: adText, delay, ts: Date.now() });
+      await redis.set('ad', { type: 'media', video, photo, link: link_, text: adText, delay, ts: Date.now() });
       return say(`✅ Pub média activée (croix après ${delay}s)`);
     }
     return say('Usage : /ad off · /ad page url délai · /ad media délai lien texte (en réponse à une photo/vidéo)');
