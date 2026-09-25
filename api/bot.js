@@ -54,8 +54,8 @@ const pemo = t => ({ t, emoji: true });
 // 🔧 Colle ici les IDs de tes emojis Telegram Premium (voir l'explication envoyée à part).
 // Tant qu'un emoji n'a pas d'ID renseigné, l'emoji normal s'affiche (comportement actuel, sans risque).
 const PREMIUM_EMOJI = {
-  // '🎉': '5348396521567359331',
-  // '🛒': '5361654007111211966',
+  // '🎉': '6073355211362016920',
+  // '🛒': '5472401690793614752',
 };
 
 function compose(segments) {
