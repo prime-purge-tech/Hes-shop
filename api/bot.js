@@ -85,14 +85,18 @@ async function sendFramed(chat, photoRef, segments) {
   return tg('sendMessage', p);
 }
 
-const CMDS = ['/list', '/del', '/chat', '/clearchat', '/pub', '/badge', '/badges', '/edit', '/restrict', '/upload', '/notify', '/ad', '/admins', '/addadmin', '/rmadmin'];
+const CMDS = [
+  ['📋', '/list'], ['🗑', '/del'], ['💬', '/chat'], ['🧹', '/clearchat'], ['📣', '/pub'],
+  ['🏷', '/badge'], ['🎖', '/badges'], ['✏️', '/edit'], ['🔒', '/restrict'], ['📤', '/upload'],
+  ['🔔', '/notify'], ['📢', '/ad'], ['👮', '/admins'], ['➕', '/addadmin'], ['➖', '/rmadmin'],
+];
 const welcomeSegments = u => [
-  seg("╭▱▱ 𝚆𝙴𝙻𝙲𝙾𝙼𝙴 ▱▱\n┃≫ "),
+  seg("╭▱▱ 𝚆𝙴𝙻𝙲𝙾𝙼𝙴 ▱▱ "), pemo('🎉'), seg("\n┃≫ "),
   link(u.first_name || 'Membre', `tg://user?id=${u.id}`),
   seg("\n╰▱▱▱▱▱▱▱▱\n≪ 𝚃𝙷𝙴 𝙷'𝙴𝚂 𝚂𝙷𝙾𝙿 "), pemo('🛒'), seg('≫'),
 ];
 const helpSegments = () => [
-  seg("╭▱▱ 𝙲𝙾𝙼𝙼𝙰𝙽𝙳𝙴𝚂 ▱▱\n" + CMDS.map(c => `┃≫ ${c}`).join('\n') + "\n╰▱▱▱▱▱▱▱▱\n≪ 𝚃𝙷𝙴 𝙷'𝙴𝚂 𝚂𝙷𝙾𝙿 "), pemo('🛒'), seg('≫'),
+  seg("╭▱▱ 𝙲𝙾𝙼𝙼𝙰𝙽𝙳𝙴𝚂 ▱▱\n" + CMDS.map(([e, c]) => `┃≫ ${e} ${c}`).join('\n') + "\n╰▱▱▱▱▱▱▱▱\n≪ 𝚃𝙷𝙴 𝙷'𝙴𝚂 𝚂𝙷𝙾𝙿 "), pemo('🛒'), seg('≫'),
 ];
 
 // photo du nouveau membre -> sinon photo du groupe -> sinon photo du bot -> sinon null (repli sur WELCOME_PIC)
@@ -153,9 +157,9 @@ async function handle(m) {
     const it = arg?.startsWith('f_') && await redis.hget('items', arg.slice(2));
     await redis.sadd('bu', String(id));   // utilisateurs du bot (pour les pubs)
     if (it) { await redis.hincrby('dls', it.id, 1); return sendBranded(chat, it); }
-    await send(chat, pick(),
+    if (await isAdmin(id)) return sendFramed(chat, pick(), helpSegments());   // admin : un seul message, stylé
+    return send(chat, pick(),
       `👋 Bienvenue ${nm(m.from)} sur <b>H'es chop</b> !\n\nApps, fichiers et discussions : tout est dans la mini app ci-dessous.`);
-    return (await isAdmin(id)) ? sendFramed(chat, pick(), helpSegments()) : undefined;
   }
   if (!await isAdmin(id)) return;
   const owner = String(id) === String(process.env.OWNER_ID);
