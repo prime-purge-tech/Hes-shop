@@ -3,6 +3,7 @@ import { redis, tg, admins, isAdmin, BRAND, brandName } from '../lib/db.js';
 const siteUrl = () => (process.env.SITE_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL ? 'https://' + process.env.VERCEL_PROJECT_PRODUCTION_URL : '')).replace(/\/$/, '');
 const delBlob = async u => { try { const { del } = await import('@vercel/blob'); await del(u); } catch {} };
 import { PICS, WELCOME_PIC } from '../lib/pics.js';
+const pick = () => PICS[Math.floor(Math.random() * PICS.length)] || WELCOME_PIC;   // photo aléatoire à chaque appel
 export const config = { maxDuration: 60 };
 
 const HELP = `📥 Ajouter : envoie une photo avec en légende le titre (ligne 1) puis la description. Les photos suivantes (sans légende) = captures d'écran en bas de la page de l'app. Enfin envoie le fichier / APK.
@@ -108,7 +109,7 @@ async function group(m) {
     if (u.is_bot) continue;
     const fid = await memberPhotoFileId(u, m.chat.id);
     const r = await sendFramed(m.chat.id, fid, welcomeSegments(u));
-    if (!r.ok) await send(m.chat.id, WELCOME_PIC, `🎉 Bienvenue ${nm(u)} dans <b>${esc(m.chat.title)}</b> !\nPasse par notre boutique 👇`);
+    if (!r.ok) await send(m.chat.id, pick(), `🎉 Bienvenue ${nm(u)} dans <b>${esc(m.chat.title)}</b> !\nPasse par notre boutique 👇`);
   }
   const l = m.left_chat_member;
   if (l && !l.is_bot)
@@ -152,9 +153,9 @@ async function handle(m) {
     const it = arg?.startsWith('f_') && await redis.hget('items', arg.slice(2));
     await redis.sadd('bu', String(id));   // utilisateurs du bot (pour les pubs)
     if (it) { await redis.hincrby('dls', it.id, 1); return sendBranded(chat, it); }
-    await send(chat, PICS[Math.floor(Math.random() * PICS.length)],
+    await send(chat, pick(),
       `👋 Bienvenue ${nm(m.from)} sur <b>H'es chop</b> !\n\nApps, fichiers et discussions : tout est dans la mini app ci-dessous.`);
-    return (await isAdmin(id)) ? say(HELP) : undefined;
+    return (await isAdmin(id)) ? sendFramed(chat, pick(), helpSegments()) : undefined;
   }
   if (!await isAdmin(id)) return;
   const owner = String(id) === String(process.env.OWNER_ID);
