@@ -561,13 +561,13 @@ async function pushState() {
   lb.textContent = sub ? 'Disable notifications' : 'Enable notifications';
   btn.onclick = async () => {
     if (!TOKEN) return toast('Log in first');
-    if (sub) { await sub.unsubscribe().catch(() => {}); await post('/api/push', { unsub: 1 }).catch(() => {}); return pushState(); }
+    if (sub) { await sub.unsubscribe().catch(() => {}); await post('/api/like?k=push', { unsub: 1 }).catch(() => {}); return pushState(); }
     if (Notification.permission === 'denied') return toast('Notifications are blocked for this site in your browser settings');
     const perm = await Notification.requestPermission(); if (perm !== 'granted') return;
     try {
-      const { key } = await (await fetch('/api/push?k=key')).json();
+      const { key } = await (await fetch('/api/like?k=pushkey')).json();
       const ns = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u2arr(key) });
-      await post('/api/push', { sub: ns.toJSON() });
+      await post('/api/like?k=push', { sub: ns.toJSON() });
       toast('Notifications enabled');
     } catch { toast('Could not enable notifications') }
     pushState();
@@ -755,4 +755,4 @@ window.addEventListener('popstate',()=>{history.pushState({h:1},'');if(confirm('
 window.addEventListener('beforeunload',e=>{if(document.querySelector('.cb.go'))return;e.preventDefault();e.returnValue=''});
 /* ---- effet d'apparition au scroll ---- */
 let io;function reveal(id){const els=$$('#'+id+' .rv');if(!els.length)return;
- try{io&&io.disconnect();io=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('in',e.isIntersecting)),{rootMargin:'0px 0px -6% 0px'});els.for
+ try{io&&io.disconnect();io=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('in',e.isIntersecting)),{rootMargin:'0px 0px 
