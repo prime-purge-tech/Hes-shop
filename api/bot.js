@@ -91,27 +91,35 @@ const welcomeSegments = u => [
   link(u.first_name || 'Membre', `tg://user?id=${u.id}`),
   seg("\n╰▱▱▱▱▱▱▱▱\n≪ 𝚃𝙷𝙴 𝙷'𝙴𝚂 𝚂𝙷𝙾𝙿 "), pemo('🛒'), seg('≫'),
 ];
-const helpSegments = () => [
-  seg("╭▱▱ 𝙲𝙾𝙼𝙼𝙰𝙽𝙳𝙴𝚂 ▱▱\n" + CMDS.map(([e, c]) => `┃≫ ${e} ${c}`).join('\n') + "\n╰▱▱▱▱▱▱▱▱\n≪ 𝚃𝙷𝙴 𝙷'𝙴𝚂 𝚂𝙷𝙾𝙿 "), pemo('🛒'), seg('≫'),
+const goodbyeSegments = u => [
+  seg("╭▱▱ 𝙶𝙾𝙾𝙳𝙱𝚈𝙴 ▱▱ "), pemo('👋'), seg("\n┃≫ "),
+  link(u.first_name || 'Membre', `tg://user?id=${u.id}`),
+  seg("\n╰▱▱▱▱▱▱▱▱\n≪ 𝚃𝙷𝙴 𝙷'𝙴𝚂 𝚂𝙷𝙾𝙿 "), pemo('🛒'), seg('≫'),
 ];
 
-async function memberPhotoFileId(u, chatId) {
-  try { const p = await tg('getUserProfilePhotos', { user_id: u.id, limit: 1 }); if (p.ok && p.result.total_count > 0) return p.result.photos[0].at(-1).file_id; } catch {}
-  try { const c = await tg('getChat', { chat_id: chatId }); if (c.ok && c.result.photo) return c.result.photo.big_file_id; } catch {}
-  try { const me = await tg('getMe'); if (me.ok) { const p = await tg('getUserProfilePhotos', { user_id: me.result.id, limit: 1 }); if (p.ok && p.result.total_count > 0) return p.result.photos[0].at(-1).file_id; } } catch {}
+// Photo de PROFIL de la personne elle-même uniquement (jamais celle du groupe ou du bot en repli,
+// pour que le message de bienvenue/départ montre toujours la bonne personne — ou une image aléatoire).
+async function personPhotoFileId(u) {
+  try {
+    const p = await tg('getUserProfilePhotos', { user_id: u.id, limit: 1 });
+    if (p.ok && p.result.total_count > 0) return p.result.photos[0].at(-1).file_id;
+  } catch {}
   return null;
 }
 
 async function group(m) {
   for (const u of m.new_chat_members || []) {
     if (u.is_bot) continue;
-    const fid = await memberPhotoFileId(u, m.chat.id);
-    const r = await sendFramed(m.chat.id, fid, welcomeSegments(u));
+    const fid = await personPhotoFileId(u);
+    const r = await sendFramed(m.chat.id, fid || pick(), welcomeSegments(u));
     if (!r.ok) await send(m.chat.id, pick(), `🎉 Bienvenue ${nm(u)} dans <b>${esc(m.chat.title)}</b> !\nPasse par notre boutique 👇`);
   }
   const l = m.left_chat_member;
-  if (l && !l.is_bot)
-    await tg('sendMessage', { chat_id: m.chat.id, parse_mode: 'HTML', text: `👋 ${nm(l)} a quitté le groupe. À bientôt !`, reply_markup: BTN });
+  if (l && !l.is_bot) {
+    const fid = await personPhotoFileId(l);
+    const r = await sendFramed(m.chat.id, fid || pick(), goodbyeSegments(l));
+    if (!r.ok) await tg('sendMessage', { chat_id: m.chat.id, parse_mode: 'HTML', text: `👋 ${nm(l)} a quitté le groupe. À bientôt !`, reply_markup: BTN });
+  }
 }
 
 async function upLink(item) {
@@ -153,6 +161,15 @@ async function handle(m) {
     if (await isAdmin(id)) return sendFramed(chat, pick(), helpSegments());
     return send(chat, pick(),
       `👋 Bienvenue ${nm(m.from)} sur <b>H'es chop</b> !\n\nApps, fichiers et discussions : tout est dans la mini app ci-dessous.`);
+  }
+  if (cmd === '/link') {
+    await redis.sadd('bu', String(id));
+    return tg('sendMessage', {
+      chat_id: chat,
+      text: `🔗 <b>H'es Store</b>\n${siteUrl()}/`,
+      parse_mode: 'HTML',
+      reply_markup: { inline_keyboard: [[{ text: '🌐 Ouvrir le site', url: siteUrl() + '/' }]] },
+    });
   }
   if (!await isAdmin(id)) return;
   const owner = String(id) === String(process.env.OWNER_ID);
