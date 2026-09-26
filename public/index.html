@@ -1,9 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>H'es Store</title>
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#0b0f1c">
-<link rel="apple-touch-icon" href="https://ganga--link--ghhzdp9sv8hk.code.run/i/jtn1l7jk.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0b0f1c;--card:#1b2030;--line:#2b3348;--tx:#eaf2ff;--mut:#8b98b5;--b1:#0d47a1;--b2:#1e88e5;--cy:#39c0ff;color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -349,7 +346,7 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 <div style="margin-top:16px"><label>New username</label><div class="inp"><i data-i="user"></i><input id="anu" placeholder="Leave empty to keep it" autocapitalize="off"></div>
 <label>New password</label><div class="inp"><i data-i="lock"></i><input id="anp" type="password" placeholder="Leave empty to keep it"></div>
 <label>Current password</label><div class="inp"><i data-i="lock"></i><input id="acp" type="password" placeholder="Required to confirm"></div>
-<button class="btn c" id="asv"><span>Save changes</span></button></div><div style="margin-top:18px;border-top:1px solid var(--line);padding-top:16px"><label>Notifications</label><p style="color:var(--mut);font-size:13px;margin:2px 0 12px">Get notified even when the site is closed.</p><button class="btn" id="pshb" type="button"><span id="pshl">Enable notifications</span></button></div></div>
+<button class="btn c" id="asv"><span>Save changes</span></button></div></div>
 <div class="sfoot rv"><div class="row2"><button data-link="tg" aria-label="Telegram"><i data-i="tg"></i></button><button data-link="wa" aria-label="WhatsApp"><i data-i="wa"></i></button><button data-link="yt" aria-label="YouTube"><i data-i="yt"></i></button><button data-link="bc" aria-label="BANチェック"><i data-i="phone"></i></button></div><small><span data-name></span> · Prime Purge Tech</small></div>
 </div></section>
 
@@ -551,30 +548,6 @@ async function showAd(force){if(ADSHOWN&&!force)return;ADSHOWN=true;
  showAd._i=setInterval(()=>{n--;if(n>0){sk.textContent='Skip '+n+'s';return}clearInterval(showAd._i);sk.disabled=false;x.disabled=false;sk.textContent='Skip ›'},1000);
  sk.onclick=adClose;x.onclick=adClose}
 let hidAt=0;document.addEventListener('visibilitychange',()=>{if(document.hidden)hidAt=Date.now();else if(user&&hidAt&&Date.now()-hidAt>120000&&!$('#adm').classList.contains('on')){hidAt=0;showAd(true)}});
-/* ---- notifications push (marchent même site fermé, une fois activées) ---- */
-const b64u2arr = s => { const p = '='.repeat((4 - s.length % 4) % 4), b = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from([...b].map(c => c.charCodeAt(0))); };
-async function pushState() {
-  const btn = $('#pshb'), lb = $('#pshl'); if (!btn) return;
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) { btn.disabled = true; lb.textContent = 'Not supported on this browser'; return; }
-  const reg = await navigator.serviceWorker.ready.catch(() => null);
-  const sub = reg && await reg.pushManager.getSubscription().catch(() => null);
-  lb.textContent = sub ? 'Disable notifications' : 'Enable notifications';
-  btn.onclick = async () => {
-    if (!TOKEN) return toast('Log in first');
-    if (sub) { await sub.unsubscribe().catch(() => {}); await post('/api/like?k=push', { unsub: 1 }).catch(() => {}); return pushState(); }
-    if (Notification.permission === 'denied') return toast('Notifications are blocked for this site in your browser settings');
-    const perm = await Notification.requestPermission(); if (perm !== 'granted') return;
-    try {
-      const { key } = await (await fetch('/api/like?k=pushkey')).json();
-      const ns = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u2arr(key) });
-      await post('/api/like?k=push', { sub: ns.toJSON() });
-      toast('Notifications enabled');
-    } catch { toast('Could not enable notifications') }
-    pushState();
-  };
-}
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
-document.addEventListener('DOMContentLoaded', pushState);
 /* ---- notifications envoyées par les admins ---- */
 let lastNotif=localStorage.getItem('hesNotif')||'';
 async function pollNotif(){if(!user)return;try{const l=await (await fetch('/api/comments?k=notif')).json();const n=l[0];
@@ -755,4 +728,7 @@ window.addEventListener('popstate',()=>{history.pushState({h:1},'');if(confirm('
 window.addEventListener('beforeunload',e=>{if(document.querySelector('.cb.go'))return;e.preventDefault();e.returnValue=''});
 /* ---- effet d'apparition au scroll ---- */
 let io;function reveal(id){const els=$$('#'+id+' .rv');if(!els.length)return;
- try{io&&io.disconnect();io=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('in',e.isIntersecting)),{rootMargin:'0px 0px 
+ try{io&&io.disconnect();io=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('in',e.isIntersecting)),{rootMargin:'0px 0px -6% 0px'});els.forEach(r=>{r.classList.remove('in');io.observe(r)})}catch{els.forEach(r=>r.classList.add('in'))}
+ setTimeout(()=>els.forEach(r=>r.classList.add('in')),700)}
+$$('.body>*,.wrap>*:not(.bk),.sc,.st').forEach(e=>e.classList.add('rv'));reveal('home');
+</script></body></html>
