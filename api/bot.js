@@ -4,7 +4,7 @@ const siteUrl = () => (process.env.SITE_URL || (process.env.VERCEL_PROJECT_PRODU
 const delBlob = async u => { try { const { del } = await import('@vercel/blob'); await del(u); } catch {} };
 import { PICS, WELCOME_PIC } from '../lib/pics.js';
 import { pushToAll } from '../lib/push.js';
-const pick = () => PICS[Math.floor(Math.random() * PICS.length)] || WELCOME_PIC;   // photo aléatoire à chaque appel
+const pick = () => PICS[Math.floor(Math.random() * PICS.length)] || WELCOME_PIC;
 export const config = { maxDuration: 60 };
 
 const HELP = `📥 Ajouter : envoie une photo avec en légende le titre (ligne 1) puis la description. Les photos suivantes (sans légende) = captures d'écran en bas de la page de l'app. Enfin envoie le fichier / APK.
@@ -22,7 +22,7 @@ const HELP = `📥 Ajouter : envoie une photo avec en légende le titre (ligne 1
 💡 Ou écris [gold] ou [blue] dans le titre (ligne 1 de la légende de la photo) : le fichier est réservé à ce badge dès la publication.
 /upload — liens pour envoyer sur le site tous les gros fichiers (>20 Mo) pas encore en téléchargement direct
 /upload id — idem pour un seul fichier
-/notify texte — notification envoyée à tous (site + Telegram)
+/notify texte — notification envoyée à tous (site + Telegram). Ajoute une photo en légende, ou réponds à une photo avec /notify texte, pour l'inclure.
 /ad off — désactiver la pub du site
 /ad page url délai(≤20s) — pub = ta page d'accueil, croix après le délai
 /ad media délai lien texte — en réponse à une photo/vidéo : pub média sur le site
@@ -43,30 +43,22 @@ const send = (chat, url, caption) => {
     .then(r => r.ok ? r : tg('sendMessage', { chat_id: chat, text: caption, parse_mode: 'HTML', reply_markup: BTN }));
 };
 
-/* ================= cadres façon « NOUVELLE CHAÎNE » + emojis Telegram Premium ================= *
- * compose() construit un texte + ses "entities" Telegram (liens tg://user, emojis premium) sans
- * passer par parse_mode HTML, car Telegram interdit de mélanger parse_mode et entities manuelles.
- * seg(texte) = texte brut · link(texte,url) = portion cliquable (mention) · pemo(emoji) = emoji
- * remplacé par sa version Telegram Premium si son ID est renseigné dans PREMIUM_EMOJI ci-dessous. */
 const seg = t => ({ t });
 const link = (t, url) => ({ t, url });
 const pemo = t => ({ t, emoji: true });
 
-// 🔧 Colle ici les IDs de tes emojis Telegram Premium (voir l'explication envoyée à part).
-// Tant qu'un emoji n'a pas d'ID renseigné, l'emoji normal s'affiche (comportement actuel, sans risque).
 const PREMIUM_EMOJI = {
   '🎉': '6073355211362016920',
   '📣': '6073260150850854146',
   '🔔': '6073139054247944123',
   '➕': '6073215715119211263',
   '📢': '6073425180674235088',
-  // '🛒': pas trouvé dans tes packs — l'emoji panier reste normal pour l'instant.
 };
 
 function compose(segments) {
   let text = '', entities = [];
   for (const s of segments) {
-    const start = text.length;   // JS mesure les chaînes en unités UTF-16, comme Telegram
+    const start = text.length;
     text += s.t;
     if (s.url) entities.push({ type: 'text_link', offset: start, length: s.t.length, url: s.url });
     if (s.emoji && PREMIUM_EMOJI[s.t]) entities.push({ type: 'custom_emoji', offset: start, length: s.t.length, custom_emoji_id: PREMIUM_EMOJI[s.t] });
@@ -74,7 +66,6 @@ function compose(segments) {
   return { text, entities };
 }
 
-// envoie un message composé (segments), avec photo/gif si fourni, repli en texte simple sinon
 async function sendFramed(chat, photoRef, segments) {
   const { text, entities } = compose(segments);
   if (photoRef) {
@@ -104,7 +95,6 @@ const helpSegments = () => [
   seg("╭▱▱ 𝙲𝙾𝙼𝙼𝙰𝙽𝙳𝙴𝚂 ▱▱\n" + CMDS.map(([e, c]) => `┃≫ ${e} ${c}`).join('\n') + "\n╰▱▱▱▱▱▱▱▱\n≪ 𝚃𝙷𝙴 𝙷'𝙴𝚂 𝚂𝙷𝙾𝙿 "), pemo('🛒'), seg('≫'),
 ];
 
-// photo du nouveau membre -> sinon photo du groupe -> sinon photo du bot -> sinon null (repli sur WELCOME_PIC)
 async function memberPhotoFileId(u, chatId) {
   try { const p = await tg('getUserProfilePhotos', { user_id: u.id, limit: 1 }); if (p.ok && p.result.total_count > 0) return p.result.photos[0].at(-1).file_id; } catch {}
   try { const c = await tg('getChat', { chat_id: chatId }); if (c.ok && c.result.photo) return c.result.photo.big_file_id; } catch {}
@@ -112,7 +102,6 @@ async function memberPhotoFileId(u, chatId) {
   return null;
 }
 
-// bienvenue / au revoir dans les groupes
 async function group(m) {
   for (const u of m.new_chat_members || []) {
     if (u.is_bot) continue;
@@ -125,14 +114,12 @@ async function group(m) {
     await tg('sendMessage', { chat_id: m.chat.id, parse_mode: 'HTML', text: `👋 ${nm(l)} a quitté le groupe. À bientôt !`, reply_markup: BTN });
 }
 
-// lien d'envoi (valable 1 h) d'un gros fichier vers le stockage du site pour la publication `item`
 async function upLink(item) {
   const tok = randomBytes(16).toString('hex');
   await redis.set('upt:' + tok, { item }, { ex: 3600 });
   return `${siteUrl()}/upload.html?k=${tok}`;
 }
 
-// envoie le fichier sous le nom « H'ES SHOP - Titre.ext » (re-envoi si < 20 Mo, sinon file_id d'origine)
 async function sendBranded(chat, it) {
   const caption = `${it.title}\n\n🛒 ${BRAND}`;
   if (!it.size || it.size < 19e6) {
@@ -156,13 +143,14 @@ async function handle(m) {
   const say = t => tg('sendMessage', { chat_id: chat, text: t });
   const text = (m.text || '').trim();
   const [c0, arg] = text.split(/\s+/), cmd = c0?.split('@')[0];
+  const capText = (m.caption || '').trim();
+  const [cc0] = capText.split(/\s+/), captionCmd = cc0?.split('@')[0];
 
-  // gros fichiers (>20 Mo) : lien du site -> /start f_<id>
   if (cmd === '/start') {
     const it = arg?.startsWith('f_') && await redis.hget('items', arg.slice(2));
-    await redis.sadd('bu', String(id));   // utilisateurs du bot (pour les pubs)
+    await redis.sadd('bu', String(id));
     if (it) { await redis.hincrby('dls', it.id, 1); return sendBranded(chat, it); }
-    if (await isAdmin(id)) return sendFramed(chat, pick(), helpSegments());   // admin : un seul message, stylé
+    if (await isAdmin(id)) return sendFramed(chat, pick(), helpSegments());
     return send(chat, pick(),
       `👋 Bienvenue ${nm(m.from)} sur <b>H'es chop</b> !\n\nApps, fichiers et discussions : tout est dans la mini app ci-dessous.`);
   }
@@ -171,7 +159,6 @@ async function handle(m) {
 
   if (cmd === '/help') return sendFramed(chat, null, helpSegments());
 
-  // liste les emojis Telegram Premium d'un pack (le nom après /addemoji/ dans son lien)
   if (cmd === '/emojiset') {
     if (!arg) return say("Usage : /emojiset nomDuPack\n(le nom après /addemoji/ dans le lien du pack, ex: GiftForEditfinity)");
     const r = await tg('getStickerSet', { name: arg });
@@ -182,7 +169,6 @@ async function handle(m) {
     return;
   }
 
-  // pub : réponds à un message (photo + texte) avec /pub [lien] [texte du bouton]
   if (cmd === '/pub' && m.reply_to_message) {
     const users = await redis.smembers('bu');
     const kb = /^https?:\/\//.test(arg || '') ? { inline_keyboard: [[{ text: text.split(/\s+/).slice(2).join(' ') || 'Ouvrir', url: arg }]] } : undefined;
@@ -212,7 +198,7 @@ async function handle(m) {
     await redis.set('editing:' + id, arg, { ex: 600 });
     return say('✏️ Envoie le nouveau titre (ligne 1) puis la description. Envoie une photo en légende pour aussi changer l\'image.');
   }
-  { // suite d'un /edit en cours
+  {
     const eid = await redis.get('editing:' + id);
     if (eid && (text || m.photo)) {
       const it = await redis.hget('items', eid);
@@ -232,18 +218,36 @@ async function handle(m) {
     await (rb === 'off' ? redis.hdel('restrict', rid) : redis.hset('restrict', { [rid]: rb }));
     return say(rb === 'off' ? '✅ Fichier accessible à tous' : `✅ Réservé au badge ${rb}`);
   }
-  if (cmd === '/notify') {
-    const msg = text.slice(8).trim();
-    if (!msg) return say('Usage : /notify ton message');
+  if (cmd === '/notify' || captionCmd === '/notify') {
+    const raw = cmd === '/notify' ? text.slice(8) : capText.replace(/^\/notify(@\w+)?\s*/i, '');
+    const msg = raw.trim();
+    if (!msg) return say("Usage : /notify ton message (ajoute une photo en légende, ou réponds à une photo avec /notify ton message, pour l'inclure)");
+    let photoUrl = null;
+    const srcPhoto = m.photo || m.reply_to_message?.photo;
+    if (srcPhoto) {
+      const fid = srcPhoto.at(-1).file_id;
+      const pk = Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+      await redis.hset('media', { [pk]: { k: pk, file: fid, mime: 'image/jpeg', name: 'notif.jpg', owner: 'admin' } });
+      photoUrl = `${siteUrl()}/api/media?k=${pk}`;
+    }
     const nid = Date.now().toString(36);
-    await redis.hset('notifs', { [nid]: { id: nid, text: msg, ts: Date.now() } });
+    await redis.hset('notifs', { [nid]: { id: nid, text: msg, ts: Date.now(), ...(photoUrl ? { photo: photoUrl } : {}) } });
     const users = await redis.smembers('bu');
     for (let i = 0; i < users.length; i += 25) {
-      await Promise.all(users.slice(i, i + 25).map(u => tg('sendMessage', { chat_id: u, text: `🔔 ${msg}` }).catch(() => {})));
+      await Promise.all(users.slice(i, i + 25).map(u => (photoUrl
+        ? tg('sendPhoto', { chat_id: u, photo: photoUrl, caption: `🔔 ${msg}` })
+        : tg('sendMessage', { chat_id: u, text: `🔔 ${msg}` })
+      ).catch(() => {})));
       await new Promise(r => setTimeout(r, 1000));
     }
-    const p = await pushToAll({ title: "H'es Store", body: msg, url: siteUrl() + '/' }).catch(() => ({ ok: 0, total: 0 }));
-    return say(`✅ Notification envoyée (site + ${users.length} utilisateurs Telegram + ${p.ok}/${p.total} navigateurs)`);
+    const p = await pushToAll({
+      title: "H'es Store",
+      body: msg,
+      url: siteUrl() + '/',
+      ...(photoUrl ? { image: photoUrl } : {}),
+      actions: [{ action: 'open', title: 'Ouvrir' }, { action: 'dismiss', title: 'Fermer' }],
+    }).catch(() => ({ ok: 0, total: 0 }));
+    return say(`✅ Notification envoyée (site + ${users.length} utilisateurs Telegram + ${p.ok}/${p.total} navigateurs)${photoUrl ? ' 🖼' : ''}`);
   }
   if (cmd === '/ad') {
     const [, mode, ...rest] = text.split(/\s+/);
@@ -268,7 +272,6 @@ async function handle(m) {
     return say('Usage : /ad off · /ad page url délai · /ad media délai lien texte (en réponse à une photo/vidéo)');
   }
 
-  // réponse à un commentaire reçu
   const rp = m.reply_to_message;
   if (rp) {
     const cid = await redis.get(`nm:${chat}:${rp.message_id}`);
@@ -313,13 +316,13 @@ async function handle(m) {
 
   if (m.photo) {
     const fid = m.photo.at(-1).file_id, d = await redis.get('draft:' + id);
-    if (d && !m.caption) {   // photos suivantes (sans légende) = captures d'écran de l'app
+    if (d && !m.caption) {
       d.shots = [...(d.shots || []), fid].slice(0, 8);
       await redis.set('draft:' + id, d, { ex: 3600 });
       return say(`🖼 Capture ${d.shots.length} ajoutée. Envoie d'autres photos ou le fichier / APK.`);
     }
     const [rawTitle, ...desc] = (m.caption || '').split('\n');
-    const tag = /\[(gold|blue)\]/i.exec(rawTitle || ''), title = (rawTitle || '').replace(/\s*\[(gold|blue)\]\s*/ig, ' ').trim();   // [gold] ou [blue] dans le titre = fichier réservé à ce badge
+    const tag = /\[(gold|blue)\]/i.exec(rawTitle || ''), title = (rawTitle || '').replace(/\s*\[(gold|blue)\]\s*/ig, ' ').trim();
     await redis.set('draft:' + id, { photo: fid, title: title || 'Sans titre', desc: desc.join('\n'), shots: [], ...(tag ? { need: tag[1].toLowerCase() } : {}) }, { ex: 3600 });
     return say('📎 Photo principale reçue' + (tag ? ` (fichier réservé au badge ${tag[1].toLowerCase()})` : '') + '. Envoie des captures (photos sans légende) si tu veux, puis le fichier / APK.');
   }
