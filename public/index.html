@@ -67,7 +67,7 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 .ic2{width:64px;height:64px;border-radius:16px;object-fit:cover;background:#111524;flex:none}
 .inf{min-width:0}.inf h3{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.inf small{color:var(--mut)}
 .mt{display:flex;gap:16px;align-items:center;margin-top:6px;color:#aab5cf;font-size:14px}
-.lk{display:flex;align-items:center;gap:6px;background:none;border:0;color:var(--mut);padding:0;font:600 14px 'Rajdhani',sans-serif}.lk.on{color:#ff5c7a}
+.lk{display:flex;align-items:center;gap:6px;background:none;border:0;color:var(--mut);padding:0;font:600 14px 'Rajdhani',sans-serif}.lk.on{color:#ff3b4e}.lk .ic{width:24px;height:24px;flex:none}.lk span{font-size:13px}
 .ds{margin:12px 0 0;color:#aab5cf;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-line}.ds.open{-webkit-line-clamp:unset}
 .dl{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:46px;margin-top:14px;border:2px solid var(--cy);border-radius:24px;background:#111524;color:#fff;font:600 13px 'Orbitron',sans-serif;overflow:hidden}
 .dl .c{position:absolute;left:3px;top:3px;bottom:3px;width:34px;border-radius:50%;background:var(--cy);color:#06202e;display:grid;place-items:center;transition:width .9s ease,border-radius .9s}
@@ -298,7 +298,7 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 <button class="skip" id="skip">Skip <i data-i="chev"></i></button><div class="sp"><h1>H'es</h1><p>Be the light behind the dark clouds.</p></div><div class="bar"></div></section>
 
 <section class="screen" id="dash">
-<div class="top"><button class="sq mn" aria-label="Menu"><i data-i="menu"></i></button><h2>H'es</h2><button class="pillb mn" aria-label="Settings"><i data-i="sl"></i><span data-name></span></button><button class="sq r" id="tp" aria-label="Profile"><i data-i="user"></i></button></div>
+<div class="top"><button class="sq mn" aria-label="Menu"><i data-i="menu"></i></button><h2>H'es</h2><button class="pillb mn" aria-label="Settings"><i data-i="sl"></i><span data-name></span></button><button class="sq" id="nbell" aria-label="Notifications" style="position:relative"><i data-i="bell"></i><span class="nbg" id="nbdg" hidden>0</span></button><button class="sq r" id="tp" aria-label="Profile"><i data-i="user"></i></button></div>
 <div class="body">
 <div class="card hero"><img src="https://ganga--link--ghhzdp9sv8hk.code.run/i/hikuwux5.jpg" alt="" onerror="this.parentNode.style.display='none'"></div>
 <div class="two"><div class="card st"><small>Accounts</small><div><i data-i="users"></i><span id="stA">…</span></div></div><div class="card st"><small>APK &amp; ZIP</small><div><i data-i="phone"></i><span id="stF">…</span></div></div></div>
@@ -371,6 +371,8 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 </div></div>
 <div class="ov2" id="sp"><div class="pb"><div class="tabs"><button data-t="my" class="a">My</button><button data-t="all">Packs</button><button data-t="new">Create</button></div><div id="sc"></div></div></div>
 <div class="ov2" id="pm"><div class="pb"><h3>Profile photo</h3><img class="pv" id="pp" alt=""><label class="btn" style="margin:0">Choose from gallery<input type="file" accept="image/*" id="pf" hidden></label><input class="ta" id="pw" type="password" placeholder="Your password" autocomplete="current-password"><button class="btn c" id="ps">Save</button><button class="btn" id="pr">Use a default photo</button><small id="pn"></small></div></div>
+<div class="ov2" id="np"><div class="pb" style="text-align:left;max-height:80vh;overflow-y:auto"><h3 style="text-align:center;margin-bottom:14px">🔔 Notifications</h3><div id="npl"><p class="sub" style="text-align:center">Loading…</p></div></div></div>
+<div class="ov2" id="npm2"><div class="pb"><h3>🔔 Activer les notifications</h3><p class="sub" style="margin:12px 0">Reçois les nouveautés et les alertes importantes même quand le site est fermé.</p><button class="btn c" id="npYes"><span>Activer</span></button><button class="btn" id="npNo" style="margin-top:10px"><span>Plus tard</span></button></div></div>
 <div class="adv" id="adm"><div class="adv-m" id="adm-m"><button class="adv-skip" id="adskip" disabled>Skip</button></div><div class="adv-br" id="adbr"><img class="adv-logo" id="adlogo" alt=""><b>H'ES STORE</b></div><p class="adv-p" id="adtx"></p><div class="adv-pr"><i id="adbar"></i></div><div class="adv-f"><button class="adv-x" id="adx" disabled aria-label="Close ad">✕</button></div></div>
 </div><svg width="0" height="0" style="position:absolute"><defs><linearGradient id="igg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#feda75"/><stop offset=".3" stop-color="#fa7e1e"/><stop offset=".55" stop-color="#d62976"/><stop offset=".8" stop-color="#962fbf"/><stop offset="1" stop-color="#4f5bd5"/></linearGradient></defs></svg><div id="toast"></div>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -378,7 +380,9 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 const SITE_NAME="H'es Store";
 const LINKS={tg:'https://t.me/PRIME_PURGE',ch:'https://t.me/PRlME_PURGE_TECH',wa:'https://whatsapp.com/channel/0029Vb7Ibg5002T79MWH2r1p',yt:'https://www.youtube.com/@no-name-officiel',ig:'',tt:'',gh:'',bc:'https://checkban-ten.vercel.app/'};
 const S=d=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
-const IC={menu:'<path d="M3 6h18M3 12h18M3 18h18"/>',sl:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',login:'<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>',wa:'<path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/>',yt:'<path d="M22.5 6.4a2.8 2.8 0 0 0-2-2C18.8 4 12 4 12 4s-6.8 0-8.5.4a2.8 2.8 0 0 0-2 2C1 8.1 1 12 1 12s0 3.9.5 5.6a2.8 2.8 0 0 0 2 2C5.2 20 12 20 12 20s6.8 0 8.5-.4a2.8 2.8 0 0 0 2-2c.5-1.7.5-5.6.5-5.6s0-3.9-.5-5.6z"/><path d="m9.7 15.5 5.8-3.5-5.8-3.5z"/>',tt:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>',eyeoff:'<path d="M17.9 17.9A10.1 10.1 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.1-5.9M9.9 4.2A9.1 9.1 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.2 3.2M1 1l22 22"/>',users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',cloud:'<path d="M18 10h-1.3A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>',shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',grid:'<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>',tool:'<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>',phone:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>',head:'<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>',send:'<path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/>',ig:'<rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/>',gh:'<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-.9-2.6c3.1-.3 6.4-1.5 6.4-7A5.4 5.4 0 0 0 20 4.8 5 5 0 0 0 19.9 1S18.7.7 16 2.5a13.4 13.4 0 0 0-7 0C6.3.7 5.1 1 5.1 1A5 5 0 0 0 5 4.8a5.4 5.4 0 0 0-1.5 3.7c0 5.5 3.3 6.7 6.4 7a3.4 3.4 0 0 0-.9 2.6V22"/>',chev:'<path d="m9 18 6-6-6-6"/>',back:'<path d="M19 12H5M12 19l-7-7 7-7"/>',help:'<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>',search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',plus:'<circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/>',mic:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5"/>',chat:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'};
+const IC={menu:'<path d="M3 6h18M3 12h18M3 18h18"/>',sl:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',login:'<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>',wa:'<path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/>',yt:'<path d="M22.5 6.4a2.8 2.8 0 0 0-2-2C18.8 4 12 4 12 4s-6.8 0-8.5.4a2.8 2.8 0 0 0-2 2C1 8.1 1 12 1 12s0 3.9.5 5.6a2.8 2.8 0 0 0 2 2C5.2 20 12 20 12 20s6.8 0 8.5-.4a2.8 2.8 0 0 0 2-2c.5-1.7.5-5.6.5-5.6s0-3.9-.5-5.6z"/><path d="m9.7 15.5 5.8-3.5-5.8-3.5z"/>',tt:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>',eyeoff:'<path d="M17.9 17.9A10.1 10.1 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.1-5.9M9.9 4.2A9.1 9.1 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.2 3.2M1 1l22 22"/>',users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',cloud:'<path d="M18 10h-1.3A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>',shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',grid:'<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>',tool:'<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>',phone:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>',head:'<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>',send:'<path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/>',ig:'<rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/>',gh:'<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-.9-2.6c3.1-.3 6.4-1.5 6.4-7A5.4 5.4 0 0 0 20 4.8 5 5 0 0 0 19.9 1S18.7.7 16 2.5a13.4 13.4 0 0 0-7 0C6.3.7 5.1 1 5.1 1A5 5 0 0 0 5 4.8a5.4 5.4 0 0 0-1.5 3.7c0 5.5 3.3 6.7 6.4 7a3.4 3.4 0 0 0-.9 2.6V22"/>',chev:'<path d="m9 18 6-6-6-6"/>',back:'<path d="M19 12H5M12 19l-7-7 7-7"/>',help:'<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>',search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',plus:'<circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/>',mic:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5"/>',chat:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',bell:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>'};
+const HEART_OFF='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 6.6a5.5 5.5 0 0 0-7.8 0L12 7.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 23l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/><circle cx="18.5" cy="5.5" r="3.7" fill="var(--card)" stroke-width="1.6"/><path d="M18.5 3.6v3.8M16.6 5.5h3.8" stroke-width="1.6"/></svg>';
+const HEART_ON='<svg class="ic" viewBox="0 0 24 24"><path fill="#ff3b4e" d="M12 21.3S3.5 15.9 3.5 9.8C3.5 6.6 6 4.5 8.7 4.5c1.7 0 3.3.9 3.3 2.4 0-1.5 1.6-2.4 3.3-2.4 2.7 0 5.2 2.1 5.2 5.3 0 6.1-8.5 11.5-8.5 11.5z"/></svg>';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const BR={wa:['#25D366','M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z'],
@@ -395,7 +399,7 @@ const sz=n=>n?' · '+(n/1048576).toFixed(1)+' MB':'';
 const tgw=()=>window.Telegram&&window.Telegram.WebApp;
 try{tgw().ready();tgw().expand()}catch{}
 let user='',exp=0,cur='home',prev='home',timer,raf,ck,PROF={},LIST=[],BOT='',pend=null,last='',TOKEN='',CHAT=[],editId=null,PACKS=[],MINE=[],sf=[],replyTo=null,rec=null,recT=0,recI=null,STARS=0,ADSHOWN=false;
-(async()=>{try{const tk=localStorage.getItem('hesTok');if(tk){TOKEN=tk;const r=await fetch('/api/auth',{headers:{authorization:'Bearer '+tk}});if(r.ok){const j=await r.json();user=j.name;exp=j.exp;show('dash');pollNotif();showAd();return}localStorage.removeItem('hesTok')}}catch{}})();
+(async()=>{try{const tk=localStorage.getItem('hesTok');if(tk){TOKEN=tk;const r=await fetch('/api/auth',{headers:{authorization:'Bearer '+tk}});if(r.ok){const j=await r.json();user=j.name;exp=j.exp;show('dash');pollNotif();showAd();maybeAskPush();return}localStorage.removeItem('hesTok')}}catch{}})();
 const NAV=['dash','files','comments','chat','help'];
 function show(id){if(id!==cur){prev=cur;cur=id}
  $$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));$('#'+id).scrollTop=0;
@@ -422,7 +426,7 @@ $('#frm').onsubmit=async e=>{e.preventDefault();const n=$('#u').value.trim().toL
  try{const r=await post('/api/auth',{action:reg?'register':'login',username:n,password:p}),j=await r.json().catch(()=>({}));
   if(!r.ok)return toast(j.error||'Something went wrong');
   if(reg){toast('Account created, you can log in');mode('log');return}
-  user=j.name;exp=j.exp;TOKEN=j.token;try{localStorage.setItem('hesTok',TOKEN)}catch{}pollNotif();showAd();show('splash')
+  user=j.name;exp=j.exp;TOKEN=j.token;try{localStorage.setItem('hesTok',TOKEN)}catch{}pollNotif();showAd();maybeAskPush();show('splash')
  }catch{toast('Server unreachable, try again')}finally{b.disabled=false}};
 /* splash 5 s */
 function splash(){clearTimeout(timer);cancelAnimationFrame(raf);const bar=$('#splash .bar');bar.classList.remove('go');void bar.offsetWidth;bar.classList.add('go');
@@ -467,7 +471,7 @@ $('#asv').onclick=async()=>{const nu=$('#anu').value.trim().toLowerCase(),np=$('
  const r=await post('/api/auth',{action:'update',username:user,password:cp,newUsername:nu,newPassword:np}).catch(()=>null),j=r?await r.json().catch(()=>({})):{};
  if(!r||!r.ok)return toast(j.error||'Could not update your account');
  user=j.name;TOKEN=j.token;try{localStorage.setItem('hesTok',TOKEN)}catch{};$('#anu').value='';$('#anp').value='';$('#acp').value='';toast('Account updated');dash()};
-async function dash(){const h=new Date().getHours();$('#gr').textContent=h<5?'Good night':h<12?'Good morning':h<18?'Good afternoon':'Good evening';
+async function dash(){refreshBell();const h=new Date().getHours();$('#gr').textContent=h<5?'Good night':h<12?'Good morning':h<18?'Good afternoon':'Good evening';
  $('#nm').textContent=user;$('#ex').textContent='Expired: '+new Date(exp||Date.now()).toISOString().slice(0,10);
  const tick=()=>{const d=new Date();$('#clk').textContent=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});$('#dt').textContent=d.toLocaleDateString([],{weekday:'long',day:'numeric',month:'long'})};
  tick();clearInterval(ck);ck=setInterval(tick,15000);
@@ -534,11 +538,16 @@ async function start(d){const i=LIST.find(x=>x.id===d.dataset.id),sp=d.querySele
   }
   fin(true)
  }catch{fin(false);toast('Not available right now. Try again later.')}}
-$('#app').addEventListener('click',async e=>{const zi=e.target.closest('.pv2');if(zi){$('#zi').src=zi.src;$('#zm').classList.add('on');return}const o=e.target.closest('[data-o]');if(o)return openDetail(o.dataset.o);const d=e.target.closest('.cb');if(d)return start(d);
+$('#app').addEventListener('click',async e=>{const zi=e.target.closest('.pv2');if(zi){$('#zi').src=zi.src;$('#zm').classList.add('on');return}
+ const b=e.target.closest('.lk');
+ if(b){const on=!b.classList.contains('on');
+  const r=await post('/api/like',{id:b.dataset.id,v:user,on}).catch(()=>null);if(!r||!r.ok)return toast('Try again in a moment');
+  const n=(await r.json()).n,i=LIST.find(x=>x.id===b.dataset.id);if(i){i.mine=on;i.likes=n}
+  b.classList.toggle('on',on);b.innerHTML=(on?HEART_ON:HEART_OFF)+`<span>${n}</span>`;
+  return}
+ const o=e.target.closest('[data-o]');if(o)return openDetail(o.dataset.o);const d=e.target.closest('.cb');if(d)return start(d);
  const p=e.target.closest('.ds');if(p)return p.classList.toggle('open');
- const b=e.target.closest('.lk');if(!b)return;const on=!b.classList.contains('on');
- const r=await post('/api/like',{id:b.dataset.id,v:user,on}).catch(()=>null);if(!r||!r.ok)return toast('Try again in a moment');
- const n=(await r.json()).n,i=LIST.find(x=>x.id===b.dataset.id);if(i){i.mine=on;i.likes=n}b.classList.toggle('on',on);b.querySelector('span').textContent=n});
+});
 /* comments + réponses admin */
 $('#cf').onsubmit=async e=>{e.preventDefault();const t=$('#ct').value.trim();if(!t)return;const b=$('#csub');b.disabled=true;
  try{const r=await post('/api/comments',{name:user,text:t,stars:STARS}),j=await r.json().catch(()=>({}));if(!r.ok)return toast(j.error||'Something went wrong');$('#ct').value='';STARS=0;stz();toast('Comment sent');loadComments()}
@@ -578,14 +587,22 @@ async function showAd(force){if(ADSHOWN&&!force)return;ADSHOWN=true;
  showAd._i=setInterval(()=>{n--;if(n>0){sk.textContent='Skip '+n+'s';return}clearInterval(showAd._i);sk.disabled=false;x.disabled=false;sk.textContent='Skip ›'},1000);
  sk.onclick=adClose;x.onclick=adClose}
 let hidAt=0;document.addEventListener('visibilitychange',()=>{if(document.hidden)hidAt=Date.now();else if(user&&hidAt&&Date.now()-hidAt>120000&&!$('#adm').classList.contains('on')){hidAt=0;showAd(true)}});
-/* ---- notifications envoyées par les admins ---- */
-let lastNotif=localStorage.getItem('hesNotif')||'';
-async function pollNotif(){if(!user)return;try{const l=await (await fetch('/api/comments?k=notif')).json();const n=l[0];
+/* ---- notifications envoyées par les admins : badge, panneau, activation ---- */
+let lastNotif=localStorage.getItem('hesNotif')||'',NOTIFS=[];
+const nSeenKey=()=>'hesNSeen:'+user;
+function refreshBell(){const seen=LSg(nSeenKey(),0),c=NOTIFS.filter(n=>n.ts>seen).length,b=$('#nbdg');if(!b)return;b.hidden=!c;b.textContent=c>99?'99+':c}
+const notifHTML=n=>`<div class="rvb" style="margin-bottom:10px">${n.photo?`<img src="${esc(n.photo)}" alt="" style="width:100%;border-radius:14px;margin-bottom:10px;object-fit:cover;max-height:220px" loading="lazy">`:''}<div class="rm">${esc(n.text)}</div><small style="color:var(--mut);display:block;margin-top:6px">${new Date(n.ts).toLocaleString()}</small></div>`;
+async function pollNotif(){if(!user)return;try{const l=await (await fetch('/api/comments?k=notif')).json();NOTIFS=Array.isArray(l)?l:[];refreshBell();const n=NOTIFS[0];
  if(n&&n.id!==lastNotif){lastNotif=n.id;try{localStorage.setItem('hesNotif',n.id)}catch{}
-  const box=$('#ntf');box.textContent='🔔 '+n.text;box.classList.add('on');setTimeout(()=>box.classList.remove('on'),5000);
-  if('Notification' in window){if(Notification.permission==='default')Notification.requestPermission();if(Notification.permission==='granted')new Notification("H'es Store",{body:n.text})}}
+  const box=$('#ntf');box.textContent='🔔 '+n.text;box.classList.add('on');setTimeout(()=>box.classList.remove('on'),5000)}
  }catch{}}
 setInterval(()=>{if(!document.hidden)pollNotif()},15000);
+$('#nbell').onclick=async()=>{await pollNotif();$('#npl').innerHTML=NOTIFS.length?NOTIFS.map(notifHTML).join(''):'<p class="sub" style="text-align:center">Aucune notification</p>';$('#np').classList.add('on');const mx=Math.max(0,...NOTIFS.map(n=>n.ts),LSg(nSeenKey(),0));LSs(nSeenKey(),mx);refreshBell()};
+$('#np').onclick=e=>{if(e.target.id==='np')$('#np').classList.remove('on')};
+function maybeAskPush(){if(!('Notification' in window)||!('serviceWorker' in navigator)||!('PushManager' in window))return;if(Notification.permission!=='default')return;$('#npm2').classList.add('on')}
+$('#npYes').onclick=async()=>{$('#npm2').classList.remove('on');await initPush();toast(Notification.permission==='granted'?'Notifications activées ✅':'Autorisation refusée ou non accordée')};
+$('#npNo').onclick=()=>{$('#npm2').classList.remove('on')};
+$('#npm2').onclick=e=>{if(e.target.id==='npm2')$('#npm2').classList.remove('on')};
 
 
 /* ---- liste Play Store + page détail ---- */
@@ -595,13 +612,13 @@ render=()=>{const q=$('#q').value.trim().toLowerCase(),rows=LIST.filter(i=>!q||(
  const feat=[...LIST].sort((a,b)=>b.dls-a.dls||b.ts-a.ts).slice(0,5),rec=[...LIST].sort((a,b)=>b.ts-a.ts).slice(0,12);
  const bn=i=>`<div class="bn" data-o="${esc(i.id)}"><img class="bimg" src="${ico(i)}" alt="" onerror="this.remove()"><div class="bo"><h3>${esc(i.title)}</h3><p>${esc((i.desc||'').split('\n')[0].slice(0,60))}</p><div class="bl"><img class="ic3" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div><b>${esc(i.title)}${nb(i.badge)}</b><small>${i.rn?i.rt+' ★ · ':''}⬇ ${i.dls} · 👁 ${i.views||0}</small></div><span class="gt">Get</span></div></div></div>`;
  $('#fl').innerHTML=(q||!LIST.length?'':`<div class="hb">${feat.map(bn).join('')}</div><div class="hs"><h3>Recommended</h3></div><div class="hc auto">${rec.map(tc).join('')}</div><div class="hs"><h3>All apps</h3></div>`)
- +(rows.map(i=>`<div class="pr rv" data-o="${esc(i.id)}"><img class="ic2" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3>${esc(i.title)}${nb(i.badge)}</h3><small>${esc(ext(i))}${sz(i.size)}</small><small>${i.rn?i.rt+' ★':'New'} &nbsp; ⬇ ${i.dls} &nbsp; 👁 ${i.views||0} &nbsp; ❤ ${i.likes}</small></div></div>`).join('')||emptyHTML);
+ +(rows.map(i=>`<div class="pr rv" data-o="${esc(i.id)}"><img class="ic2" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3>${esc(i.title)}${nb(i.badge)}</h3><small>${esc(ext(i))}${sz(i.size)}</small><small>${i.rn?i.rt+' ★':'New'} &nbsp; ⬇ ${i.dls} &nbsp; 👁 ${i.views||0}</small></div><button class="lk${i.mine?' on':''}" data-id="${esc(i.id)}" style="margin-left:auto" aria-label="Like">${i.mine?HEART_ON:HEART_OFF}<span>${i.likes}</span></button></div>`).join('')||emptyHTML);
  reveal('files')};
 function openDetail(id){const i=LIST.find(x=>x.id===id);if(!i)return;if(TOKEN)post('/api/like?k=view',{id:i.id}).then(r=>r.json()).then(j=>{if(j&&j.n!=null){i.views=j.n;const e=$('#dvw');if(e)e.textContent=j.n}}).catch(()=>{});const mb=i.size?(i.size/1048576).toFixed(1)+' MB':'—',e=esc(ext(i));
  $('#db').innerHTML=`<div class="r1 rv"><img class="ic2" style="width:96px;height:96px" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3 style="white-space:normal;font-size:19px">${esc(i.title)}${nb(i.badge)}</h3><small class="au">H'es Team</small>${i.badge?`<small class="au">🔒 ${i.badge==='gold'?'Gold badge only':'Blue &amp; Gold badges'}</small>`:''}</div></div>
  <div class="stats rv"><div><b>${i.rn?i.rt+' ★':'—'}</b><small>${i.rn||0} ratings</small></div><div><b>${i.dls}</b><small>Downloads</small></div><div><b>${e}</b><small>${mb}</small></div><div><b id="dvw">${i.views||0}</b><small>Views</small></div></div>
  <button class="cb rv" data-id="${esc(i.id)}" ${i.badge?`data-need="${i.badge}"`:""}><span class="cb__eyes"><span class="cb__eye"><span class="cb__pupil"></span></span><span class="cb__eye"><span class="cb__pupil"></span></span></span><span class="cb__cover tx2">Download</span></button>
- <button class="lk rv${i.mine?' on':''}" data-id="${esc(i.id)}" style="margin-top:14px">❤ <span>${i.likes}</span>&nbsp; Like</button>
+ <button class="lk rv${i.mine?' on':''}" data-id="${esc(i.id)}" style="margin-top:14px">${i.mine?HEART_ON:HEART_OFF}<span>${i.likes}</span></button>
  ${i.ns?`<div class="hc rv" style="margin-top:18px">${Array.from({length:i.ns},(_,n)=>`<img class="pv2" src="/api/file?k=img&id=${encodeURIComponent(i.id)}&n=${n}" alt="" loading="lazy">`).join('')}</div>`:i.hasImg?`<div class="hc rv" style="margin-top:18px"><img class="pv2" src="${ico(i)}" alt=""></div>`:''}
  <div class="hs rv"><h3>About this app</h3></div><p class="ds open rv">${esc(i.desc)}</p><div class="chips rv"><span>${e}</span><span>H'es Store</span></div>
  <div class="hs rv"><h3>Details</h3></div><div class="card kv rv"><div><span>Type</span><b>${e}</b></div><div><span>Size</span><b>${mb}</b></div><div><span>Downloads</span><b>${i.dls}</b></div><div><span>Published</span><b>${new Date(i.ts).toLocaleDateString()}</b></div></div>
@@ -739,26 +756,4 @@ $('#fl').addEventListener('pointerdown',e=>{const c=e.target.closest('.hb,.auto'
 setInterval(()=>{if(cur!=='files'||document.hidden)return;$$('#fl .hb,#fl .auto').forEach(el=>{if(+el.dataset.p>Date.now())return;const c=el.firstElementChild;if(!c)return;
  const w=c.offsetWidth+14,max=el.scrollWidth-el.clientWidth;el.scrollTo({left:el.scrollLeft+w>=max-4?0:el.scrollLeft+w,behavior:'smooth'})})},3500);
 let RSTAR=0;
-const rz=()=>{const z=$('#rz');if(z)z.innerHTML=[1,2,3,4,5].map(n=>`<button type="button" data-rs="${n}" aria-label="${n} stars">${n<=RSTAR?'★':'☆'}</button>`).join('')};
-async function loadReviews(id){const box=$('#rvbox');box.innerHTML='<small class="sub">Loading…</small>';
- try{const d=await (await fetch('/api/comments?k=rev&id='+encodeURIComponent(id),{headers:auth()})).json(),mx=Math.max(1,...d.dist),rr=Math.round(d.avg);RSTAR=d.mine?d.mine.stars:0;
-  box.innerHTML=`<div class="rsum"><div><div class="big">${d.n?d.avg:'—'}</div><div class="stars">${'★'.repeat(rr)}${'☆'.repeat(5-rr)}</div><small>${d.n} ratings</small></div><div class="bars">${[5,4,3,2,1].map(s=>`<div><span>${s}</span><i><u style="width:${d.dist[s-1]/mx*100}%"></u></i></div>`).join('')}</div></div>
-  <div class="card wrt"><small>Rate this app</small><div class="stz" id="rz"></div><textarea class="ta" id="rt2" rows="2" maxlength="300" placeholder="Write a review (optional)">${d.mine?esc(d.mine.text):''}</textarea><button class="btn c" id="rs" data-id="${esc(id)}"><span>${d.mine?'Update review':'Submit review'}</span></button></div>
-  ${d.list.map(x=>`<div class="rvb"><div class="rvh">${avw(x.name,x.badge)}<div><div class="rn">${esc(x.name)}</div><div class="stars">${'★'.repeat(x.stars)}${'☆'.repeat(5-x.stars)} <small>${new Date(x.ts).toLocaleDateString()}</small></div></div></div>${x.text?`<div class="rm">${esc(x.text)}</div>`:''}</div>`).join('')}`;rz()
- }catch{box.innerHTML='<small class="sub">Could not load the reviews.</small>'}}
-$('#db').addEventListener('click',async e=>{const s=e.target.closest('[data-rs]');if(s){RSTAR=+s.dataset.rs;return rz()}
- const b=e.target.closest('#rs');if(!b)return;if(!RSTAR)return toast('Choose 1 to 5 stars');
- const r=await post('/api/comments?k=rev',{id:b.dataset.id,stars:RSTAR,text:$('#rt2').value}).catch(()=>null),j=r?await r.json().catch(()=>({})):{};
- if(!r||!r.ok)return toast(j.error||'Could not send your review');
- const i=LIST.find(x=>x.id===b.dataset.id);if(i){i.rt=j.avg;i.rn=j.n}toast('Thanks for your review ★');loadReviews(b.dataset.id)});
-
-/* ---- quitter le site : confirmation solide ---- */
-history.pushState({h:1},'');
-window.addEventListener('popstate',()=>{history.pushState({h:1},'');if(confirm('Leave H\'es Store?'))history.go(-2)});
-window.addEventListener('beforeunload',e=>{if(document.querySelector('.cb.go'))return;e.preventDefault();e.returnValue=''});
-/* ---- effet d'apparition au scroll ---- */
-let io;function reveal(id){const els=$$('#'+id+' .rv');if(!els.length)return;
- try{io&&io.disconnect();io=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('in',e.isIntersecting)),{rootMargin:'0px 0px -6% 0px'});els.forEach(r=>{r.classList.remove('in');io.observe(r)})}catch{els.forEach(r=>r.classList.add('in'))}
- setTimeout(()=>els.forEach(r=>r.classList.add('in')),700)}
-$$('.body>*,.wrap>*:not(.bk),.sc,.st').forEach(e=>e.classList.add('rv'));reveal('home');
-</script></body></html>
+const rz=()=>{const z=$('#rz');if(z)z.
