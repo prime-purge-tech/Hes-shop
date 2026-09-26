@@ -1,6 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>H'es Store</title>
+<link rel="manifest" href="/manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0b0f1c;--card:#1b2030;--line:#2b3348;--tx:#eaf2ff;--mut:#8b98b5;--b1:#0d47a1;--b2:#1e88e5;--cy:#39c0ff;color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -393,7 +394,7 @@ const sz=n=>n?' · '+(n/1048576).toFixed(1)+' MB':'';
 const tgw=()=>window.Telegram&&window.Telegram.WebApp;
 try{tgw().ready();tgw().expand()}catch{}
 let user='',exp=0,cur='home',prev='home',timer,raf,ck,PROF={},LIST=[],BOT='',pend=null,last='',TOKEN='',CHAT=[],editId=null,PACKS=[],MINE=[],sf=[],replyTo=null,rec=null,recT=0,recI=null,STARS=0,ADSHOWN=false;
-(async()=>{try{const tk=localStorage.getItem('hesTok');if(tk){TOKEN=tk;const r=await fetch('/api/auth',{headers:{authorization:'Bearer '+tk}});if(r.ok){const j=await r.json();user=j.name;exp=j.exp;show('dash');pollNotif();showAd();return}localStorage.removeItem('hesTok')}}catch{}})();
+(async()=>{try{const tk=localStorage.getItem('hesTok');if(tk){TOKEN=tk;const r=await fetch('/api/auth',{headers:{authorization:'Bearer '+tk}});if(r.ok){const j=await r.json();user=j.name;exp=j.exp;show('dash');pollNotif();showAd();initPush();return}localStorage.removeItem('hesTok')}}catch{}})();
 const NAV=['dash','files','comments','chat','help'];
 function show(id){if(id!==cur){prev=cur;cur=id}
  $$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));$('#'+id).scrollTop=0;
@@ -420,7 +421,7 @@ $('#frm').onsubmit=async e=>{e.preventDefault();const n=$('#u').value.trim().toL
  try{const r=await post('/api/auth',{action:reg?'register':'login',username:n,password:p}),j=await r.json().catch(()=>({}));
   if(!r.ok)return toast(j.error||'Something went wrong');
   if(reg){toast('Account created, you can log in');mode('log');return}
-  user=j.name;exp=j.exp;TOKEN=j.token;try{localStorage.setItem('hesTok',TOKEN)}catch{}pollNotif();showAd();show('splash')
+  user=j.name;exp=j.exp;TOKEN=j.token;try{localStorage.setItem('hesTok',TOKEN)}catch{}pollNotif();showAd();initPush();show('splash')
  }catch{toast('Server unreachable, try again')}finally{b.disabled=false}};
 /* splash 5 s */
 function splash(){clearTimeout(timer);cancelAnimationFrame(raf);const bar=$('#splash .bar');bar.classList.remove('go');void bar.offsetWidth;bar.classList.add('go');
@@ -431,6 +432,24 @@ function splash(){clearTimeout(timer);cancelAnimationFrame(raf);const bar=$('#sp
   const g=x.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);g.addColorStop(0,'rgba(90,100,130,.28)');g.addColorStop(1,'transparent');x.fillStyle=g;x.fillRect(0,0,360,780)});
   if(cur==='splash')raf=requestAnimationFrame(f)})()}
 $('#skip').onclick=()=>{clearTimeout(timer);show('dash')};
+/* ---- push notifications navigateur (Web Push) ---- */
+function b64ToArr(b){const s=(b+'='.repeat((4-b.length%4)%4)).replace(/-/g,'+').replace(/_/g,'/');const raw=atob(s);return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)))}
+async function initPush(){
+ if(!('serviceWorker' in navigator)||!('PushManager' in window)||!TOKEN)return;
+ try{
+  const reg=await navigator.serviceWorker.register('/sw.js');
+  if(Notification.permission==='denied')return;
+  let perm=Notification.permission;if(perm==='default')perm=await Notification.requestPermission();
+  if(perm!=='granted')return;
+  let sub=await reg.pushManager.getSubscription();
+  if(!sub){
+   const {key}=await (await fetch('/api/like?k=pushkey')).json();
+   if(!key)return;
+   sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64ToArr(key)});
+  }
+  await post('/api/like?k=push',{sub});
+ }catch(e){console.error('push init',e)}
+}
 /* dashboard + profile */
 $('#asv').onclick=async()=>{const nu=$('#anu').value.trim().toLowerCase(),np=$('#anp').value,cp=$('#acp').value;
  if(!nu&&!np)return toast('Nothing to change');if(!cp)return toast('Enter your current password');
