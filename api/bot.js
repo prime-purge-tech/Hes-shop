@@ -86,6 +86,7 @@ const CMDS = [
   ['🏷', '/badge'], ['🎖', '/badges'], ['✏️', '/edit'], ['🔒', '/restrict'], ['📤', '/upload'],
   ['🔔', '/notify'], ['📢', '/ad'], ['👮', '/admins'], ['➕', '/addadmin'], ['➖', '/rmadmin'],
 ];
+const helpSegments = () => [seg(HELP)];
 const welcomeSegments = u => [
   seg("╭▱▱ 𝚆𝙴𝙻𝙲𝙾𝙼𝙴 ▱▱ "), pemo('🎉'), seg("\n┃≫ "),
   link(u.first_name || 'Membre', `tg://user?id=${u.id}`),
