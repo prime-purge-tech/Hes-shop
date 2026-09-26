@@ -3,6 +3,7 @@ import { redis, tg, admins, isAdmin, BRAND, brandName } from '../lib/db.js';
 const siteUrl = () => (process.env.SITE_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL ? 'https://' + process.env.VERCEL_PROJECT_PRODUCTION_URL : '')).replace(/\/$/, '');
 const delBlob = async u => { try { const { del } = await import('@vercel/blob'); await del(u); } catch {} };
 import { PICS, WELCOME_PIC } from '../lib/pics.js';
+import { pushToAll } from '../lib/push.js';
 const pick = () => PICS[Math.floor(Math.random() * PICS.length)] || WELCOME_PIC;   // photo aléatoire à chaque appel
 export const config = { maxDuration: 60 };
 
@@ -241,7 +242,8 @@ async function handle(m) {
       await Promise.all(users.slice(i, i + 25).map(u => tg('sendMessage', { chat_id: u, text: `🔔 ${msg}` }).catch(() => {})));
       await new Promise(r => setTimeout(r, 1000));
     }
-    return say(`✅ Notification envoyée (site + ${users.length} utilisateurs Telegram)`);
+    const p = await pushToAll({ title: "H'es Store", body: msg, url: siteUrl() + '/' }).catch(() => ({ ok: 0, total: 0 }));
+    return say(`✅ Notification envoyée (site + ${users.length} utilisateurs Telegram + ${p.ok}/${p.total} navigateurs)`);
   }
   if (cmd === '/ad') {
     const [, mode, ...rest] = text.split(/\s+/);
