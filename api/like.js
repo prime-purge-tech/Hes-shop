@@ -2,15 +2,15 @@ import { redis, whoami } from '../lib/db.js';
 import { savePush, removePush } from '../lib/push.js';
 
 export default async (req, res) => {
+  if (req.query.k === 'pushkey') {   // clé publique VAPID nécessaire au navigateur pour s'abonner (rien de secret ici) — vérifié en premier
+    if (!process.env.VAPID_PUBLIC_KEY) return res.status(500).json({ error: 'Push not configured' });
+    return res.json({ key: process.env.VAPID_PUBLIC_KEY });
+  }
   if (req.method === 'GET') {   // fichiers likés par cet utilisateur (pour l'état ❤ au chargement)
     const v = String(req.query.v || '').trim().toLowerCase();
     if (!v) return res.json([]);
     res.setHeader('Cache-Control', 'no-store');
     return res.json((await redis.smembers('ulikes:' + v)) || []);
-  }
-  if (req.query.k === 'pushkey') {   // clé publique VAPID nécessaire au navigateur pour s'abonner (rien de secret ici)
-    if (!process.env.VAPID_PUBLIC_KEY) return res.status(500).json({ error: 'Push not configured' });
-    return res.json({ key: process.env.VAPID_PUBLIC_KEY });
   }
   if (req.method !== 'POST') return res.status(405).end();
   if (req.query.k === 'push') {   // abonnement / désabonnement aux notifications du navigateur, lié au compte connecté
