@@ -347,7 +347,8 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 <div style="margin-top:16px"><label>New username</label><div class="inp"><i data-i="user"></i><input id="anu" placeholder="Leave empty to keep it" autocapitalize="off"></div>
 <label>New password</label><div class="inp"><i data-i="lock"></i><input id="anp" type="password" placeholder="Leave empty to keep it"></div>
 <label>Current password</label><div class="inp"><i data-i="lock"></i><input id="acp" type="password" placeholder="Required to confirm"></div>
-<button class="btn c" id="asv"><span>Save changes</span></button></div></div>
+<button class="btn c" id="asv"><span>Save changes</span></button>
+<button class="btn c" id="pushBtn" style="margin-top:14px"><span>🔔 Activer les notifications</span></button></div></div>
 <div class="sfoot rv"><div class="row2"><button data-link="tg" aria-label="Telegram"><i data-i="tg"></i></button><button data-link="wa" aria-label="WhatsApp"><i data-i="wa"></i></button><button data-link="yt" aria-label="YouTube"><i data-i="yt"></i></button><button data-link="bc" aria-label="BANチェック"><i data-i="phone"></i></button></div><small><span data-name></span> · Prime Purge Tech</small></div>
 </div></section>
 
@@ -394,7 +395,7 @@ const sz=n=>n?' · '+(n/1048576).toFixed(1)+' MB':'';
 const tgw=()=>window.Telegram&&window.Telegram.WebApp;
 try{tgw().ready();tgw().expand()}catch{}
 let user='',exp=0,cur='home',prev='home',timer,raf,ck,PROF={},LIST=[],BOT='',pend=null,last='',TOKEN='',CHAT=[],editId=null,PACKS=[],MINE=[],sf=[],replyTo=null,rec=null,recT=0,recI=null,STARS=0,ADSHOWN=false;
-(async()=>{try{const tk=localStorage.getItem('hesTok');if(tk){TOKEN=tk;const r=await fetch('/api/auth',{headers:{authorization:'Bearer '+tk}});if(r.ok){const j=await r.json();user=j.name;exp=j.exp;show('dash');pollNotif();showAd();initPush();return}localStorage.removeItem('hesTok')}}catch{}})();
+(async()=>{try{const tk=localStorage.getItem('hesTok');if(tk){TOKEN=tk;const r=await fetch('/api/auth',{headers:{authorization:'Bearer '+tk}});if(r.ok){const j=await r.json();user=j.name;exp=j.exp;show('dash');pollNotif();showAd();return}localStorage.removeItem('hesTok')}}catch{}})();
 const NAV=['dash','files','comments','chat','help'];
 function show(id){if(id!==cur){prev=cur;cur=id}
  $$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));$('#'+id).scrollTop=0;
@@ -421,7 +422,7 @@ $('#frm').onsubmit=async e=>{e.preventDefault();const n=$('#u').value.trim().toL
  try{const r=await post('/api/auth',{action:reg?'register':'login',username:n,password:p}),j=await r.json().catch(()=>({}));
   if(!r.ok)return toast(j.error||'Something went wrong');
   if(reg){toast('Account created, you can log in');mode('log');return}
-  user=j.name;exp=j.exp;TOKEN=j.token;try{localStorage.setItem('hesTok',TOKEN)}catch{}pollNotif();showAd();initPush();show('splash')
+  user=j.name;exp=j.exp;TOKEN=j.token;try{localStorage.setItem('hesTok',TOKEN)}catch{}pollNotif();showAd();show('splash')
  }catch{toast('Server unreachable, try again')}finally{b.disabled=false}};
 /* splash 5 s */
 function splash(){clearTimeout(timer);cancelAnimationFrame(raf);const bar=$('#splash .bar');bar.classList.remove('go');void bar.offsetWidth;bar.classList.add('go');
@@ -450,6 +451,16 @@ async function initPush(){
   await post('/api/like?k=push',{sub});
  }catch(e){console.error('push init',e)}
 }
+document.addEventListener('click',async e=>{
+ if(!e.target.closest('#pushBtn'))return;
+ const has={sw:'serviceWorker' in navigator,push:'PushManager' in window,notif:'Notification' in window,perm:window.Notification?Notification.permission:'n/a'};
+ alert(JSON.stringify(has,null,2));
+ if(!has.sw||!has.push)return toast('Notifications non supportées sur ce navigateur');
+ await initPush();
+ const after=window.Notification?Notification.permission:'n/a';
+ alert('Après tentative : '+after);
+ toast(after==='granted'?'Notifications activées ✅':'Autorisation refusée ou non accordée');
+});
 /* dashboard + profile */
 $('#asv').onclick=async()=>{const nu=$('#anu').value.trim().toLowerCase(),np=$('#anp').value,cp=$('#acp').value;
  if(!nu&&!np)return toast('Nothing to change');if(!cp)return toast('Enter your current password');
