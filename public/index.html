@@ -374,7 +374,7 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 <div class="ov2" id="np"><div class="pb" style="text-align:left;max-height:80vh;overflow-y:auto"><h3 style="text-align:center;margin-bottom:14px">🔔 Notifications</h3><div id="npl"><p class="sub" style="text-align:center">Loading…</p></div></div></div>
 <div class="ov2" id="npm2"><div class="pb"><h3>🔔 Activer les notifications</h3><p class="sub" style="margin:12px 0">Reçois les nouveautés et les alertes importantes même quand le site est fermé.</p><button class="btn c" id="npYes"><span>Activer</span></button><button class="btn" id="npNo" style="margin-top:10px"><span>Plus tard</span></button></div></div>
 <div class="adv" id="adm"><div class="adv-m" id="adm-m"><button class="adv-skip" id="adskip" disabled>Skip</button></div><div class="adv-br" id="adbr"><img class="adv-logo" id="adlogo" alt=""><b>H'ES STORE</b></div><p class="adv-p" id="adtx"></p><div class="adv-pr"><i id="adbar"></i></div><div class="adv-f"><button class="adv-x" id="adx" disabled aria-label="Close ad">✕</button></div></div>
-</div><svg width="0" height="0" style="position:absolute"><defs><linearGradient id="igg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#feda75"/><stop offset=".3" stop-color="#fa7e1e"/><stop offset=".55" stop-color="#d62976"/><stop offset=".8" stop-color="#962fbf"/><stop offset="1" stop-color="#4f5bd5"/></linearGradient></defs></svg><div id="toast"></div>
+</div><svg width="0" height="0" style="position:absolute"><defs><linearGradient id="igg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#feda75"/><stop offset=".3" stop-color="#fa7e1e"/><stop offset=".55" stop-color="#d62976"/><stop offset=".8" stop-color="#962fbf"/><stop offset="1" stop-color="#4f5bd5"/></linearGradient></defs></svg><div id="toast"></div><div id="ntf"></div>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
 const SITE_NAME="H'es Store";
@@ -756,4 +756,4 @@ $('#fl').addEventListener('pointerdown',e=>{const c=e.target.closest('.hb,.auto'
 setInterval(()=>{if(cur!=='files'||document.hidden)return;$$('#fl .hb,#fl .auto').forEach(el=>{if(+el.dataset.p>Date.now())return;const c=el.firstElementChild;if(!c)return;
  const w=c.offsetWidth+14,max=el.scrollWidth-el.clientWidth;el.scrollTo({left:el.scrollLeft+w>=max-4?0:el.scrollLeft+w,behavior:'smooth'})})},3500);
 let RSTAR=0;
-const rz=()=>{const z=$('#rz');if(z)z.
+const rz=()=>{cons
