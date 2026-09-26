@@ -209,12 +209,19 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 .acsec .inp{margin-bottom:14px}.acsec .btn{padding:14px}
 .zm{position:fixed;inset:0;z-index:60;background:#000d;display:none;align-items:center;justify-content:center;padding:20px}.zm.on{display:flex}
 .zm img{max-width:100%;max-height:90vh;border-radius:12px}
-.adm{position:absolute;inset:0;z-index:40;background:#000e;display:none;align-items:center;justify-content:center;padding:18px}.adm.on{display:flex}
-.adc{position:relative;width:100%;max-width:420px;background:#000;border-radius:20px;overflow:hidden}
-.adc iframe,.adc video,.adc img{width:100%;height:min(70vh,520px);object-fit:contain;background:#000;border:0;display:block}
-.adx{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;background:#000a;color:#fff;border:1px solid #ffffff44;display:none;place-items:center;font-size:16px;z-index:2}
-.adx.on{display:grid}.adt{position:absolute;top:10px;left:10px;background:#000a;color:#fff;border-radius:14px;padding:6px 12px;font-size:12px;z-index:2}
-.adcap{padding:14px;color:#fff;background:#0b0f1c}.adcap a{color:var(--cy);font-weight:600}
+/* ===== pub plein écran (fond noir pur, style YouTube) ===== */
+.adv{position:fixed;inset:0;z-index:9999;background:#000;display:none;flex-direction:column;color:#fff}.adv.on{display:flex}
+.adv-m{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;background:#000;overflow:hidden;cursor:pointer;padding-top:env(safe-area-inset-top,0px)}
+.adv-m img,.adv-m video,.adv-m iframe{width:100%;height:100%;object-fit:contain;border:0;display:block;background:#000}
+.adv-skip{position:absolute;right:12px;bottom:12px;z-index:2;padding:10px 20px;border-radius:26px;border:1.5px solid #fff;background:#000000b0;color:#fff;font:600 15px system-ui,sans-serif}.adv-skip:disabled{opacity:.85}
+.adv-br{display:flex;align-items:center;justify-content:center;gap:10px;padding:26px 16px 6px;background:#000}
+.adv-logo{width:58px;height:58px;border-radius:14px;object-fit:cover;background:#111;flex:none}
+.adv-br b{color:#fff;font:600 30px system-ui,sans-serif;letter-spacing:.2px}
+.adv-p{margin:0;padding:8px 18px 18px;color:#9aa0a6;font:400 15px/1.4 system-ui,sans-serif;background:#000;min-height:20px}
+.adv-pr{height:4px;margin:0 14px;background:#ffffff30;border-radius:4px;position:relative;background-clip:padding-box}
+.adv-pr i{display:block;height:100%;width:0;background:#fff;border-radius:4px;position:relative}.adv-pr i::after{content:'';position:absolute;right:-5px;top:-4px;width:12px;height:12px;border-radius:50%;background:#fff}
+.adv-f{display:flex;padding:16px 14px calc(16px + env(safe-area-inset-bottom,0px));background:#000}
+.adv-x{width:56px;height:56px;border-radius:50%;background:#2a2b2e;color:#fff;border:0;font-size:24px;padding:0}.adv-x:disabled{opacity:.35}
 #ntf{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%) translateY(-140%);width:min(92%,420px);background:#10182d;border:1px solid var(--cy);border-radius:16px;padding:12px 16px;z-index:70;transition:transform .4s}#ntf.on{transform:translateX(-50%) translateY(0)}
 
 /* ===== chat "lounge" (fusionné depuis la v3) ===== */
@@ -349,7 +356,7 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 </div></div>
 <div class="ov2" id="sp"><div class="pb"><div class="tabs"><button data-t="my" class="a">My</button><button data-t="all">Packs</button><button data-t="new">Create</button></div><div id="sc"></div></div></div>
 <div class="ov2" id="pm"><div class="pb"><h3>Profile photo</h3><img class="pv" id="pp" alt=""><label class="btn" style="margin:0">Choose from gallery<input type="file" accept="image/*" id="pf" hidden></label><input class="ta" id="pw" type="password" placeholder="Your password" autocomplete="current-password"><button class="btn c" id="ps">Save</button><button class="btn" id="pr">Use a default photo</button><small id="pn"></small></div></div>
-<div class="adm" id="adm"><div class="adc" id="adbox"><button class="adx" id="adx" aria-label="Close ad">✕</button></div></div>
+<div class="adv" id="adm"><div class="adv-m" id="adm-m"><button class="adv-skip" id="adskip" disabled>Skip</button></div><div class="adv-br" id="adbr"><img class="adv-logo" id="adlogo" alt=""><b>H'ES STORE</b></div><p class="adv-p" id="adtx"></p><div class="adv-pr"><i id="adbar"></i></div><div class="adv-f"><button class="adv-x" id="adx" disabled aria-label="Close ad">✕</button></div></div>
 </div><svg width="0" height="0" style="position:absolute"><defs><linearGradient id="igg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#feda75"/><stop offset=".3" stop-color="#fa7e1e"/><stop offset=".55" stop-color="#d62976"/><stop offset=".8" stop-color="#962fbf"/><stop offset="1" stop-color="#4f5bd5"/></linearGradient></defs></svg><div id="toast"></div>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
@@ -472,23 +479,38 @@ $('#cf').onsubmit=async e=>{e.preventDefault();const t=$('#ct').value.trim();if(
 /* chat public */
 setInterval(()=>{if(cur==='chat'&&!document.hidden)chat()},5000);
 
-/* ---- pub du site (page ou média), une fois par session ---- */
-async function showAd(){if(ADSHOWN)return;ADSHOWN=true;
- try{const ad=await (await fetch('/api/comments?k=ad')).json();if(!ad)return;
-  const box=$('#adbox'),x=$('#adx');box.querySelectorAll(':scope > *:not(.adx)').forEach(n=>n.remove());x.classList.remove('on');
-  const closeIn=s=>{x.classList.remove('on');clearTimeout(showAd._t);showAd._t=setTimeout(()=>x.classList.add('on'),Math.max(0,Math.min(20,s||5))*1000)};
-  if(ad.type==='page'){const f=document.createElement('iframe');f.src=ad.url;box.insertBefore(f,x);closeIn(ad.delay)}
-  else if(ad.type==='media'){
-   const cap=document.createElement('div');cap.className='adcap';cap.innerHTML=(ad.text?`<p>${esc(ad.text)}</p>`:'')+(ad.link?`<a href="${esc(ad.link)}" target="_blank" rel="noopener">Open link →</a>`:'');
-   if(ad.video){const v=document.createElement('video');v.src='/api/media?k='+encodeURIComponent(ad.video);v.autoplay=true;v.muted=true;v.playsInline=true;v.controls=true;
-    box.insertBefore(v,x);box.appendChild(cap);
-    if(ad.photo)v.onended=()=>{v.remove();const im=document.createElement('img');im.src='/api/media?k='+encodeURIComponent(ad.photo);box.insertBefore(im,x)};
-    closeIn(ad.delay)}
-   else if(ad.photo){const im=document.createElement('img');im.src='/api/media?k='+encodeURIComponent(ad.photo);box.insertBefore(im,x);box.appendChild(cap);closeIn(ad.delay)}
-  } else return;
-  $('#adm').classList.add('on')
- }catch{}}
-$('#adx').onclick=()=>$('#adm').classList.remove('on');
+/* ---- pub du site plein écran (page ou média), une fois par session ---- */
+const ADLOGOS=["https://files.catbox.moe/r4wda2.jpg","https://files.catbox.moe/djdlo8.jpg","https://files.catbox.moe/egdrnj.jpg","https://files.catbox.moe/gp70w5.jpg","https://files.catbox.moe/yy60fy.jpg","https://files.catbox.moe/ojmxln.jpg","https://files.catbox.moe/n0ow0o.jpg","https://files.catbox.moe/at3l2w.jpg","https://files.catbox.moe/67rd3p.jpg","https://files.catbox.moe/dqw7ub.jpg","https://files.catbox.moe/06jtsi.jpg","https://files.catbox.moe/4lrxrh.jpg","https://files.catbox.moe/m2rste.jpg","https://files.catbox.moe/or6z67.jpg","https://files.catbox.moe/vsbaxf.jpg","https://files.catbox.moe/6mza6d.jpg","https://files.catbox.moe/6jn4uq.jpg","https://files.catbox.moe/jgjec4.jpg","https://files.catbox.moe/f5kshs.jpg"];
+const adClose=()=>{const el=$('#adm');clearInterval(showAd._i);el.classList.remove('on');$('#adm-m').querySelectorAll('video,iframe,img').forEach(n=>n.remove())};
+async function showAd(force){if(ADSHOWN&&!force)return;ADSHOWN=true;
+ let ad;try{ad=await (await fetch('/api/comments?k=ad&t='+Date.now())).json()}catch{return}
+ if(!ad||!ad.type)return;
+ const el=$('#adm'),m=$('#adm-m'),sk=$('#adskip'),x=$('#adx'),bar=$('#adbar'),lg=$('#adlogo'),tx=$('#adtx'),br=$('#adbr');
+ document.body.appendChild(el);   // toujours au-dessus de tout le site
+ clearInterval(showAd._i);m.querySelectorAll('video,iframe,img').forEach(n=>n.remove());
+ const pick=()=>ADLOGOS[Math.floor(Math.random()*ADLOGOS.length)];
+ lg.style.visibility='visible';lg.onerror=()=>{lg.onerror=()=>{lg.style.visibility='hidden'};lg.src=pick()};lg.src=pick();
+ let go=null;const add=n=>m.insertBefore(n,sk);
+ if(ad.type==='page'){const f=document.createElement('iframe');f.src=ad.url;add(f);br.style.display='none';tx.style.display='none'}
+ else{br.style.display='';tx.style.display='';
+  if(ad.type==='media'){
+   tx.textContent=ad.text||'';if(ad.link)go=()=>window.open(ad.link,'_blank','noopener');
+   const ph=()=>{const im=document.createElement('img');im.src='/api/media?k='+encodeURIComponent(ad.photo);add(im)};
+   if(ad.video){const v=document.createElement('video');v.src='/api/media?k='+encodeURIComponent(ad.video);v.autoplay=true;v.muted=true;v.playsInline=true;v.loop=!ad.photo;if(ad.photo)v.onended=()=>{v.remove();ph()};add(v)}
+   else if(ad.photo)ph()}
+  else if(ad.type==='apk'){
+   tx.textContent=ad.title+(ad.text?' — '+ad.text:'');
+   if(ad.photo){const im=document.createElement('img');im.src='/api/file?k=img&id='+encodeURIComponent(ad.id);im.onerror=()=>im.remove();add(im)}
+   go=async()=>{adClose();if(!LIST.find(i=>i.id===ad.id))await loadFiles();openDetail(ad.id)}}
+  else return}
+ m.onclick=e=>{if(e.target.closest('#adskip'))return;if(go)go()};
+ const delay=Math.max(3,+ad.delay||5);let n=delay;   // pas de plafond : le délai choisi côté bot (même > 20 s) est respecté tel quel
+ el.classList.add('on');
+ sk.disabled=true;x.disabled=true;sk.textContent='Skip '+n+'s';
+ bar.style.transition='none';bar.style.width='0';void bar.offsetWidth;bar.style.transition='width '+delay+'s linear';bar.style.width='100%';
+ showAd._i=setInterval(()=>{n--;if(n>0){sk.textContent='Skip '+n+'s';return}clearInterval(showAd._i);sk.disabled=false;x.disabled=false;sk.textContent='Skip ›'},1000);
+ sk.onclick=adClose;x.onclick=adClose}
+let hidAt=0;document.addEventListener('visibilitychange',()=>{if(document.hidden)hidAt=Date.now();else if(user&&hidAt&&Date.now()-hidAt>120000&&!$('#adm').classList.contains('on')){hidAt=0;showAd(true)}});
 /* ---- notifications push (marchent même site fermé, une fois activées) ---- */
 const b64u2arr = s => { const p = '='.repeat((4 - s.length % 4) % 4), b = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from([...b].map(c => c.charCodeAt(0))); };
 async function pushState() {
