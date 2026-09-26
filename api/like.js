@@ -1,4 +1,5 @@
 import { redis, whoami } from '../lib/db.js';
+import { savePush, removePush } from '../lib/push.js';
 
 export default async (req, res) => {
   if (req.method === 'GET') {   // fichiers likés par cet utilisateur (pour l'état ❤ au chargement)
@@ -7,7 +8,19 @@ export default async (req, res) => {
     res.setHeader('Cache-Control', 'no-store');
     return res.json((await redis.smembers('ulikes:' + v)) || []);
   }
+  if (req.query.k === 'pushkey') {   // clé publique VAPID nécessaire au navigateur pour s'abonner (rien de secret ici)
+    if (!process.env.VAPID_PUBLIC_KEY) return res.status(500).json({ error: 'Push not configured' });
+    return res.json({ key: process.env.VAPID_PUBLIC_KEY });
+  }
   if (req.method !== 'POST') return res.status(405).end();
+  if (req.query.k === 'push') {   // abonnement / désabonnement aux notifications du navigateur, lié au compte connecté
+    const me = await whoami(req);
+    if (!me) return res.status(401).json({ error: 'Please log in to enable notifications' });
+    const b = req.body || {};
+    if (b.sub) { await savePush(me, b.sub); return res.json({ ok: true }); }
+    if (b.unsub) { await removePush(me); return res.json({ ok: true }); }
+    return res.status(400).json({ error: 'Missing sub or unsub' });
+  }
   if (req.query.k === 'view') {   // vue d'un APK : 1 par compte
     const me = await whoami(req), vid = String(req.body?.id || '');
     if (!me || !vid || !await redis.hexists('items', vid)) return res.status(400).json({ error: 'Invalid request' });
