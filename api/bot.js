@@ -24,8 +24,8 @@ const HELP = `📥 Ajouter : envoie une photo avec en légende le titre (ligne 1
 /upload id — idem pour un seul fichier
 /notify texte — notification envoyée à tous (site + Telegram). Ajoute une photo en légende, ou réponds à une photo avec /notify texte, pour l'inclure.
 /ad off — désactiver la pub du site
-/ad page url délai(≤20s) — pub = ta page d'accueil, croix après le délai
-/ad media délai lien texte — en réponse à une photo/vidéo : pub média sur le site
+/ad page url délai — pub plein écran = ta page d'accueil, croix/Skip après le délai (en secondes, sans plafond)
+/ad media délai lien texte — en réponse à une photo/vidéo : pub média plein écran sur le site (délai en secondes, sans plafond)
 /help — aide rapide (liste des commandes, sans les explications)
 /admins — voir les admins
 /addadmin ID · /rmadmin ID (propriétaire)
@@ -97,8 +97,6 @@ const goodbyeSegments = u => [
   seg("\n╰▱▱▱▱▱▱▱▱\n≪ 𝚃𝙷𝙴 𝙷'𝙴𝚂 𝚂𝙷𝙾𝙿 "), pemo('🛒'), seg('≫'),
 ];
 
-// Photo de PROFIL de la personne elle-même uniquement (jamais celle du groupe ou du bot en repli,
-// pour que le message de bienvenue/départ montre toujours la bonne personne — ou une image aléatoire).
 async function personPhotoFileId(u) {
   try {
     const p = await tg('getUserProfilePhotos', { user_id: u.id, limit: 1 });
@@ -267,26 +265,27 @@ async function handle(m) {
     return say(`✅ Notification envoyée (site + ${users.length} utilisateurs Telegram + ${p.ok}/${p.total} navigateurs)${photoUrl ? ' 🖼' : ''}`);
   }
   if (cmd === '/ad') {
+    // Note : le délai n'est plus plafonné à 20 s, il est envoyé tel quel au site (Math.max(0, ...) uniquement, pas de min()).
     const [, mode, ...rest] = text.split(/\s+/);
     if (mode === 'off') { await redis.del('ad'); return say('✅ Pub désactivée'); }
     if (mode === 'page') {
-      const url = rest[0], delay = Math.max(0, Math.min(20, parseInt(rest[1]) || 5));
-      if (!/^https?:\/\//.test(url || '')) return say('Usage : /ad page https://... délai(≤20s)');
+      const url = rest[0], delay = Math.max(0, parseInt(rest[1]) || 5);
+      if (!/^https?:\/\//.test(url || '')) return say('Usage : /ad page https://... délai (en secondes, sans plafond)');
       await redis.set('ad', { type: 'page', url, delay, ts: Date.now() });
-      return say(`✅ Pub page activée (croix après ${delay}s)`);
+      return say(`✅ Pub plein écran (page) activée — Skip possible après ${delay}s`);
     }
     if (mode === 'media') {
       const rp = m.reply_to_message;
       if (!rp) return say("Réponds à un message avec une photo et/ou une vidéo : /ad media délai lien texte");
-      const delay = Math.max(0, Math.min(20, parseInt(rest[0]) || 5)), link_ = rest[1] || '', adText = rest.slice(2).join(' ');
+      const delay = Math.max(0, parseInt(rest[0]) || 5), link_ = rest[1] || '', adText = rest.slice(2).join(' ');
       const put = async (file, mime, name) => { const k = Date.now().toString(36) + Math.random().toString(36).slice(2, 5); await redis.hset('media', { [k]: { k, file, mime, name, owner: 'admin' } }); return k; };
       const video = rp.video ? await put(rp.video.file_id, 'video/mp4', 'ad.mp4') : null;
       const photo = rp.photo ? await put(rp.photo.at(-1).file_id, 'image/jpeg', 'ad.jpg') : null;
       if (!video && !photo) return say('Le message ne contient ni photo ni vidéo');
       await redis.set('ad', { type: 'media', video, photo, link: link_, text: adText, delay, ts: Date.now() });
-      return say(`✅ Pub média activée (croix après ${delay}s)`);
+      return say(`✅ Pub plein écran (média) activée — Skip possible après ${delay}s`);
     }
-    return say('Usage : /ad off · /ad page url délai · /ad media délai lien texte (en réponse à une photo/vidéo)');
+    return say('Usage : /ad off · /ad page url délai · /ad media délai lien texte (en réponse à une photo/vidéo) — délai en secondes, sans plafond');
   }
 
   const rp = m.reply_to_message;
