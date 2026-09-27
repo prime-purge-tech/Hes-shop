@@ -7,6 +7,42 @@ import { pushToAll } from '../lib/push.js';
 const pick = () => PICS[Math.floor(Math.random() * PICS.length)] || WELCOME_PIC;
 export const config = { maxDuration: 60 };
 
+// Communautés à rejoindre avant de pouvoir utiliser le bot — bot déjà admin sur les 3 canaux Telegram,
+// ce qui permet de vérifier l'appartenance automatiquement (WhatsApp reste un simple lien, non vérifiable).
+const CHANNELS = [
+  { url: 'https://t.me/PRIME_PURGE', chatId: '@PRIME_PURGE', label: '📢 Join PRIME_PURGE' },
+  { url: 'https://t.me/PRlME_PURGE_TECH', chatId: '@PRlME_PURGE_TECH', label: '📢 Join PRIME_PURGE_TECH' },
+  { url: 'https://t.me/HESSS_SUPPORT', chatId: '@HESSS_SUPPORT', label: '📢 Join HESSS_SUPPORT' },
+];
+const WA_CHANNEL_URL = 'https://whatsapp.com/channel/0029Vb7Ibg5002T79MWH2r1p';
+const JOIN_BTN = {
+  inline_keyboard: [
+    ...CHANNELS.map(c => [{ text: c.label, url: c.url }]),
+    [{ text: '🟢 Join WhatsApp', url: WA_CHANNEL_URL }],
+    [{ text: "✅ J'ai rejoint", callback_data: 'chk_join' }],
+  ],
+};
+// true = membre des 3 canaux, false = il en manque au moins un, null = aucun canal vérifiable
+// (le bot n'y est pas admin) -> dans ce cas on laisse passer, pour ne jamais bloquer tout le monde
+// à cause d'une mauvaise configuration.
+async function isMember(userId) {
+  let checked = false, allGood = true;
+  for (const c of CHANNELS) {
+    try {
+      const r = await tg('getChatMember', { chat_id: c.chatId, user_id: userId });
+      if (!r.ok) continue;
+      checked = true;
+      if (!['member', 'administrator', 'creator'].includes(r.result.status)) allGood = false;
+    } catch {}
+  }
+  return checked ? allGood : null;
+}
+const sendJoinGate = chat => tg('sendPhoto', {
+  chat_id: chat, photo: pick(),
+  caption: "🔒 Pour utiliser ce bot, rejoins d'abord nos communautés, puis appuie sur « J'ai rejoint ».",
+  reply_markup: JOIN_BTN,
+});
+
 const HELP = `📥 Ajouter : envoie une photo avec en légende le titre (ligne 1) puis la description. Les photos suivantes (sans légende) = captures d'écran en bas de la page de l'app. Enfin envoie le fichier / APK.
 
 /list — voir les publications
@@ -98,10 +134,20 @@ const goodbyeSegments = u => [
   seg("\n╰▱▱▱▱▱▱▱▱\n≪ 𝚃𝙷𝙴 𝙷'𝙴𝚂 𝚂𝙷𝙾𝙿 "), pemo('🛒'), seg('≫'),
 ];
 
+// Photo affichée pour le welcome/goodbye : la photo de profil de la personne, sinon celle du bot lui-même
+// (jamais une photo aléatoire à cette étape — le repli aléatoire n'intervient qu'en tout dernier recours,
+// si même le bot n'a pas de photo).
 async function personPhotoFileId(u) {
   try {
     const p = await tg('getUserProfilePhotos', { user_id: u.id, limit: 1 });
     if (p.ok && p.result.total_count > 0) return p.result.photos[0].at(-1).file_id;
+  } catch {}
+  try {
+    const me = await tg('getMe');
+    if (me.ok) {
+      const p = await tg('getUserProfilePhotos', { user_id: me.result.id, limit: 1 });
+      if (p.ok && p.result.total_count > 0) return p.result.photos[0].at(-1).file_id;
+    }
   } catch {}
   return null;
 }
@@ -153,11 +199,17 @@ async function handle(m) {
   const capText = (m.caption || '').trim();
   const [cc0] = capText.split(/\s+/), captionCmd = cc0?.split('@')[0];
 
+  const admin = await isAdmin(id);
+  if (!admin) {
+    const joined = await isMember(id);
+    if (joined === false) return sendJoinGate(chat);   // pas encore rejoint : on bloque avant tout le reste
+  }
+
   if (cmd === '/start') {
     const it = arg?.startsWith('f_') && await redis.hget('items', arg.slice(2));
     await redis.sadd('bu', String(id));
     if (it) { await redis.hincrby('dls', it.id, 1); return sendBranded(chat, it); }
-    if (await isAdmin(id)) return sendFramed(chat, pick(), helpSegments());
+    if (admin) return sendFramed(chat, pick(), helpSegments());
     return send(chat, pick(),
       `👋 Bienvenue ${nm(m.from)} sur <b>H'es chop</b> !\n\nApps, fichiers et discussions : tout est dans la mini app ci-dessous.`);
   }
@@ -170,7 +222,7 @@ async function handle(m) {
       reply_markup: { inline_keyboard: [[{ text: '🌐 Ouvrir le site', url: siteUrl() + '/' }]] },
     });
   }
-  if (!await isAdmin(id)) return;
+  if (!admin) return;
   const owner = String(id) === String(process.env.OWNER_ID);
 
   if (cmd === '/help') return sendFramed(chat, null, helpSegments());
@@ -266,7 +318,6 @@ async function handle(m) {
     return say(`✅ Notification envoyée (site + ${users.length} utilisateurs Telegram + ${p.ok}/${p.total} navigateurs)${photoUrl ? ' 🖼' : ''}`);
   }
   if (cmd === '/ad') {
-    // Note : le délai n'est plus plafonné à 20 s, il est envoyé tel quel au site (Math.max(0, ...) uniquement, pas de min()).
     const [, mode, ...rest] = text.split(/\s+/);
     if (mode === 'off') { await redis.del('ad'); return say('✅ Pub désactivée'); }
     if (mode === 'page') {
@@ -356,8 +407,27 @@ async function handle(m) {
   return say(HELP);
 }
 
+// Clic sur "✅ J'ai rejoint" : revérifie l'appartenance et, si c'est bon, relance /start.
+async function handleCallback(cq) {
+  const chat = cq.message?.chat?.id;
+  if (cq.data === 'chk_join') {
+    const ok = await isMember(cq.from.id);
+    await tg('answerCallbackQuery', {
+      callback_query_id: cq.id,
+      text: ok === false ? "Tu n'as pas encore rejoint 😅" : 'Merci ! ✅',
+      show_alert: ok === false,
+    });
+    if (ok !== false && chat) {
+      await tg('deleteMessage', { chat_id: chat, message_id: cq.message.message_id }).catch(() => {});
+      await handle({ from: cq.from, chat: cq.message.chat, text: '/start' }).catch(console.error);
+    }
+  }
+}
+
 export default async (req, res) => {
   if (req.headers['x-telegram-bot-api-secret-token'] !== process.env.WEBHOOK_SECRET) return res.status(401).end();
+  const cq = req.body?.callback_query;
+  if (cq) { await handleCallback(cq).catch(console.error); return res.status(200).end(); }
   const m = req.body?.message;
   if (m?.new_chat_members || m?.left_chat_member) await group(m).catch(console.error);
   else if (m?.chat?.type === 'private') await handle(m).catch(e => {
