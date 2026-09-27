@@ -462,13 +462,15 @@ $('#zm').onclick=()=>$('#zm').classList.remove('on');
 const DLI=S('<path d="M12 5v14M5 12l7 7 7-7"/>');
 const ext=i=>((i.name||'').split('.').pop()||'FILE').toUpperCase().slice(0,4);
 let render=()=>{};
-async function loadFiles(){$('#fl').innerHTML='<p class="sub" style="margin:0">Loading…</p>';
+let DL={};try{DL=JSON.parse(localStorage.getItem('hesDL:'+user)||'{}')}catch{}
+async function loadFiles(){try{DL=JSON.parse(localStorage.getItem('hesDL:'+user)||'{}')}catch{}
+ $('#fl').innerHTML='<p class="sub" style="margin:0">Loading…</p>';
  try{const [d,m]=await Promise.all([fetch('/api/items').then(r=>r.json()),fetch('/api/like?v='+encodeURIComponent(user)).then(r=>r.json())]);
   BOT=d.bot;LIST=d.items.map(i=>({...i,mine:m.includes(i.id)}));render()}
  catch{$('#fl').innerHTML='<p class="sub" style="margin:0">Could not load the files. Try again later.</p>'}}
 $('#sb').onclick=()=>{const o=$('#files .top').classList.toggle('s');if(o)$('#q').focus();else{$('#q').value='';render()}};$('#q').oninput=()=>render();
 async function start(d){const i=LIST.find(x=>x.id===d.dataset.id),sp=d.querySelector('.tx2');if(!i||d.classList.contains('go'))return;
- if(d.dataset.need&&PROF.badge!==d.dataset.need)return toast('This file needs the '+d.dataset.need+' badge');
+ if(!TOKEN)return toast('Please log in again to download');   // la regle des badges est verifiee par le serveur, pas ici
  const w=tgw(),id=encodeURIComponent(i.id),deep=`https://t.me/${BOT}?start=f_${i.id}`,url='/api/file?k=dl&id='+id;
  const fin=ok=>{sp.textContent=ok?'Done ✓':'Failed';d.classList.add(ok?'done':'err');setTimeout(()=>{d.classList.remove('go','done','err');sp.textContent='Download'},2500)};
  d.classList.add('go');sp.textContent='Downloading…';
@@ -482,6 +484,7 @@ async function start(d){const i=LIST.find(x=>x.id===d.dataset.id),sp=d.querySele
    const a=document.createElement('a');a.href=url+'&t='+encodeURIComponent(TOKEN);a.download=i.dn||i.name||'file';
    document.body.appendChild(a);a.click();a.remove();
   }
+  DL[i.id]=1;try{localStorage.setItem('hesDL:'+user,JSON.stringify(DL))}catch{}
   fin(true)
  }catch{fin(false);toast('Not available right now. Try again later.')}}
 $('#app').addEventListener('click',async e=>{const zi=e.target.closest('.pv2');if(zi){$('#zi').src=zi.src;$('#zm').classList.add('on');return}const o=e.target.closest('[data-o]');if(o)return openDetail(o.dataset.o);const d=e.target.closest('.cb');if(d)return start(d);
@@ -540,10 +543,13 @@ setInterval(()=>{if(!document.hidden)pollNotif()},15000);
 
 /* ---- liste Play Store + page detail ---- */
 const ico=i=>i.hasImg?'/api/file?k=img&id='+encodeURIComponent(i.id):'';
+const shot0=i=>i.ns?'/api/file?k=img&id='+encodeURIComponent(i.id)+'&n=0':ico(i);   // grande photo du carrousel : 1ere capture d'ecran si dispo, sinon l'icone
 const tc=i=>`<div class="tc" data-o="${esc(i.id)}"><img src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><b>${esc(i.title)}</b><small>${i.rn?i.rt+' ★':'New'} · ⬇ ${i.dls}</small></div>`;
-render=()=>{const q=$('#q').value.trim().toLowerCase(),rows=LIST.filter(i=>!q||(i.title+' '+i.desc).toLowerCase().includes(q));
+render=()=>{const q=$('#q').value.trim().toLowerCase();
+ const rows=LIST.filter(i=>!q||(i.title+' '+i.desc).toLowerCase().includes(q))
+   .sort((a,b)=>(DL[a.id]?1:0)-(DL[b.id]?1:0)||a.ts-b.ts);   // non telecharges d'abord, les plus anciens en tete
  const feat=[...LIST].sort((a,b)=>b.dls-a.dls||b.ts-a.ts).slice(0,5),rec=[...LIST].sort((a,b)=>b.ts-a.ts).slice(0,12);
- const bn=i=>`<div class="bn" data-o="${esc(i.id)}"><img class="bimg" src="${ico(i)}" alt="" onerror="this.remove()"><div class="bo"><h3>${esc(i.title)}</h3><p>${esc((i.desc||'').split('\n')[0].slice(0,60))}</p><div class="bl"><img class="ic3" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div><b>${esc(i.title)}</b><small>${i.rn?i.rt+' ★ · ':''}⬇ ${i.dls}</small></div><span class="gt">Get</span></div></div></div>`;
+ const bn=i=>`<div class="bn" data-o="${esc(i.id)}"><img class="bimg" src="${shot0(i)}" alt="" onerror="this.remove()"><div class="bo"><h3>${esc(i.title)}</h3><p>${esc((i.desc||'').split('\n')[0].slice(0,60))}</p><div class="bl"><img class="ic3" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div><b>${esc(i.title)}</b><small>${i.rn?i.rt+' ★ · ':''}⬇ ${i.dls}</small></div><span class="gt">Get</span></div></div></div>`;
  $('#fl').innerHTML=(q||!LIST.length?'':`<div class="hb">${feat.map(bn).join('')}</div><div class="hs"><h3>Recommended</h3></div><div class="hc auto">${rec.map(tc).join('')}</div><div class="hs"><h3>All apps</h3></div>`)
  +(rows.map(i=>`<div class="pr rv" data-o="${esc(i.id)}"><img class="ic2" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3>${esc(i.title)}</h3><small>${esc(ext(i))}${sz(i.size)}</small><small>${i.rn?i.rt+' ★':'New'} &nbsp; ⬇ ${i.dls} &nbsp; ❤ ${i.likes}</small></div></div>`).join('')||emptyHTML);
  reveal('files')};
