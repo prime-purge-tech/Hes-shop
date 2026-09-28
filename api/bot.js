@@ -2,44 +2,6 @@ import { redis, tg, admins, isAdmin, BRAND, brandName } from '../lib/db.js';
 import { PICS, WELCOME_PIC } from '../lib/pics.js';
 export const config = { maxDuration: 60 };
 
-const siteUrl = () => (process.env.SITE_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL ? 'https://' + process.env.VERCEL_PROJECT_PRODUCTION_URL : 'https://hes-shop.vercel.app')).replace(/\/$/, '');
-const pickPic = () => PICS[Math.floor(Math.random() * PICS.length)] || WELCOME_PIC;
-
-// Communautés à rejoindre avant d'utiliser le bot. Le bot est admin des 3 canaux Telegram : l'appartenance
-// est vérifiée automatiquement. WhatsApp reste un simple lien (impossible à vérifier via l'API Telegram).
-const CHANNELS = [
-  { url: 'https://t.me/PRIME_PURGE', chatId: '@PRIME_PURGE', label: '📢 Join PRIME_PURGE' },
-  { url: 'https://t.me/PRlME_PURGE_TECH', chatId: '@PRlME_PURGE_TECH', label: '📢 Join PRIME_PURGE_TECH' },
-  { url: 'https://t.me/HESSS_SUPPORT', chatId: '@HESSS_SUPPORT', label: '📢 Join HESSS_SUPPORT' },
-];
-const WA_CHANNEL_URL = 'https://whatsapp.com/channel/0029Vb7Ibg5002T79MWH2r1p';
-const JOIN_BTN = {
-  inline_keyboard: [
-    ...CHANNELS.map(c => [{ text: c.label, url: c.url }]),
-    [{ text: '🟢 Join WhatsApp', url: WA_CHANNEL_URL }],
-    [{ text: "✅ J'ai rejoint", callback_data: 'chk_join' }],
-  ],
-};
-// true = membre des 3 canaux · false = il en manque au moins un · null = aucun canal vérifiable
-// (le bot n'y est pas admin) -> on laisse passer plutôt que de bloquer tout le monde.
-async function isMember(userId) {
-  let checked = false, allGood = true;
-  for (const c of CHANNELS) {
-    try {
-      const r = await tg('getChatMember', { chat_id: c.chatId, user_id: userId });
-      if (!r.ok) continue;
-      checked = true;
-      if (!['member', 'administrator', 'creator'].includes(r.result.status)) allGood = false;
-    } catch {}
-  }
-  return checked ? allGood : null;
-}
-const sendJoinGate = chat => tg('sendPhoto', {
-  chat_id: chat, photo: pickPic(),
-  caption: "🔒 Pour utiliser ce bot, rejoins d'abord nos communautés, puis appuie sur « J'ai rejoint ».",
-  reply_markup: JOIN_BTN,
-});
-
 const HELP = `📥 Ajouter : envoie une photo avec en légende le titre (ligne 1) puis la description. Les photos suivantes (sans légende) = captures d'écran en bas de la page de l'app. Enfin envoie le fichier / APK.
 
 /list — voir les publications
@@ -56,7 +18,6 @@ const HELP = `📥 Ajouter : envoie une photo avec en légende le titre (ligne 1
 /ad off — désactiver la pub du site
 /ad page url délai(≤20s) — pub = ta page d'accueil, croix après le délai
 /ad media délai lien texte — en réponse à une photo/vidéo : pub média sur le site
-/link — lien du site (pour tout le monde)
 /admins — voir les admins
 /addadmin ID · /rmadmin ID (propriétaire)
 
@@ -73,34 +34,13 @@ const send = (chat, url, caption) => {
     .then(r => r.ok ? r : tg('sendMessage', { chat_id: chat, text: caption, parse_mode: 'HTML', reply_markup: BTN }));
 };
 
-// Photo du welcome/goodbye : la photo de profil de la personne, sinon celle du bot.
-async function personPhotoFileId(u) {
-  try {
-    const p = await tg('getUserProfilePhotos', { user_id: u.id, limit: 1 });
-    if (p.ok && p.result.total_count > 0) return p.result.photos[0].at(-1).file_id;
-  } catch {}
-  try {
-    const me = await tg('getMe');
-    if (me.ok) {
-      const p = await tg('getUserProfilePhotos', { user_id: me.result.id, limit: 1 });
-      if (p.ok && p.result.total_count > 0) return p.result.photos[0].at(-1).file_id;
-    }
-  } catch {}
-  return null;
-}
-
-// bienvenue / au revoir dans les groupes (avec la photo de la personne, ou celle du bot)
+// bienvenue / au revoir dans les groupes
 async function group(m) {
-  for (const u of m.new_chat_members || []) {
-    if (u.is_bot) continue;
-    const fid = await personPhotoFileId(u);
-    await send(m.chat.id, fid || WELCOME_PIC, `🎉 Bienvenue ${nm(u)} dans <b>${esc(m.chat.title)}</b> !\nPasse par notre boutique 👇`);
-  }
+  for (const u of m.new_chat_members || [])
+    if (!u.is_bot) await send(m.chat.id, WELCOME_PIC, `🎉 Bienvenue ${nm(u)} dans <b>${esc(m.chat.title)}</b> !\nPasse par notre boutique 👇`);
   const l = m.left_chat_member;
-  if (l && !l.is_bot) {
-    const fid = await personPhotoFileId(l);
-    await send(m.chat.id, fid || WELCOME_PIC, `👋 ${nm(l)} a quitté le groupe. À bientôt !`);
-  }
+  if (l && !l.is_bot)
+    await tg('sendMessage', { chat_id: m.chat.id, parse_mode: 'HTML', text: `👋 ${nm(l)} a quitté le groupe. À bientôt !`, reply_markup: BTN });
 }
 
 // envoie le fichier sous le nom « H'ES SHOP - Titre.ext » (re-envoi si < 20 Mo, sinon file_id d'origine)
@@ -128,32 +68,16 @@ async function handle(m) {
   const text = (m.text || '').trim();
   const [c0, arg] = text.split(/\s+/), cmd = c0?.split('@')[0];
 
-  // portail d'abonnement : les admins passent toujours, les autres doivent avoir rejoint les canaux
-  const admin = await isAdmin(id);
-  if (!admin) {
-    const joined = await isMember(id);
-    if (joined === false) return sendJoinGate(chat);
-  }
-
   // gros fichiers (>20 Mo) : lien du site -> /start f_<id>
   if (cmd === '/start') {
     const it = arg?.startsWith('f_') && await redis.hget('items', arg.slice(2));
     await redis.sadd('bu', String(id));   // utilisateurs du bot (pour les pubs)
     if (it) { await redis.hincrby('dls', it.id, 1); return sendBranded(chat, it); }
-    await send(chat, pickPic(),
+    await send(chat, PICS[Math.floor(Math.random() * PICS.length)],
       `👋 Bienvenue ${nm(m.from)} sur <b>H'es chop</b> !\n\nApps, fichiers et discussions : tout est dans la mini app ci-dessous.`);
-    return admin ? say(HELP) : undefined;
+    return (await isAdmin(id)) ? say(HELP) : undefined;
   }
-  if (cmd === '/link') {
-    await redis.sadd('bu', String(id));
-    return tg('sendMessage', {
-      chat_id: chat,
-      text: `🔗 <b>H'es Store</b>\n${siteUrl()}/`,
-      parse_mode: 'HTML',
-      reply_markup: { inline_keyboard: [[{ text: '🌐 Ouvrir le site', url: siteUrl() + '/' }]] },
-    });
-  }
-  if (!admin) return;
+  if (!await isAdmin(id)) return;
   const owner = String(id) === String(process.env.OWNER_ID);
 
   // pub : réponds à un message (photo + texte) avec /pub [lien] [texte du bouton]
@@ -294,26 +218,8 @@ async function handle(m) {
   return say(HELP);
 }
 
-// Clic sur « ✅ J'ai rejoint » : revérifie l'appartenance puis relance /start si c'est bon.
-async function handleCallback(cq) {
-  if (cq.data !== 'chk_join') return tg('answerCallbackQuery', { callback_query_id: cq.id });
-  const ok = await isMember(cq.from.id);
-  await tg('answerCallbackQuery', {
-    callback_query_id: cq.id,
-    text: ok === false ? "Tu n'as pas encore rejoint 😅" : 'Merci ! ✅',
-    show_alert: ok === false,
-  });
-  const chat = cq.message?.chat;
-  if (ok !== false && chat) {
-    await tg('deleteMessage', { chat_id: chat.id, message_id: cq.message.message_id });
-    await handle({ from: cq.from, chat, text: '/start' });
-  }
-}
-
 export default async (req, res) => {
   if (req.headers['x-telegram-bot-api-secret-token'] !== process.env.WEBHOOK_SECRET) return res.status(401).end();
-  const cq = req.body?.callback_query;
-  if (cq) { await handleCallback(cq).catch(console.error); return res.status(200).end(); }
   const m = req.body?.message;
   if (m?.new_chat_members || m?.left_chat_member) await group(m).catch(console.error);
   else if (m?.chat?.type === 'private') await handle(m).catch(e => {
