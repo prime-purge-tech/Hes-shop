@@ -315,6 +315,19 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 <form class="cfm" id="chf"><div class="pl"><button type="button" id="at" aria-label="Attach"><i data-i="plus"></i></button><input class="ta" id="cx" maxlength="300" placeholder="Your message…" aria-label="Chat message" autocomplete="off"><button type="button" id="sk" aria-label="Stickers">😊</button></div><button type="button" class="go" id="go" aria-label="Send or record"><i data-i="mic"></i></button><input type="file" id="mf" accept="image/*,video/*" hidden></form></section>
 
 
+<section class="screen" id="submit"><div class="top"><button class="sq mn" aria-label="Menu"><i data-i="menu"></i></button><h2>ADD APP</h2></div>
+<div class="body">
+<form class="card cf" id="sbf">
+<label>App or file name</label><div class="inp"><i data-i="phone"></i><input id="sbn" maxlength="60" placeholder="Enter the name" autocomplete="off"></div>
+<label>Icon</label><label class="btn" style="margin:0 0 22px"><i data-i="phone"></i>Choose an icon<input type="file" accept="image/*" id="sbi" hidden></label>
+<img id="sbp" alt="" style="display:none;width:88px;height:88px;border-radius:20px;object-fit:cover;margin:-8px auto 20px;display:block">
+<label>Description</label><textarea class="ta" id="sbd" rows="4" maxlength="500" placeholder="What does it do?" style="margin-bottom:22px"></textarea>
+<button class="btn c" id="sbs" type="submit"><i data-i="send"></i><span>Send for review</span></button>
+</form>
+<p class="sub" style="text-align:center;margin-top:18px">Sent to the team for review. Once approved, you'll be asked to send the file to the bot.</p>
+</div></section>
+
+
 <section class="screen" id="help"><div class="top"><button class="sq mn" aria-label="Menu"><i data-i="menu"></i></button><h2>ABOUT</h2></div>
 <div class="body">
 <div class="card au2 rv" style="text-align:center"><img src="https://ganga--link--ghhzdp9sv8hk.code.run/i/jtn1l7jk.jpg" alt="" onerror="this.remove()">
@@ -338,7 +351,7 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 </div></section>
 
 <section class="screen" id="detail"><div class="top"><button class="sq" data-back aria-label="Back"><i data-i="back"></i></button><h2>APP</h2></div><div class="body" id="db"></div></section>
-<div class="nav2"><button data-go="dash" aria-label="Home"><i data-i="grid"></i></button><button data-go="files" aria-label="Files"><i data-i="phone"></i></button><button data-go="chat" aria-label="Chat"><i data-i="chat"></i></button><button data-go="comments" aria-label="Reviews"><i data-i="wa"></i></button><button data-go="help" aria-label="About"><i data-i="user"></i></button></div>
+<div class="nav2"><button data-go="dash" aria-label="Home"><i data-i="grid"></i></button><button data-go="chat" aria-label="Chat"><i data-i="chat"></i></button><button data-go="submit" aria-label="Submit"><i data-i="plus"></i></button><button data-go="comments" aria-label="Reviews"><i data-i="wa"></i></button><button data-go="help" aria-label="About"><i data-i="user"></i></button></div>
 <div class="zm" id="zm"><img id="zi" alt=""></div>
 <div class="ov" id="ov"><div class="dr"><h2 data-name></h2><small>2026 – All rights reserved</small><hr>
 <h4>Store</h4>
@@ -381,7 +394,7 @@ const tgw=()=>window.Telegram&&window.Telegram.WebApp;
 try{tgw().ready();tgw().expand()}catch{}
 let user='',exp=0,cur='home',prev='home',timer,raf,ck,PROF={},LIST=[],BOT='',pend=null,last='',TOKEN='',CHAT=[],editId=null,PACKS=[],MINE=[],sf=[],replyTo=null,rec=null,recT=0,recI=null,STARS=0,ADSHOWN=false;
 (async()=>{try{const tk=localStorage.getItem('hesTok');if(tk){TOKEN=tk;const r=await fetch('/api/auth',{headers:{authorization:'Bearer '+tk}});if(r.ok){const j=await r.json();user=j.name;exp=j.exp;show('dash');pollNotif();showAd();return}localStorage.removeItem('hesTok')}}catch{}})();
-const NAV=['dash','files','comments','chat','help'];
+const NAV=['dash','files','comments','chat','help','submit'];
 function show(id){if(id!==cur){prev=cur;cur=id}
  $$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));$('#'+id).scrollTop=0;
  $('#ov').classList.remove('on');$('#app').classList.toggle('nv',NAV.includes(id));
@@ -678,6 +691,18 @@ $('#db').addEventListener('click',async e=>{const s=e.target.closest('[data-rs]'
  if(!r||!r.ok)return toast(j.error||'Could not send your review');
  const i=LIST.find(x=>x.id===b.dataset.id);if(i){i.rt=j.avg;i.rn=j.n}toast('Thanks for your review ★');loadReviews(b.dataset.id)});
 
+/* ---- envoi d'une app / d'un fichier (a valider par les admins) ---- */
+let sbIcon='';
+$('#sbi').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{sbIcon=await shrink(f);$('#sbp').src=sbIcon;$('#sbp').style.display='block'}catch{toast('Invalid image')}};
+$('#sbf').onsubmit=async e=>{e.preventDefault();const name=$('#sbn').value.trim(),desc=$('#sbd').value.trim();
+ if(name.length<2)return toast('Enter a name');if(!sbIcon)return toast('Choose an icon');if(desc.length<5)return toast('Add a short description');
+ const b=$('#sbs');b.disabled=true;
+ try{const r=await post('/api/comments?k=sub',{type:'app',name,desc,icon:sbIcon}),j=await r.json().catch(()=>({}));
+  if(!r.ok)return toast(j.error||'Something went wrong');
+  toast('Sent! Opening Telegram to send the file…');
+  const w=tgw();if(w&&w.openTelegramLink)w.openTelegramLink(j.deep);else if(j.deep)window.open(j.deep,'_blank','noopener');
+  $('#sbf').reset();$('#sbp').style.display='none';sbIcon=''
+ }catch{toast('Server unreachable, try again')}finally{b.disabled=false}};
 /* ---- quitter le site : confirmation solide ---- */
 history.pushState({h:1},'');
 window.addEventListener('popstate',()=>{history.pushState({h:1},'');if(confirm('Leave H\'es Store?'))history.go(-2)});
