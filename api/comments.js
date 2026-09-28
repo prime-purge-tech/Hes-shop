@@ -93,6 +93,22 @@ export default async (req, res) => {
   }
 
   /* ---------- notes (1 à 5 étoiles) et avis d'une publication ---------- */
+  /* ---------- demande d'ajout d'une app / d'un fichier (validée par les admins via le bot) ---------- */
+  if (req.query.k === 'sub' && req.method === 'POST') {
+    const me = await whoami(req);
+    if (!me) return res.status(401).json({ error: 'Log in again' });
+    if (await limit('rl:sub:' + me, 5, 3600)) return res.status(429).json({ error: 'Too many requests, try again later.' });
+    const b = req.body || {};
+    const type = b.type === 'file' ? 'file' : 'app';
+    const name = String(b.name || '').trim().slice(0, 60), desc = String(b.desc || '').trim().slice(0, 500), icon = String(b.icon || '');
+    if (name.length < 2 || desc.length < 5) return res.status(400).json({ error: 'Name and description are required.' });
+    if (!/^data:image\/(jpeg|png|webp);base64,/.test(icon) || icon.length > 300000) return res.status(400).json({ error: 'Invalid icon.' });
+    const id = 's' + Math.random().toString(16).slice(2, 12).padEnd(10, '0');
+    await redis.set('sub:' + id, { id, by: me, type, name, desc, icon, ts: Date.now() }, { ex: 604800 });
+    const bot = process.env.BOT_USERNAME;
+    return res.json({ ok: true, id, deep: bot ? `https://t.me/${bot}?start=sub_${id}` : '' });
+  }
+
   if (req.query.k === 'rev') {
     const id = String(req.query.id || req.body?.id || '');
     if (!id || !await redis.hexists('items', id)) return res.status(404).end();
