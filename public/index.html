@@ -123,12 +123,14 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
 
 .rv{opacity:0;transform:translateY(34px);filter:blur(10px);transition:opacity .7s,transform .7s,filter .7s}.rv.in{opacity:1;transform:none;filter:none}
-.hs{display:flex;align-items:center;margin:26px 0 12px}.hs h3{font-size:16px}
+.hs{display:flex;align-items:center;justify-content:space-between;margin:26px 0 12px}.hs h3{font-size:16px}
+.hs .hsdot{background:none;border:0;color:var(--mut);font-size:18px;padding:4px}
 .hc{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}.hc::-webkit-scrollbar{display:none}
 .tc{flex:0 0 104px;cursor:pointer}.tc img{display:block;width:104px;height:104px;border-radius:24px;object-fit:cover;background:#111524}
 .tc b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font:600 12px 'Orbitron',sans-serif;margin-top:8px}.tc small{color:var(--mut)}
 .pr{display:flex;gap:16px;align-items:center;padding:12px 0;cursor:pointer}
 .ic2{width:84px;height:84px;border-radius:20px}.pr .inf{display:flex;flex-direction:column;gap:3px}.pr .inf h3{font-size:16px}
+.pr .spn{color:#7fd8a0;font-size:12px;font-weight:600;letter-spacing:.4px}
 .stats{display:flex;margin:20px 0;text-align:center}.stats div{flex:1;border-left:1px solid var(--line)}.stats div:first-child{border:0}
 .stats b{display:block;font:600 15px 'Orbitron',sans-serif}.stats small{color:var(--mut)}
 .au{color:var(--cy);font-weight:600}.pv2{height:210px;border-radius:18px;object-fit:cover}
@@ -291,7 +293,8 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 <div class="two"><div class="card st"><small>Accounts</small><div><i data-i="users"></i><span id="stA">…</span></div></div><div class="card st"><small>APK &amp; ZIP</small><div><i data-i="phone"></i><span id="stF">…</span></div></div></div>
 <div class="sec">FEATURE NEWS</div>
 <button class="feat" data-link="wa"><div class="bx"><i data-i="wa" data-c="#fff"></i></div><div><h3>WhatsApp Hub</h3><p>Maximizing potential, boundless performance</p></div></button>
-<div class="card wth"><i data-i="cloud"></i><div><h3 id="clk">--:--</h3><p id="dt">--</p></div></div>
+<div class="hs"><h3>Sponsored · Recommendations</h3><button class="hsdot" aria-label="More">⋮</button></div>
+<div id="dashApps"></div>
 <div class="pc"><button class="pc-ic l mn" aria-label="Menu"><i data-i="menu"></i></button><button class="pc-ic r" id="pg" aria-label="Edit profile"><i data-i="sl"></i></button>
 <div class="pc-t"><div class="avw big"><div class="sh" id="mp"><i data-i="shield"></i></div><span class="bd" id="mb" hidden></span></div>
 <h3 id="nm">user</h3><small id="gr">Hello</small><span class="mb">MEMBER</span><small id="ex">Expired: --</small>
@@ -313,6 +316,23 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 <div id="ed" hidden>Editing your message <button type="button" id="ec" aria-label="Cancel">✕</button></div>
 <div id="rb" hidden><span id="rt"></span><button type="button" id="rc" aria-label="Cancel">✕</button></div>
 <form class="cfm" id="chf"><div class="pl"><button type="button" id="at" aria-label="Attach"><i data-i="plus"></i></button><input class="ta" id="cx" maxlength="300" placeholder="Your message…" aria-label="Chat message" autocomplete="off"><button type="button" id="sk" aria-label="Stickers">😊</button></div><button type="button" class="go" id="go" aria-label="Send or record"><i data-i="mic"></i></button><input type="file" id="mf" accept="image/*,video/*" hidden></form></section>
+
+
+<section class="screen" id="submit"><div class="top"><button class="sq mn" aria-label="Menu"><i data-i="menu"></i></button><h2>ADD APP</h2></div>
+<div class="body">
+<form class="card cf" id="sbf">
+<label>App or file name</label><div class="inp"><i data-i="phone"></i><input id="sbn" maxlength="60" placeholder="Enter the name" autocomplete="off"></div>
+<label>Icon</label><label class="btn" style="margin:0 0 22px"><i data-i="phone"></i>Choose an icon<input type="file" accept="image/*" id="sbi" hidden></label>
+<img id="sbp" alt="" style="display:none;width:88px;height:88px;border-radius:20px;object-fit:cover;margin:-8px auto 20px;display:block">
+<label>Description</label><textarea class="ta" id="sbd" rows="4" maxlength="500" placeholder="What does it do?" style="margin-bottom:22px"></textarea>
+<label>File to publish (APK, ZIP…)</label><label class="btn" style="margin:0 0 6px"><i data-i="phone"></i>Choose a file<input type="file" id="sbfile" hidden></label>
+<small class="sub" id="sbfn" style="display:block;margin:0 0 22px">No file selected · max 45 MB</small>
+<label>Screenshots (optional)</label><label class="btn" style="margin:0 0 10px"><i data-i="phone"></i>Choose screenshots<input type="file" accept="image/*" id="sbshots" multiple hidden></label>
+<div class="hc" id="sbsp" style="margin-bottom:22px"></div>
+<button class="btn c" id="sbs" type="submit"><i data-i="send"></i><span>Send for review</span></button>
+</form>
+<p class="sub" style="text-align:center;margin-top:18px">Sent straight to the team for review — no extra step needed. Once approved, it appears in the apps list.</p>
+</div></section>
 
 
 <section class="screen" id="help"><div class="top"><button class="sq mn" aria-label="Menu"><i data-i="menu"></i></button><h2>ABOUT</h2></div>
@@ -338,7 +358,7 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 </div></section>
 
 <section class="screen" id="detail"><div class="top"><button class="sq" data-back aria-label="Back"><i data-i="back"></i></button><h2>APP</h2></div><div class="body" id="db"></div></section>
-<div class="nav2"><button data-go="dash" aria-label="Home"><i data-i="grid"></i></button><button data-go="files" aria-label="Files"><i data-i="phone"></i></button><button data-go="chat" aria-label="Chat"><i data-i="chat"></i></button><button data-go="comments" aria-label="Reviews"><i data-i="wa"></i></button><button data-go="help" aria-label="About"><i data-i="user"></i></button></div>
+<div class="nav2"><button data-go="dash" aria-label="Home"><i data-i="grid"></i></button><button data-go="chat" aria-label="Chat"><i data-i="chat"></i></button><button data-go="submit" aria-label="Submit"><i data-i="plus"></i></button><button data-go="comments" aria-label="Reviews"><i data-i="wa"></i></button><button data-go="help" aria-label="About"><i data-i="user"></i></button></div>
 <div class="zm" id="zm"><img id="zi" alt=""></div>
 <div class="ov" id="ov"><div class="dr"><h2 data-name></h2><small>2026 – All rights reserved</small><hr>
 <h4>Store</h4>
@@ -379,9 +399,9 @@ const post=(u,b,m)=>fetch(u,{method:m||'POST',headers:{'content-type':'applicati
 const sz=n=>n?' · '+(n/1048576).toFixed(1)+' MB':'';
 const tgw=()=>window.Telegram&&window.Telegram.WebApp;
 try{tgw().ready();tgw().expand()}catch{}
-let user='',exp=0,cur='home',prev='home',timer,raf,ck,PROF={},LIST=[],BOT='',pend=null,last='',TOKEN='',CHAT=[],editId=null,PACKS=[],MINE=[],sf=[],replyTo=null,rec=null,recT=0,recI=null,STARS=0,ADSHOWN=false;
+let user='',exp=0,cur='home',prev='home',timer,raf,ck,PROF={},LIST=[],ADS=[],BOT='',pend=null,last='',TOKEN='',CHAT=[],editId=null,PACKS=[],MINE=[],sf=[],replyTo=null,rec=null,recT=0,recI=null,STARS=0,ADSHOWN=false;
 (async()=>{try{const tk=localStorage.getItem('hesTok');if(tk){TOKEN=tk;const r=await fetch('/api/auth',{headers:{authorization:'Bearer '+tk}});if(r.ok){const j=await r.json();user=j.name;exp=j.exp;show('dash');pollNotif();showAd();return}localStorage.removeItem('hesTok')}}catch{}})();
-const NAV=['dash','files','comments','chat','help'];
+const NAV=['dash','files','comments','chat','help','submit'];
 function show(id){if(id!==cur){prev=cur;cur=id}
  $$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));$('#'+id).scrollTop=0;
  $('#ov').classList.remove('on');$('#app').classList.toggle('nv',NAV.includes(id));
@@ -426,15 +446,14 @@ $('#asv').onclick=async()=>{const nu=$('#anu').value.trim().toLowerCase(),np=$('
  user=j.name;TOKEN=j.token;try{localStorage.setItem('hesTok',TOKEN)}catch{};$('#anu').value='';$('#anp').value='';$('#acp').value='';toast('Account updated');dash()};
 async function dash(){const h=new Date().getHours();$('#gr').textContent=h<5?'Good night':h<12?'Good morning':h<18?'Good afternoon':'Good evening';
  $('#nm').textContent=user;$('#ex').textContent='Expired: '+new Date(exp||Date.now()).toISOString().slice(0,10);
- const tick=()=>{const d=new Date();$('#clk').textContent=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});$('#dt').textContent=d.toLocaleDateString([],{weekday:'long',day:'numeric',month:'long'})};
- tick();clearInterval(ck);ck=setInterval(tick,15000);
  try{const j=await (await fetch('/api/stats')).json();$('#stA').textContent=j.accounts??'–';$('#stF').textContent=j.files??'–'}catch{}
  try{PROF=await (await fetch('/api/profile?u='+encodeURIComponent(user))).json();const a=`<img class="av2" src="${esc(PROF.photo)}" alt="" onerror="this.remove()">`;$('#mp').innerHTML=a;$('#tp').innerHTML=a;const bb=PROF.badge;$('#mb').className='bd '+(bb||'');$('#mb').hidden=!bb;$('#mb').innerHTML=bb?BD:''}catch{}
- await ensureList();renderCrew();startFban()}
+ await ensureList();await ensureAds();renderCrew();startFban();renderDashApps()}
 /* ---- bannière du haut (tourne toutes les 8s parmi les apps a badge) + top 3 telechargements ---- */
 async function ensureList(){if(LIST.length)return;
  try{const [d,m]=await Promise.all([fetch('/api/items').then(r=>r.json()),fetch('/api/like?v='+encodeURIComponent(user)).then(r=>r.json())]);
   BOT=d.bot;LIST=d.items.map(i=>({...i,mine:m.includes(i.id)}))}catch{}}
+async function ensureAds(){try{const j=await (await fetch('/api/comments?k=ad&t='+Date.now())).json();ADS=Array.isArray(j)?j:[]}catch{ADS=[]}}
 let FBI=0,FBT=null;
 function renderFban(){const pool=LIST.filter(i=>i.badge);clearInterval(FBT);const el=$('#fban');if(!el)return;
  if(!pool.length){el.style.display='none';return}el.style.display='';
@@ -447,6 +466,20 @@ function renderFban(){const pool=LIST.filter(i=>i.badge);clearInterval(FBT);cons
 function startFban(){FBI=0;renderFban()}
 function renderCrew(){const top=[...LIST].sort((a,b)=>b.dls-a.dls).slice(0,3),CR=['🥇','🥈','🥉'];
  $('#crew').innerHTML=top.map((i,x)=>`<div class="crc" data-o="${esc(i.id)}"><span class="crown">${CR[x]}</span><img src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><b>${esc(i.title)}</b><small>⬇ ${i.dls}</small><span class="gt2">Download</span></div>`).join('')}
+/* ---- liste « Play Store » sur le dashboard : pubs (Sponsorisé) + reste des applications ---- */
+function adRowHTML(ad){
+ if(ad.type==='apk'){const cover=ad.photo&&ad.apkId?'/api/file?k=img&id='+encodeURIComponent(ad.apkId):'';
+  return `<div class="pr rv" data-ad="${esc(ad.id)}"><img class="ic2" src="${cover}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3>${esc(ad.title||'')}</h3><small class="spn">Sponsored</small><small>${esc((ad.text||'').slice(0,60))}</small></div></div>`}
+ if(ad.type==='page'){return `<div class="pr rv" data-ad="${esc(ad.id)}"><img class="ic2" src="https://ganga--link--ghhzdp9sv8hk.code.run/i/jtn1l7jk.jpg" alt=""><div class="inf"><h3>H'es Store</h3><small class="spn">Sponsored</small><small>${esc((ad.url||'').replace(/^https?:\/\//,'').slice(0,60))}</small></div></div>`}
+ return `<div class="pr rv" data-ad="${esc(ad.id)}"><img class="ic2" src="https://ganga--link--ghhzdp9sv8hk.code.run/i/jtn1l7jk.jpg" alt=""><div class="inf"><h3>${esc((ad.text||"H'es Store").split('\n')[0].slice(0,40))}</h3><small class="spn">Sponsored</small><small>${esc((ad.link||'').replace(/^https?:\/\//,'').slice(0,60))}</small></div></div>`}
+function appRowHTML(i){return `<div class="pr rv" data-o="${esc(i.id)}"><img class="ic2" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3>${esc(i.title)}${nb(i.badge)}</h3><small>${i.rn?i.rt+' ★':'New'} · ⬇ ${i.dls}</small><small>${esc((i.desc||'').split('\n')[0].slice(0,60))}</small></div></div>`}
+function renderDashApps(){const box=$('#dashApps');if(!box)return;
+ const rows=[...ADS.map(adRowHTML),...[...LIST].sort((a,b)=>b.ts-a.ts).map(appRowHTML)];
+ box.innerHTML=rows.join('')||'<p class="sub" style="margin:0">No apps yet.</p>';reveal('dash')}
+function openAd(id){const ad=ADS.find(a=>a.id===id);if(!ad)return;
+ if(ad.type==='apk'){if(ad.apkId){if(!LIST.find(i=>i.id===ad.apkId))return loadFiles().then(()=>openDetail(ad.apkId));openDetail(ad.apkId)}return}
+ if(ad.type==='page'){window.open(ad.url,'_blank','noopener');return}
+ renderAdAndOpen(ad)}
 const shrink=(f,ty='image/jpeg')=>new Promise((ok,ko)=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas'),m=Math.min(im.width,im.height);c.width=c.height=256;
  c.getContext('2d').drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,256,256);URL.revokeObjectURL(im.src);ok(c.toDataURL(ty,.8))};im.onerror=ko;im.src=URL.createObjectURL(f)});
 const openP=()=>{pend=null;$('#pp').src=PROF.photo||'';$('#pw').value='';$('#pn').textContent=PROF.next>Date.now()?'Next change possible on '+new Date(PROF.next).toLocaleDateString():'You can change your profile once a week.';$('#pm').classList.add('on')};
@@ -461,6 +494,7 @@ $('#zm').onclick=()=>$('#zm').classList.remove('on');
 /* files : style Play Store */
 const DLI=S('<path d="M12 5v14M5 12l7 7 7-7"/>');
 const ext=i=>((i.name||'').split('.').pop()||'FILE').toUpperCase().slice(0,4);
+const nb=b=>b?`<span class="nbd ${b}" title="${b==='gold'?'Gold badge only':'Blue & Gold badges'}">${BD}</span>`:'';
 let render=()=>{};
 let DL={};try{DL=JSON.parse(localStorage.getItem('hesDL:'+user)||'{}')}catch{}
 async function loadFiles(){try{DL=JSON.parse(localStorage.getItem('hesDL:'+user)||'{}')}catch{}
@@ -487,7 +521,9 @@ async function start(d){const i=LIST.find(x=>x.id===d.dataset.id),sp=d.querySele
   DL[i.id]=1;try{localStorage.setItem('hesDL:'+user,JSON.stringify(DL))}catch{}
   fin(true)
  }catch{fin(false);toast('Not available right now. Try again later.')}}
-$('#app').addEventListener('click',async e=>{const zi=e.target.closest('.pv2');if(zi){$('#zi').src=zi.src;$('#zm').classList.add('on');return}const o=e.target.closest('[data-o]');if(o)return openDetail(o.dataset.o);const d=e.target.closest('.cb');if(d)return start(d);
+$('#app').addEventListener('click',async e=>{const zi=e.target.closest('.pv2');if(zi){$('#zi').src=zi.src;$('#zm').classList.add('on');return}
+ const ad=e.target.closest('[data-ad]');if(ad)return openAd(ad.dataset.ad);
+ const o=e.target.closest('[data-o]');if(o)return openDetail(o.dataset.o);const d=e.target.closest('.cb');if(d)return start(d);
  const p=e.target.closest('.ds');if(p)return p.classList.toggle('open');
  const b=e.target.closest('.lk');if(!b)return;const on=!b.classList.contains('on');
  const r=await post('/api/like',{id:b.dataset.id,v:user,on}).catch(()=>null);if(!r||!r.ok)return toast('Try again in a moment');
@@ -499,12 +535,10 @@ $('#cf').onsubmit=async e=>{e.preventDefault();const t=$('#ct').value.trim();if(
 /* chat public */
 setInterval(()=>{if(cur==='chat'&&!document.hidden)chat()},5000);
 
-/* ---- pub plein ecran du site (page, media ou APK reserve) ---- */
+/* ---- pub plein ecran du site (page, media ou APK reserve), plusieurs pubs possibles ---- */
 const ADLOGOS=["https://files.catbox.moe/r4wda2.jpg","https://files.catbox.moe/djdlo8.jpg","https://files.catbox.moe/egdrnj.jpg","https://files.catbox.moe/gp70w5.jpg","https://files.catbox.moe/yy60fy.jpg","https://files.catbox.moe/ojmxln.jpg","https://files.catbox.moe/n0ow0o.jpg","https://files.catbox.moe/at3l2w.jpg","https://files.catbox.moe/67rd3p.jpg","https://files.catbox.moe/dqw7ub.jpg","https://files.catbox.moe/06jtsi.jpg","https://files.catbox.moe/4lrxrh.jpg","https://files.catbox.moe/m2rste.jpg","https://files.catbox.moe/or6z67.jpg","https://files.catbox.moe/vsbaxf.jpg","https://files.catbox.moe/6mza6d.jpg","https://files.catbox.moe/6jn4uq.jpg","https://files.catbox.moe/jgjec4.jpg","https://files.catbox.moe/f5kshs.jpg"];
 const adClose=()=>{const el=$('#adm');clearInterval(showAd._i);el.classList.remove('on');$('#adm-m').querySelectorAll('video,iframe,img').forEach(n=>n.remove())};
-async function showAd(force){if(ADSHOWN&&!force)return;ADSHOWN=true;
- let ad;try{ad=await (await fetch('/api/comments?k=ad&t='+Date.now())).json()}catch{return}
- if(!ad||!ad.type)return;
+function renderAdAndOpen(ad){
  const el=$('#adm'),m=$('#adm-m'),sk=$('#adskip'),x=$('#adx'),bar=$('#adbar'),lg=$('#adlogo'),tx=$('#adtx'),br=$('#adbr');
  document.body.appendChild(el);
  clearInterval(showAd._i);m.querySelectorAll('video,iframe,img').forEach(n=>n.remove());
@@ -520,16 +554,20 @@ async function showAd(force){if(ADSHOWN&&!force)return;ADSHOWN=true;
    else if(ad.photo)ph()}
   else if(ad.type==='apk'){
    tx.textContent=ad.title+(ad.text?' — '+ad.text:'');
-   if(ad.photo){const im=document.createElement('img');im.src='/api/file?k=img&id='+encodeURIComponent(ad.id);im.onerror=()=>im.remove();add(im)}
-   go=async()=>{adClose();if(!LIST.find(i=>i.id===ad.id))await loadFiles();openDetail(ad.id)}}
+   if(ad.photo&&ad.apkId){const im=document.createElement('img');im.src='/api/file?k=img&id='+encodeURIComponent(ad.apkId);im.onerror=()=>im.remove();add(im)}
+   go=async()=>{adClose();if(ad.apkId){if(!LIST.find(i=>i.id===ad.apkId))await loadFiles();openDetail(ad.apkId)}}}
   else return}
  m.onclick=e=>{if(e.target.closest('#adskip'))return;if(go)go()};
- const delay=Math.max(3,Math.min(20,+ad.delay||5));let n=delay;
+ const delay=Math.max(3,+ad.delay||5);let n=delay;
  el.classList.add('on');
  sk.disabled=true;x.disabled=true;sk.textContent='Skip '+n+'s';
  bar.style.transition='none';bar.style.width='0';void bar.offsetWidth;bar.style.transition='width '+delay+'s linear';bar.style.width='100%';
  showAd._i=setInterval(()=>{n--;if(n>0){sk.textContent='Skip '+n+'s';return}clearInterval(showAd._i);sk.disabled=false;x.disabled=false;sk.textContent='Skip ›'},1000);
  sk.onclick=adClose;x.onclick=adClose}
+async function showAd(force){if(ADSHOWN&&!force)return;ADSHOWN=true;
+ if(!ADS.length)await ensureAds();
+ if(!ADS.length)return;
+ renderAdAndOpen(ADS[Math.floor(Math.random()*ADS.length)])}
 let hidAt=0;document.addEventListener('visibilitychange',()=>{if(document.hidden)hidAt=Date.now();else if(user&&hidAt&&Date.now()-hidAt>120000&&!$('#adm').classList.contains('on')){hidAt=0;showAd(true)}});
 /* ---- notifications envoyees par les admins ---- */
 let lastNotif=localStorage.getItem('hesNotif')||'';
@@ -544,17 +582,17 @@ setInterval(()=>{if(!document.hidden)pollNotif()},15000);
 /* ---- liste Play Store + page detail ---- */
 const ico=i=>i.hasImg?'/api/file?k=img&id='+encodeURIComponent(i.id):'';
 const shot0=i=>i.ns?'/api/file?k=img&id='+encodeURIComponent(i.id)+'&n=0':ico(i);   // grande photo du carrousel : 1ere capture d'ecran si dispo, sinon l'icone
-const tc=i=>`<div class="tc" data-o="${esc(i.id)}"><img src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><b>${esc(i.title)}</b><small>${i.rn?i.rt+' ★':'New'} · ⬇ ${i.dls}</small></div>`;
+const tc=i=>`<div class="tc" data-o="${esc(i.id)}"><img src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><b>${esc(i.title)}${nb(i.badge)}</b><small>${i.rn?i.rt+' ★':'New'} · ⬇ ${i.dls}</small></div>`;
 render=()=>{const q=$('#q').value.trim().toLowerCase();
  const rows=LIST.filter(i=>!q||(i.title+' '+i.desc).toLowerCase().includes(q))
    .sort((a,b)=>(DL[a.id]?1:0)-(DL[b.id]?1:0)||a.ts-b.ts);   // non telecharges d'abord, les plus anciens en tete
  const feat=[...LIST].sort((a,b)=>b.dls-a.dls||b.ts-a.ts).slice(0,5),rec=[...LIST].sort((a,b)=>b.ts-a.ts).slice(0,12);
- const bn=i=>`<div class="bn" data-o="${esc(i.id)}"><img class="bimg" src="${shot0(i)}" alt="" onerror="this.remove()"><div class="bo"><h3>${esc(i.title)}</h3><p>${esc((i.desc||'').split('\n')[0].slice(0,60))}</p><div class="bl"><img class="ic3" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div><b>${esc(i.title)}</b><small>${i.rn?i.rt+' ★ · ':''}⬇ ${i.dls}</small></div><span class="gt">Get</span></div></div></div>`;
+ const bn=i=>`<div class="bn" data-o="${esc(i.id)}"><img class="bimg" src="${shot0(i)}" alt="" onerror="this.remove()"><div class="bo"><h3>${esc(i.title)}${nb(i.badge)}</h3><p>${esc((i.desc||'').split('\n')[0].slice(0,60))}</p><div class="bl"><img class="ic3" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div><b>${esc(i.title)}</b><small>${i.rn?i.rt+' ★ · ':''}⬇ ${i.dls}</small></div><span class="gt">Get</span></div></div></div>`;
  $('#fl').innerHTML=(q||!LIST.length?'':`<div class="hb">${feat.map(bn).join('')}</div><div class="hs"><h3>Recommended</h3></div><div class="hc auto">${rec.map(tc).join('')}</div><div class="hs"><h3>All apps</h3></div>`)
- +(rows.map(i=>`<div class="pr rv" data-o="${esc(i.id)}"><img class="ic2" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3>${esc(i.title)}</h3><small>${esc(ext(i))}${sz(i.size)}</small><small>${i.rn?i.rt+' ★':'New'} &nbsp; ⬇ ${i.dls} &nbsp; ❤ ${i.likes}</small></div></div>`).join('')||emptyHTML);
+ +(rows.map(i=>`<div class="pr rv" data-o="${esc(i.id)}"><img class="ic2" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3>${esc(i.title)}${nb(i.badge)}</h3><small>${esc(ext(i))}${sz(i.size)}</small><small>${i.rn?i.rt+' ★':'New'} &nbsp; ⬇ ${i.dls} &nbsp; ❤ ${i.likes}</small></div></div>`).join('')||emptyHTML);
  reveal('files')};
 function openDetail(id){const i=LIST.find(x=>x.id===id);if(!i)return;const mb=i.size?(i.size/1048576).toFixed(1)+' MB':'—',e=esc(ext(i));
- $('#db').innerHTML=`<div class="r1 rv"><img class="ic2" style="width:96px;height:96px" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3 style="white-space:normal;font-size:19px">${esc(i.title)}</h3><small class="au">H'es Team</small></div></div>
+ $('#db').innerHTML=`<div class="r1 rv"><img class="ic2" style="width:96px;height:96px" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3 style="white-space:normal;font-size:19px">${esc(i.title)}${nb(i.badge)}</h3><small class="au">H'es Team</small></div></div>
  <div class="stats rv"><div><b>${i.rn?i.rt+' ★':'—'}</b><small>${i.rn||0} ratings</small></div><div><b>${i.dls}</b><small>Downloads</small></div><div><b>${e}</b><small>${mb}</small></div></div>
  <button class="cb rv" data-id="${esc(i.id)}" ${i.badge?`data-need="${i.badge}"`:""}><span class="cb__eyes"><span class="cb__eye"><span class="cb__pupil"></span></span><span class="cb__eye"><span class="cb__pupil"></span></span></span><span class="cb__cover tx2">Download</span></button>
  <button class="lk rv${i.mine?' on':''}" data-id="${esc(i.id)}" style="margin-top:14px">❤ <span>${i.likes}</span>&nbsp; Like</button>
@@ -678,6 +716,23 @@ $('#db').addEventListener('click',async e=>{const s=e.target.closest('[data-rs]'
  if(!r||!r.ok)return toast(j.error||'Could not send your review');
  const i=LIST.find(x=>x.id===b.dataset.id);if(i){i.rt=j.avg;i.rn=j.n}toast('Thanks for your review ★');loadReviews(b.dataset.id)});
 
+/* ---- envoi d'une app / d'un fichier : direct depuis le site, avec le fichier et les captures ---- */
+let sbIcon='',sbFileB=null,sbShots=[];
+$('#sbi').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{sbIcon=await shrink(f);$('#sbp').src=sbIcon;$('#sbp').style.display='block'}catch{toast('Invalid image')}};
+$('#sbfile').onchange=e=>{const f=e.target.files[0];if(!f)return;
+ if(f.size>45*1024*1024){toast('File too large (max 45 MB)');e.target.value='';sbFileB=null;$('#sbfn').textContent='No file selected · max 45 MB';return}
+ const rd=new FileReader();rd.onload=()=>{sbFileB={data:rd.result,name:f.name,size:f.size};$('#sbfn').textContent=f.name+sz(f.size)};rd.onerror=()=>toast('Could not read the file');rd.readAsDataURL(f)};
+$('#sbshots').onchange=async e=>{const files=[...e.target.files].slice(0,6);sbShots=[];$('#sbsp').innerHTML='';
+ for(const f of files){try{const d=await shrink(f);sbShots.push(d);const im=document.createElement('img');im.src=d;im.style.cssText='width:84px;height:84px;border-radius:16px;object-fit:cover;flex:none;background:#111524';$('#sbsp').appendChild(im)}catch{}}};
+$('#sbf').onsubmit=async e=>{e.preventDefault();const name=$('#sbn').value.trim(),desc=$('#sbd').value.trim();
+ if(name.length<2)return toast('Enter a name');if(!sbIcon)return toast('Choose an icon');if(desc.length<5)return toast('Add a short description');
+ if(!sbFileB)return toast('Choose the file to publish');
+ const b=$('#sbs');b.disabled=true;toast('Uploading…');
+ try{const r=await post('/api/comments?k=sub',{type:'app',name,desc,icon:sbIcon,file:sbFileB,shots:sbShots}),j=await r.json().catch(()=>({}));
+  if(!r.ok)return toast(j.error||'Something went wrong');
+  toast('Sent! The team will review it shortly.');
+  $('#sbf').reset();$('#sbp').style.display='none';sbIcon='';sbFileB=null;sbShots=[];$('#sbfn').textContent='No file selected · max 45 MB';$('#sbsp').innerHTML=''
+ }catch{toast('Server unreachable, try again')}finally{b.disabled=false}};
 /* ---- quitter le site : confirmation solide ---- */
 history.pushState({h:1},'');
 window.addEventListener('popstate',()=>{history.pushState({h:1},'');if(confirm('Leave H\'es Store?'))history.go(-2)});
