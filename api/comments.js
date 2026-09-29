@@ -10,6 +10,18 @@ const mentions = async (text, me) => {
 };
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
 
+// ---- upload direct vers Telegram (multipart), sans passer par le bot / une conversation Telegram ----
+const b64buf = s => Buffer.from(String(s || '').split(',')[1] || '', 'base64');
+async function tgUpload(method, fields, fileField, buf, filename, mime) {
+  const fd = new FormData();
+  for (const [k, v] of Object.entries(fields || {})) if (v !== undefined && v !== null) fd.append(k, String(v));
+  fd.append(fileField, new Blob([buf], { type: mime || 'application/octet-stream' }), filename || 'file');
+  try {
+    const r = await fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/${method}`, { method: 'POST', body: fd });
+    return await r.json();
+  } catch { return { ok: false }; }
+}
+
 export default async (req, res) => {
   const bg = async () => await redis.hgetall('badges') || {};   // badges donnés par les admins du bot
 
@@ -70,19 +82,18 @@ export default async (req, res) => {
     return res.json({ ok: true });
   }
 
-  /* ---------- pub du site (page ou média), gérée par le bot ---------- */
+  /* ---------- pub(s) du site (page, média ou APK), gérées par le bot — plusieurs pubs actives à la fois ---------- */
   if (req.query.k === 'ad') {
     if (req.method !== 'GET') return res.status(405).end();
     res.setHeader('Cache-Control', 'no-store');
-    const [ad, rs] = await Promise.all([redis.get('ad'), redis.hgetall('restrict')]);   // ad = pub des admins (/ad), rs = fichiers réservés à un badge
+    const [ads, rs] = await Promise.all([redis.hgetall('ads'), redis.hgetall('restrict')]);   // ads = pubs des admins (/ad), rs = fichiers réservés à un badge
+    const list = Object.values(ads || {});
     const ids = Object.keys(rs || {});
-    let apk = null;
     if (ids.length) {
       const it = await redis.hget('items', ids[Math.floor(Math.random() * ids.length)]);
-      if (it) apk = { type: 'apk', id: it.id, title: it.title, text: String(it.desc || '').split('\n')[0].slice(0, 140), badge: rs[it.id], photo: !!it.photo, delay: 5 };
+      if (it) list.push({ id: 'apk-' + it.id, apkId: it.id, type: 'apk', title: it.title, text: String(it.desc || '').split('\n')[0].slice(0, 140), badge: rs[it.id], photo: !!it.photo, delay: 5 });
     }
-    const pool = [ad, apk].filter(Boolean);
-    return res.json(pool.length ? pool[Math.floor(Math.random() * pool.length)] : null);
+    return res.json(list);
   }
 
   /* ---------- notifications (envoyées par les admins depuis le bot) ---------- */
@@ -92,8 +103,7 @@ export default async (req, res) => {
     return res.json(Object.values(await redis.hgetall('notifs') || {}).sort((a, c) => c.ts - a.ts).slice(0, 20));
   }
 
-  /* ---------- notes (1 à 5 étoiles) et avis d'une publication ---------- */
-  /* ---------- demande d'ajout d'une app / d'un fichier (validée par les admins via le bot) ---------- */
+  /* ---------- demande d'ajout d'une app / d'un fichier : direct depuis le site (fichier + captures uploadés ici même) ---------- */
   if (req.query.k === 'sub' && req.method === 'POST') {
     const me = await whoami(req);
     if (!me) return res.status(401).json({ error: 'Log in again' });
@@ -103,10 +113,52 @@ export default async (req, res) => {
     const name = String(b.name || '').trim().slice(0, 60), desc = String(b.desc || '').trim().slice(0, 500), icon = String(b.icon || '');
     if (name.length < 2 || desc.length < 5) return res.status(400).json({ error: 'Name and description are required.' });
     if (!/^data:image\/(jpeg|png|webp);base64,/.test(icon) || icon.length > 300000) return res.status(400).json({ error: 'Invalid icon.' });
+
+    const fileB = b.file;
+    if (!fileB || !/^data:/.test(String(fileB.data || ''))) return res.status(400).json({ error: 'Please attach the file to publish.' });
+    const fileBuf = b64buf(fileB.data);
+    if (!fileBuf.length) return res.status(400).json({ error: 'The file looks empty, try again.' });
+    if (fileBuf.length > 45 * 1024 * 1024) return res.status(400).json({ error: 'File must be under 45 MB.' });
+    const fileName = String(fileB.name || 'file').slice(0, 80), fileSize = fileBuf.length;
+
+    const shotsIn = Array.isArray(b.shots) ? b.shots.slice(0, 6) : [];
+    for (const s of shotsIn) if (!/^data:image\/(jpeg|png|webp);base64,/.test(s) || s.length > 400000) return res.status(400).json({ error: 'Invalid screenshot.' });
+
+    const list = await admins();
+    if (!list.length) return res.status(503).json({ error: 'No admin available right now, try later.' });
+
     const id = 's' + Math.random().toString(16).slice(2, 12).padEnd(10, '0');
-    await redis.set('sub:' + id, { id, by: me, type, name, desc, icon, ts: Date.now() }, { ex: 604800 });
-    const bot = process.env.BOT_USERNAME;
-    return res.json({ ok: true, id, deep: bot ? `https://t.me/${bot}?start=sub_${id}` : '' });
+    const first = list[0];
+
+    // icône : uploadée une fois pour récupérer un file_id Telegram réutilisable
+    let iconFid = '';
+    const iconR = await tgUpload('sendPhoto', { chat_id: first }, 'photo', b64buf(icon), 'icon.jpg', 'image/jpeg');
+    if (iconR.ok) iconFid = iconR.result.photo.at(-1).file_id;
+
+    // captures d'écran : idem, une fois chacune
+    const shotFids = [];
+    for (const s of shotsIn) {
+      const r = await tgUpload('sendPhoto', { chat_id: first }, 'photo', b64buf(s), 'shot.jpg', 'image/jpeg');
+      if (r.ok) shotFids.push(r.result.photo.at(-1).file_id);
+    }
+
+    const cap = `📥 Nouvelle demande d'ajout (envoyée depuis le site)\n\n${type === 'file' ? '📄 Fichier' : '📱 Application'} : ${name}\n📝 ${desc.slice(0, 450)}\n\n👤 Compte du site : ${me}\n📎 ${fileName} (${(fileSize / 1048576).toFixed(1)} Mo)${shotFids.length ? `\n🖼 ${shotFids.length} capture(s)` : ''}\n\nID : ${id}`;
+    const kb = { inline_keyboard: [[{ text: '✅ Valider', callback_data: 'sa:' + id }, { text: '❌ Refuser', callback_data: 'sr:' + id }]] };
+
+    // fichier : upload direct au premier admin (récupère le file_id), puis renvoi rapide (sans re-upload) aux autres admins
+    const docR = await tgUpload('sendDocument', { chat_id: first, caption: cap, reply_markup: JSON.stringify(kb) }, 'document', fileBuf, fileName, 'application/octet-stream');
+    if (!docR.ok) return res.status(502).json({ error: 'Could not reach Telegram, try again.' });
+    const fileFid = docR.result.document.file_id;
+    const msgs = [{ chat: first, mid: docR.result.message_id }];
+
+    for (const a of list.slice(1)) {
+      const r = await tg('sendDocument', { chat_id: a, document: fileFid, caption: cap, reply_markup: kb }).catch(() => null);
+      if (r?.ok) msgs.push({ chat: a, mid: r.result.message_id });
+    }
+
+    const sub = { id, by: me, type, name, desc, iconFid, shots: shotFids, file: fileFid, fileName, size: fileSize, ts: Date.now(), msgs };
+    await redis.set('sub:' + id, sub, { ex: 604800 });
+    return res.json({ ok: true, id });
   }
 
   if (req.query.k === 'rev') {
