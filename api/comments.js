@@ -1,4 +1,5 @@
 import { redis, tg, admins, limit, ip, whoami } from '../lib/db.js';
+export const config = { maxDuration: 60 };
 const esc = s => s.replace(/[&<>]/g, c => '&#' + c.charCodeAt(0) + ';');
 const KIND = { photo: '📷 Photo', video: '🎬 Video', voice: '🎤 Voice message' };
 // @pseudo dans un message -> liste des comptes existants cités (max 5)
