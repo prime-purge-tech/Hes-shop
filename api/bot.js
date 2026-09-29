@@ -1,4 +1,4 @@
-import { redis, tg, admins, isAdmin, BRAND, brandName } from '../lib/db.js';
+import { redis, tg, admins, isAdmin, limit, BRAND, brandName } from '../lib/db.js';
 import { PICS, WELCOME_PIC } from '../lib/pics.js';
 export const config = { maxDuration: 60 };
 
@@ -22,6 +22,7 @@ const HELP = `📥 Ajouter : envoie une photo avec en légende le titre (ligne 1
 /ad media délai lien texte — en réponse à une photo/vidéo : ajoute une pub média plein écran
 Plusieurs pubs peuvent être actives en même temps : chaque /ad page ou /ad media EN AJOUTE une nouvelle (elle ne remplace pas les autres), et le site en choisit une au hasard à chaque fois, en plus de les afficher toutes dans la liste des applications.
 /lien — lien de la mini app avec une photo au hasard (tout le monde, aussi dans les groupes)
+/tagall [message] — dans un groupe (admins du groupe) : mentionne tous les membres connus, avec ta photo de profil ou celle du groupe (1 fois / 5 min)
 /ok ID · /no ID — valider / refuser une demande d'ajout (ou utilise les boutons ✅ ❌)
 /admins — voir les admins
 /addadmin ID · /rmadmin ID (propriétaire)
@@ -93,19 +94,62 @@ async function memberPic(u) {
   return null;
 }
 
-// bienvenue / au revoir dans les groupes
+// bienvenue / au revoir dans les groupes (+ suivi des membres pour /tagall)
 async function group(m) {
-  for (const u of m.new_chat_members || [])
-    if (!u.is_bot) await sendFramed(m.chat.id, (await memberPic(u)) || pick(), welcomeSegs(u));
+  for (const u of m.new_chat_members || []) {
+    if (u.is_bot) continue;
+    await redis.hset('gm:' + m.chat.id, { [u.id]: u.first_name || 'Membre' }).catch(() => {});
+    await sendFramed(m.chat.id, (await memberPic(u)) || pick(), welcomeSegs(u));
+  }
   const l = m.left_chat_member;
-  if (l && !l.is_bot) await sendFramed(m.chat.id, (await memberPic(l)) || pick(), byeSegs(l));
+  if (l && !l.is_bot) {
+    await redis.hdel('gm:' + m.chat.id, String(l.id)).catch(() => {});
+    await sendFramed(m.chat.id, (await memberPic(l)) || pick(), byeSegs(l));
+  }
 }
 
 // /lien : lien de la mini app + photo au hasard
 const lien = chat => sendFramed(chat, pick(), linkSegs());
 
+/* ================= /tagall : même style que le welcome ================= *
+ * Telegram ne permet pas à un bot de lister tous les membres d'un groupe : on mentionne les admins
+ * + tous ceux vus (message ou arrivée) depuis que le bot est dans le groupe.
+ * 1er message : photo de celui qui lance (sinon photo du groupe, sinon photo du bot) dans un cadre.
+ * Ensuite : la liste des membres en cadres, par paquets de 30 (limite Telegram = 100 mentions / message). */
+const TAG_CHUNK = 30;
+async function tagall(m) {
+  const chat = m.chat.id, say = t => tg('sendMessage', { chat_id: chat, text: t });
+  if (!/group/.test(m.chat.type)) return say('Cette commande fonctionne uniquement dans les groupes.');
+
+  const st = await tg('getChatMember', { chat_id: chat, user_id: m.from.id });
+  const ok = ['creator', 'administrator'].includes(st.result?.status) || await isAdmin(m.from.id);
+  if (!ok) return say('⛔ Réservé aux admins du groupe.');
+  if (await limit('rl:tagall:' + chat, 1, 300)) return say('⏳ Réessaie dans quelques minutes.');
+
+  const known = { ...(await redis.hgetall('gm:' + chat) || {}) };
+  const adm = await tg('getChatAdministrators', { chat_id: chat });
+  for (const a of adm.result || []) if (!a.user.is_bot) known[a.user.id] = a.user.first_name || 'Membre';
+  known[m.from.id] = m.from.first_name || 'Membre';
+  const users = Object.entries(known).map(([id, n]) => ({ id: Number(id), first_name: String(n) }));
+  const custom = m.text.replace(/^\/tagall(@\w+)?/i, '').trim();
+
+  // photo : la personne qui lance, sinon la photo du groupe, sinon une photo du bot
+  let photo = await memberPic(m.from);
+  if (!photo) { const c = await tg('getChat', { chat_id: chat }); photo = c.result?.photo?.big_file_id || pick(); }
+  await sendFramed(chat, photo, frame('TAGALL', '📢', [who(m.from), seg(custom ? ' — ' + custom : '')]));
+
+  for (let i = 0; i < users.length; i += TAG_CHUNK) {
+    const body = [];
+    users.slice(i, i + TAG_CHUNK).forEach((u, k) => { if (k) body.push(seg('\n┃≫ ')); body.push(who(u)); });
+    const { text, entities } = compose(frame('MEMBRES', '👥', body));
+    entities.unshift({ type: 'expandable_blockquote', offset: 0, length: text.length });   // même cadre, repliable
+    await tg('sendMessage', { chat_id: chat, text, entities, reply_markup: BTN });
+    await new Promise(r => setTimeout(r, 1000));
+  }
+}
+
 /* ================= liste de commandes en citation (comme /start), avec /commandes cliquables ================= */
-const HELP_CMDS = ['/list', '/del', '/chat', '/clearchat', '/pub', '/users', '/badge', '/badges', '/edit', '/restrict', '/notify', '/ad', '/lien', '/ok', '/no', '/admins', '/addadmin', '/rmadmin'];
+const HELP_CMDS = ['/list', '/del', '/chat', '/clearchat', '/pub', '/users', '/badge', '/badges', '/edit', '/restrict', '/notify', '/ad', '/lien', '/tagall', '/ok', '/no', '/admins', '/addadmin', '/rmadmin'];
 const utf16len = s => String(s).length;   // les chaînes JS sont déjà en unités UTF-16, comme les offsets Telegram
 function helpQuotedText() {
   const lines = HELP_CMDS.map(c => `┃≫ ${c}`).join('\n');
@@ -421,8 +465,12 @@ async function handle(m) {
 export default async (req, res) => {
   if (req.headers['x-telegram-bot-api-secret-token'] !== process.env.WEBHOOK_SECRET) return res.status(401).end();
   const m = req.body?.message, cq = req.body?.callback_query;
+  // suivi des membres des groupes (pour /tagall)
+  if (m?.from && !m.from.is_bot && /group/.test(m.chat?.type || ''))
+    await redis.hset('gm:' + m.chat.id, { [m.from.id]: m.from.first_name || 'Membre' }).catch(() => {});
   if (cq) await callback(cq).catch(console.error);
   else if (m?.new_chat_members || m?.left_chat_member) await group(m).catch(console.error);
+  else if (m?.text && /^\/tagall(@\w+)?(\s|$)/i.test(m.text.trim())) await tagall(m).catch(console.error);
   else if (m?.text && /^\/lien(@\w+)?(\s|$)/i.test(m.text.trim())) await lien(m.chat.id).catch(console.error);
   else if (m?.chat?.type === 'private') await handle(m).catch(e => {
     console.error(e);
