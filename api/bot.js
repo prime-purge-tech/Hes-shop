@@ -15,12 +15,18 @@ const HELP = `📥 Ajouter : envoie une photo avec en légende le titre (ligne 1
 /edit id — répondre avec /edit id, puis titre et description sur 2 lignes
 /restrict id blue|gold|off — réserver un fichier aux détenteurs d'un badge
 /notify texte — notification envoyée à tous (site + Telegram)
-/ad off — désactiver la pub du site
-/ad page url délai(≤20s) — pub = ta page d'accueil, croix après le délai
-/ad media délai lien texte — en réponse à une photo/vidéo : pub média sur le site
+/ad off — désactiver toutes les pubs
+/ad list — voir les pubs actives (avec leur id)
+/ad del id — supprimer une seule pub
+/ad page url délai — ajoute une pub plein écran = une page web, croix/Skip après le délai (en secondes)
+/ad media délai lien texte — en réponse à une photo/vidéo : ajoute une pub média plein écran
+Plusieurs pubs peuvent être actives en même temps : chaque /ad page ou /ad media EN AJOUTE une nouvelle (elle ne remplace pas les autres), et le site en choisit une au hasard à chaque fois, en plus de les afficher toutes dans la liste des applications.
+/lien — lien de la mini app avec une photo au hasard (tout le monde, aussi dans les groupes)
+/ok ID · /no ID — valider / refuser une demande d'ajout (ou utilise les boutons ✅ ❌)
 /admins — voir les admins
 /addadmin ID · /rmadmin ID (propriétaire)
 
+📥 Les demandes d'ajout envoyées depuis le site (avec le fichier et les captures déjà joints) arrivent ici directement avec les boutons ✅ Valider / ❌ Refuser.
 💬 Réponds à un commentaire reçu pour répondre sur le site, ou réponds « /del » pour le supprimer.`;
 
 const SHOP = 'https://t.me/Hessbbot/hes_shop';
@@ -33,14 +39,148 @@ const send = (chat, url, caption) => {
   return tg(meth, { chat_id: chat, [key]: url, caption, parse_mode: 'HTML', reply_markup: BTN })
     .then(r => r.ok ? r : tg('sendMessage', { chat_id: chat, text: caption, parse_mode: 'HTML', reply_markup: BTN }));
 };
+const pick = () => PICS[Math.floor(Math.random() * PICS.length)] || WELCOME_PIC;   // photo du bot au hasard
+
+/* ================= cadres « NOUVELLE CHAÎNE » ================= *
+ * compose() fabrique le texte + ses entities Telegram (mention, lien, emoji premium) sans parse_mode. */
+const mono = s => [...String(s)].map(c => {   // lettres en police « monospace » (𝚆𝙴𝙻𝙲𝙾𝙼𝙴, 𝚕𝚒𝚗𝚔…)
+  const k = c.charCodeAt(0);
+  if (k >= 65 && k <= 90) return String.fromCodePoint(0x1D670 + k - 65);
+  if (k >= 97 && k <= 122) return String.fromCodePoint(0x1D68A + k - 97);
+  if (k >= 48 && k <= 57) return String.fromCodePoint(0x1D7F6 + k - 48);
+  return c;
+}).join('');
+const seg = t => ({ t });
+const link = (t, url) => ({ t, url });
+const who = u => ({ t: u.first_name || 'Membre', uid: u.id });
+const pemo = t => ({ t, emoji: true });
+const PREMIUM_EMOJI = { '🎉': '6073355211362016920' };   // emoji Telegram Premium (les autres restent des emojis normaux)
+
+function compose(segments) {
+  let text = '', entities = [];
+  for (const s of segments) {
+    const start = text.length;   // JS compte en unités UTF-16, comme Telegram
+    text += s.t;
+    if (s.uid) entities.push({ type: 'text_mention', offset: start, length: s.t.length, user: { id: s.uid } });
+    if (s.url) entities.push({ type: 'text_link', offset: start, length: s.t.length, url: s.url });
+    if (s.emoji && PREMIUM_EMOJI[s.t]) entities.push({ type: 'custom_emoji', offset: start, length: s.t.length, custom_emoji_id: PREMIUM_EMOJI[s.t] });
+  }
+  return { text, entities };
+}
+async function sendFramed(chat, photoRef, segments) {
+  const { text, entities } = compose(segments);
+  if (photoRef) {
+    const p = { chat_id: chat, photo: photoRef, caption: text, reply_markup: BTN };
+    if (entities.length) p.caption_entities = entities;
+    const r = await tg('sendPhoto', p);
+    if (r.ok) return r;
+  }
+  const p = { chat_id: chat, text, reply_markup: BTN };
+  if (entities.length) p.entities = entities;
+  return tg('sendMessage', p);
+}
+const frame = (title, emoji, body) => [
+  seg(`╭▱▱ ${mono(title)} ▱▱ `), ...(emoji ? [pemo(emoji)] : []), seg('\n┃≫ '), ...body,
+  seg(`\n╰▱▱▱▱▱▱▱▱\n≪ ${mono("THE H'ES SHOP")} `), pemo('🛒'), seg('≫'),
+];
+const welcomeSegs = u => frame('WELCOME', '🎉', [who(u)]);
+const byeSegs = u => frame('GOODBYE', '👋', [who(u)]);
+const linkSegs = () => frame('link', '', [link(SHOP, SHOP)]);
+
+// photo de profil de la personne (arrive / part) ; sinon photo du bot au hasard
+async function memberPic(u) {
+  try { const p = await tg('getUserProfilePhotos', { user_id: u.id, limit: 1 }); if (p.ok && p.result.total_count > 0) return p.result.photos[0].at(-1).file_id; } catch {}
+  return null;
+}
 
 // bienvenue / au revoir dans les groupes
 async function group(m) {
   for (const u of m.new_chat_members || [])
-    if (!u.is_bot) await send(m.chat.id, WELCOME_PIC, `🎉 Bienvenue ${nm(u)} dans <b>${esc(m.chat.title)}</b> !\nPasse par notre boutique 👇`);
+    if (!u.is_bot) await sendFramed(m.chat.id, (await memberPic(u)) || pick(), welcomeSegs(u));
   const l = m.left_chat_member;
-  if (l && !l.is_bot)
-    await tg('sendMessage', { chat_id: m.chat.id, parse_mode: 'HTML', text: `👋 ${nm(l)} a quitté le groupe. À bientôt !`, reply_markup: BTN });
+  if (l && !l.is_bot) await sendFramed(m.chat.id, (await memberPic(l)) || pick(), byeSegs(l));
+}
+
+// /lien : lien de la mini app + photo au hasard
+const lien = chat => sendFramed(chat, pick(), linkSegs());
+
+/* ================= demandes d'ajout envoyées depuis le site ================= */
+async function uploadPhoto(chat, dataUrl, caption, markup) {   // envoie l'icône (data URL) et renvoie la réponse Telegram (avec son file_id)
+  try {
+    const buf = Buffer.from(String(dataUrl).split(',')[1] || '', 'base64');
+    const fd = new FormData();
+    fd.append('chat_id', String(chat)); fd.append('caption', caption);
+    if (markup) fd.append('reply_markup', JSON.stringify(markup));
+    fd.append('photo', new Blob([buf], { type: 'image/jpeg' }), 'icon.jpg');
+    return await (await fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd })).json();
+  } catch { return { ok: false }; }
+}
+
+async function subStart(m, sid) {   // /start sub_<id> : l'utilisateur vient du site (ancien parcours, encore utilisable en secours)
+  const say = t => tg('sendMessage', { chat_id: m.chat.id, text: t });
+  const sub = await redis.get('sub:' + sid);
+  if (!sub || sub.done) return say("❌ Cette demande a expiré ou a déjà été traitée. Recommence depuis le site (page « + »).");
+  if (sub.file) return say('✅ Cette demande a déjà été envoyée aux admins avec son fichier, rien à faire ici.');
+  await redis.set('subwait:' + m.from.id, sid, { ex: 3600 });
+  return say(`📎 « ${sub.name} »\n\nEnvoie-moi maintenant le fichier (APK, ZIP, TXT…) comme document. Les admins vont le vérifier avant de le publier.`);
+}
+
+async function subFile(m, sid) {   // l'utilisateur envoie le fichier : tout part vers les admins (ancien parcours, encore utilisable en secours)
+  const id = m.from.id, say = t => tg('sendMessage', { chat_id: m.chat.id, text: t });
+  const sub = await redis.get('sub:' + sid);
+  if (!sub || sub.done) { await redis.del('subwait:' + id); return say('❌ Demande expirée. Recommence depuis le site.'); }
+  if (!m.document) return say('📎 Envoie-le comme fichier (trombone → Fichier), pas comme photo ou vidéo.');
+  const list = await admins();
+  if (!list.length) return say("⚠️ Aucun admin disponible pour le moment, réessaie plus tard.");
+  sub.file = m.document.file_id; sub.fileName = m.document.file_name || 'file'; sub.size = m.document.file_size || 0;
+  sub.tg = { id, name: m.from.first_name || '', user: m.from.username || '' };
+  const tgu = [m.from.first_name, m.from.username && '@' + m.from.username, id].filter(Boolean).join(' ');
+  sub.cap = `📥 Nouvelle demande d'ajout\n\n${sub.type === 'file' ? '📄 Fichier' : '📱 Application'} : ${sub.name}\n📝 ${String(sub.desc).slice(0, 450)}\n\n👤 Compte du site : ${sub.by}\n✈️ Telegram : ${tgu}\n📎 ${sub.fileName} (${(sub.size / 1048576).toFixed(1)} Mo)\n\nID : ${sid} — /ok ${sid} · /no ${sid}`;
+  const kb = { inline_keyboard: [[{ text: '✅ Valider', callback_data: 'sa:' + sid }, { text: '❌ Refuser', callback_data: 'sr:' + sid }]] };
+  sub.msgs = [];
+  for (const a of list) {
+    let r;
+    if (sub.iconFid) r = await tg('sendPhoto', { chat_id: a, photo: sub.iconFid, caption: sub.cap, reply_markup: kb });
+    else {
+      r = await uploadPhoto(a, sub.icon, sub.cap, kb);
+      const ph = r?.result?.photo; if (ph) sub.iconFid = ph.at(-1).file_id;
+    }
+    if (!r?.ok) r = await tg('sendMessage', { chat_id: a, text: sub.cap, reply_markup: kb });
+    if (r?.ok) sub.msgs.push({ chat: a, mid: r.result.message_id });
+    await tg('sendDocument', { chat_id: a, document: sub.file, caption: `📎 ${sub.fileName} — demande ${sid}` }).catch(() => {});
+  }
+  if (sub.iconFid) delete sub.icon;   // l'icône est maintenant chez Telegram
+  await redis.set('sub:' + sid, sub, { ex: 604800 });
+  await redis.del('subwait:' + id);
+  return say("✅ Reçu ! Ta demande a été envoyée aux admins. Tu seras prévenu ici dès qu'elle est validée.");
+}
+
+async function decide(sid, ok, admin) {   // valider / refuser (boutons ou /ok /no)
+  const sub = await redis.get('sub:' + sid);
+  if (!sub) return '❌ Demande introuvable ou expirée';
+  if (sub.done) return '⚠️ Déjà traitée';
+  if (!sub.file) return "⏳ L'utilisateur n'a pas encore envoyé le fichier";
+  sub.done = ok ? 'ok' : 'no';
+  let itemId = '';
+  if (ok) {
+    itemId = Date.now().toString(36);
+    await redis.hset('items', { [itemId]: { id: itemId, title: sub.name, desc: sub.desc, photo: sub.iconFid, shots: sub.shots || [], file: sub.file, name: sub.fileName, size: sub.size, ts: Date.now(), by: sub.by, kind: sub.type } });
+  }
+  await redis.set('sub:' + sid, sub, { ex: 86400 });
+  const status = `${ok ? '✅ Validé' : '❌ Refusé'} par ${admin?.first_name || 'un admin'}`;
+  for (const x of sub.msgs || [])   // retire les boutons chez tous les admins
+    await tg('editMessageCaption', { chat_id: x.chat, message_id: x.mid, caption: `${sub.cap || sub.name}\n\n${status}`, reply_markup: { inline_keyboard: [] } })
+      .then(r => r.ok ? r : tg('editMessageText', { chat_id: x.chat, message_id: x.mid, text: `${sub.cap || sub.name}\n\n${status}`, reply_markup: { inline_keyboard: [] } })).catch(() => {});
+  if (sub.tg?.id) await tg('sendMessage', { chat_id: sub.tg.id, text: ok ? `✅ « ${sub.name} » a été validé et publié sur le site !` : `❌ Ta demande « ${sub.name} » n'a pas été acceptée.` }).catch(() => {});
+  return ok ? `✅ Publié : ${sub.name} (ID ${itemId})` : `🗑 Refusé : ${sub.name}`;
+}
+
+async function callback(cq) {
+  const data = cq.data || '';
+  if (!/^s[ar]:/.test(data)) return tg('answerCallbackQuery', { callback_query_id: cq.id });
+  if (!await isAdmin(cq.from.id)) return tg('answerCallbackQuery', { callback_query_id: cq.id, text: 'Réservé aux admins', show_alert: true });
+  const msg = await decide(data.slice(3), data[1] === 'a', cq.from);
+  return tg('answerCallbackQuery', { callback_query_id: cq.id, text: msg.slice(0, 180) });
 }
 
 // envoie le fichier sous le nom « H'ES SHOP - Titre.ext » (re-envoi si < 20 Mo, sinon file_id d'origine)
@@ -68,17 +208,25 @@ async function handle(m) {
   const text = (m.text || '').trim();
   const [c0, arg] = text.split(/\s+/), cmd = c0?.split('@')[0];
 
-  // gros fichiers (>20 Mo) : lien du site -> /start f_<id>
   if (cmd === '/start') {
-    const it = arg?.startsWith('f_') && await redis.hget('items', arg.slice(2));
     await redis.sadd('bu', String(id));   // utilisateurs du bot (pour les pubs)
+    if (arg?.startsWith('sub_')) return subStart(m, arg.slice(4));   // demande d'ajout venue du site (ancien parcours)
+    const it = arg?.startsWith('f_') && await redis.hget('items', arg.slice(2));   // gros fichiers (>20 Mo) : lien du site
     if (it) { await redis.hincrby('dls', it.id, 1); return sendBranded(chat, it); }
-    await send(chat, PICS[Math.floor(Math.random() * PICS.length)],
+    await send(chat, pick(),
       `👋 Bienvenue ${nm(m.from)} sur <b>H'es chop</b> !\n\nApps, fichiers et discussions : tout est dans la mini app ci-dessous.`);
     return (await isAdmin(id)) ? say(HELP) : undefined;
   }
+
+  // fichier d'une demande d'ajout à l'ancienne (utilisateur qui vient du site sans upload direct)
+  const wait = await redis.get('subwait:' + id);
+  if (wait && (m.document || m.photo || m.video || m.audio || m.voice)) return subFile(m, wait);
+  if (wait && text && !text.startsWith('/') && !await isAdmin(id)) return say("📎 J'attends ton fichier : envoie-le comme document (trombone → Fichier).");
+
   if (!await isAdmin(id)) return;
   const owner = String(id) === String(process.env.OWNER_ID);
+
+  if (cmd === '/ok' || cmd === '/no') return say(arg ? await decide(arg, cmd === '/ok', m.from) : 'Usage : /ok ID ou /no ID');
 
   // pub : réponds à un message (photo + texte) avec /pub [lien] [texte du bouton]
   if (cmd === '/pub' && m.reply_to_message) {
@@ -144,25 +292,37 @@ async function handle(m) {
   }
   if (cmd === '/ad') {
     const [, mode, ...rest] = text.split(/\s+/);
-    if (mode === 'off') { await redis.del('ad'); return say('✅ Pub désactivée'); }
+    if (mode === 'off') { await redis.del('ads'); return say('✅ Toutes les pubs sont désactivées'); }
+    if (mode === 'list') {
+      const all = Object.values(await redis.hgetall('ads') || {});
+      if (!all.length) return say('Aucune pub active. Ajoute-en une avec /ad page ou /ad media.');
+      return say(all.map(a => `${a.id} — ${a.type}${a.type === 'page' ? ' · ' + a.url : (a.text ? ' · ' + a.text.slice(0, 40) : '')} (skip ${a.delay}s)`).join('\n'));
+    }
+    if (mode === 'del') {
+      if (!rest[0]) return say('Usage : /ad del id (voir /ad list)');
+      const n = await redis.hdel('ads', rest[0]);
+      return say(n ? '🗑 Pub supprimée' : '❌ Id introuvable (voir /ad list)');
+    }
     if (mode === 'page') {
-      const url = rest[0], delay = Math.max(0, Math.min(20, parseInt(rest[1]) || 5));
-      if (!/^https?:\/\//.test(url || '')) return say('Usage : /ad page https://... délai(≤20s)');
-      await redis.set('ad', { type: 'page', url, delay, ts: Date.now() });
-      return say(`✅ Pub page activée (croix après ${delay}s)`);
+      const url = rest[0], delay = Math.max(0, parseInt(rest[1]) || 5);
+      if (!/^https?:\/\//.test(url || '')) return say('Usage : /ad page https://... délai');
+      const aid = 'ad' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+      await redis.hset('ads', { [aid]: { id: aid, type: 'page', url, delay, ts: Date.now() } });
+      return say(`✅ Pub page ajoutée (id ${aid}) — Skip après ${delay}s. Les autres pubs restent actives (voir /ad list).`);
     }
     if (mode === 'media') {
       const rp = m.reply_to_message;
       if (!rp) return say("Réponds à un message avec une photo et/ou une vidéo : /ad media délai lien texte");
-      const delay = Math.max(0, Math.min(20, parseInt(rest[0]) || 5)), link = rest[1] || '', adText = rest.slice(2).join(' ');
+      const delay = Math.max(0, parseInt(rest[0]) || 5), lnk = rest[1] || '', adText = rest.slice(2).join(' ');
       const put = async (file, mime, name) => { const k = Date.now().toString(36) + Math.random().toString(36).slice(2, 5); await redis.hset('media', { [k]: { k, file, mime, name, owner: 'admin' } }); return k; };
       const video = rp.video ? await put(rp.video.file_id, 'video/mp4', 'ad.mp4') : null;
       const photo = rp.photo ? await put(rp.photo.at(-1).file_id, 'image/jpeg', 'ad.jpg') : null;
       if (!video && !photo) return say('Le message ne contient ni photo ni vidéo');
-      await redis.set('ad', { type: 'media', video, photo, link, text: adText, delay, ts: Date.now() });
-      return say(`✅ Pub média activée (croix après ${delay}s)`);
+      const aid = 'ad' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+      await redis.hset('ads', { [aid]: { id: aid, type: 'media', video, photo, link: lnk, text: adText, delay, ts: Date.now() } });
+      return say(`✅ Pub média ajoutée (id ${aid}) — Skip après ${delay}s. Les autres pubs restent actives (voir /ad list).`);
     }
-    return say('Usage : /ad off · /ad page url délai · /ad media délai lien texte (en réponse à une photo/vidéo)');
+    return say('Usage : /ad off · /ad list · /ad del id · /ad page url délai · /ad media délai lien texte (en réponse à une photo/vidéo)');
   }
 
   // réponse à un commentaire reçu
@@ -220,8 +380,10 @@ async function handle(m) {
 
 export default async (req, res) => {
   if (req.headers['x-telegram-bot-api-secret-token'] !== process.env.WEBHOOK_SECRET) return res.status(401).end();
-  const m = req.body?.message;
-  if (m?.new_chat_members || m?.left_chat_member) await group(m).catch(console.error);
+  const m = req.body?.message, cq = req.body?.callback_query;
+  if (cq) await callback(cq).catch(console.error);
+  else if (m?.new_chat_members || m?.left_chat_member) await group(m).catch(console.error);
+  else if (m?.text && /^\/lien(@\w+)?(\s|$)/i.test(m.text.trim())) await lien(m.chat.id).catch(console.error);
   else if (m?.chat?.type === 'private') await handle(m).catch(e => {
     console.error(e);
     if (String(m.from.id) === String(process.env.OWNER_ID)) return tg('sendMessage', { chat_id: m.chat.id, text: '⚠️ Erreur : ' + e.message });
