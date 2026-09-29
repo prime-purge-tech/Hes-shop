@@ -104,6 +104,24 @@ async function group(m) {
 // /lien : lien de la mini app + photo au hasard
 const lien = chat => sendFramed(chat, pick(), linkSegs());
 
+/* ================= liste de commandes en citation (comme /start), avec /commandes cliquables ================= */
+const HELP_CMDS = ['/list', '/del', '/chat', '/clearchat', '/pub', '/users', '/badge', '/badges', '/edit', '/restrict', '/notify', '/ad', '/lien', '/ok', '/no', '/admins', '/addadmin', '/rmadmin'];
+const utf16len = s => String(s).length;   // les chaînes JS sont déjà en unités UTF-16, comme les offsets Telegram
+function helpQuotedText() {
+  const lines = HELP_CMDS.map(c => `┃≫ ${c}`).join('\n');
+  return `╭▱▱ ${mono('COMMANDES')} ▱▱\n${lines}\n╰▱▱▱▱▱▱▱▱\n≪ ${mono("THE H'ES SHOP")} 🛒≫`;
+}
+function helpEntities(text) {
+  const out = [{ type: 'expandable_blockquote', offset: 0, length: utf16len(text) }];
+  for (const m of String(text).matchAll(/\/[a-z][a-z0-9_]*/gi))
+    out.push({ type: 'bot_command', offset: utf16len(text.slice(0, m.index)), length: utf16len(m[0]) });
+  return out;
+}
+function sendHelp(chat) {
+  const text = helpQuotedText();
+  return tg('sendMessage', { chat_id: chat, text, entities: helpEntities(text), reply_markup: BTN });
+}
+
 /* ================= demandes d'ajout envoyées depuis le site ================= */
 async function uploadPhoto(chat, dataUrl, caption, markup) {   // envoie l'icône (data URL) et renvoie la réponse Telegram (avec son file_id)
   try {
@@ -155,11 +173,15 @@ async function subFile(m, sid) {   // l'utilisateur envoie le fichier : tout par
   return say("✅ Reçu ! Ta demande a été envoyée aux admins. Tu seras prévenu ici dès qu'elle est validée.");
 }
 
-async function decide(sid, ok, admin) {   // valider / refuser (boutons ou /ok /no)
+// Étape rapide : ne fait que les opérations Redis (toujours rapides), pour pouvoir répondre au clic
+// immédiatement même s'il y a plusieurs admins — avant, tout attendait la mise à jour de CHAQUE message
+// admin (plusieurs appels Telegram en série) avant de répondre, ce qui pouvait dépasser le délai que
+// Telegram accorde à un bouton et le faisait paraître « bloqué » sans jamais valider.
+async function decide(sid, ok, admin) {
   const sub = await redis.get('sub:' + sid);
-  if (!sub) return '❌ Demande introuvable ou expirée';
-  if (sub.done) return '⚠️ Déjà traitée';
-  if (!sub.file) return "⏳ L'utilisateur n'a pas encore envoyé le fichier";
+  if (!sub) return { msg: '❌ Demande introuvable ou expirée' };
+  if (sub.done) return { msg: '⚠️ Déjà traitée' };
+  if (!sub.file) return { msg: "⏳ L'utilisateur n'a pas encore envoyé le fichier" };
   sub.done = ok ? 'ok' : 'no';
   let itemId = '';
   if (ok) {
@@ -167,20 +189,37 @@ async function decide(sid, ok, admin) {   // valider / refuser (boutons ou /ok /
     await redis.hset('items', { [itemId]: { id: itemId, title: sub.name, desc: sub.desc, photo: sub.iconFid, shots: sub.shots || [], file: sub.file, name: sub.fileName, size: sub.size, ts: Date.now(), by: sub.by, kind: sub.type } });
   }
   await redis.set('sub:' + sid, sub, { ex: 86400 });
+  const msg = ok ? `✅ Publié : ${sub.name} (ID ${itemId})` : `🗑 Refusé : ${sub.name}`;
+  return { msg, sub, ok };
+}
+
+// Étape lente : nettoyage (retire les boutons chez tous les admins, prévient l'auteur) — faite APRÈS avoir répondu au clic
+async function decideCleanup(sub, ok, admin) {
   const status = `${ok ? '✅ Validé' : '❌ Refusé'} par ${admin?.first_name || 'un admin'}`;
-  for (const x of sub.msgs || [])   // retire les boutons chez tous les admins
-    await tg('editMessageCaption', { chat_id: x.chat, message_id: x.mid, caption: `${sub.cap || sub.name}\n\n${status}`, reply_markup: { inline_keyboard: [] } })
-      .then(r => r.ok ? r : tg('editMessageText', { chat_id: x.chat, message_id: x.mid, text: `${sub.cap || sub.name}\n\n${status}`, reply_markup: { inline_keyboard: [] } })).catch(() => {});
+  await Promise.allSettled((sub.msgs || []).map(x =>
+    tg('editMessageCaption', { chat_id: x.chat, message_id: x.mid, caption: `${sub.cap || sub.name}\n\n${status}`, reply_markup: { inline_keyboard: [] } })
+      .then(r => r.ok ? r : tg('editMessageText', { chat_id: x.chat, message_id: x.mid, text: `${sub.cap || sub.name}\n\n${status}`, reply_markup: { inline_keyboard: [] } }))
+  ));
   if (sub.tg?.id) await tg('sendMessage', { chat_id: sub.tg.id, text: ok ? `✅ « ${sub.name} » a été validé et publié sur le site !` : `❌ Ta demande « ${sub.name} » n'a pas été acceptée.` }).catch(() => {});
-  return ok ? `✅ Publié : ${sub.name} (ID ${itemId})` : `🗑 Refusé : ${sub.name}`;
+}
+
+// Utilisé par /ok et /no (pas pressés par un délai de bouton, donc on peut tout attendre d'un coup)
+async function decideAndNotify(sid, ok, admin) {
+  const result = await decide(sid, ok, admin);
+  if (result.sub) await decideCleanup(result.sub, result.ok, admin).catch(() => {});
+  return result.msg;
 }
 
 async function callback(cq) {
   const data = cq.data || '';
   if (!/^s[ar]:/.test(data)) return tg('answerCallbackQuery', { callback_query_id: cq.id });
   if (!await isAdmin(cq.from.id)) return tg('answerCallbackQuery', { callback_query_id: cq.id, text: 'Réservé aux admins', show_alert: true });
-  const msg = await decide(data.slice(3), data[1] === 'a', cq.from);
-  return tg('answerCallbackQuery', { callback_query_id: cq.id, text: msg.slice(0, 180) });
+  const sid = data.slice(3), ok = data[1] === 'a';
+  let result;
+  try { result = await decide(sid, ok, cq.from); }
+  catch (e) { console.error(e); return tg('answerCallbackQuery', { callback_query_id: cq.id, text: '⚠️ Erreur, réessaie', show_alert: true }); }
+  await tg('answerCallbackQuery', { callback_query_id: cq.id, text: result.msg.slice(0, 180) });   // répond au clic tout de suite
+  if (result.sub) decideCleanup(result.sub, result.ok, cq.from).catch(console.error);   // puis nettoie, sans faire attendre le bouton
 }
 
 // envoie le fichier sous le nom « H'ES SHOP - Titre.ext » (re-envoi si < 20 Mo, sinon file_id d'origine)
@@ -215,7 +254,7 @@ async function handle(m) {
     if (it) { await redis.hincrby('dls', it.id, 1); return sendBranded(chat, it); }
     await send(chat, pick(),
       `👋 Bienvenue ${nm(m.from)} sur <b>H'es chop</b> !\n\nApps, fichiers et discussions : tout est dans la mini app ci-dessous.`);
-    return (await isAdmin(id)) ? say(HELP) : undefined;
+    return (await isAdmin(id)) ? sendHelp(chat) : undefined;
   }
 
   // fichier d'une demande d'ajout à l'ancienne (utilisateur qui vient du site sans upload direct)
@@ -226,7 +265,8 @@ async function handle(m) {
   if (!await isAdmin(id)) return;
   const owner = String(id) === String(process.env.OWNER_ID);
 
-  if (cmd === '/ok' || cmd === '/no') return say(arg ? await decide(arg, cmd === '/ok', m.from) : 'Usage : /ok ID ou /no ID');
+  if (cmd === '/help') return say(HELP);
+  if (cmd === '/ok' || cmd === '/no') return say(arg ? await decideAndNotify(arg, cmd === '/ok', m.from) : 'Usage : /ok ID ou /no ID');
 
   // pub : réponds à un message (photo + texte) avec /pub [lien] [texte du bouton]
   if (cmd === '/pub' && m.reply_to_message) {
@@ -375,7 +415,7 @@ async function handle(m) {
     await redis.del('draft:' + id);
     return say(`✅ Publié sur le site : ${it.title}\nID : ${it.id}`);
   }
-  return say(HELP);
+  return sendHelp(chat);
 }
 
 export default async (req, res) => {
