@@ -218,8 +218,11 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 .chtop{gap:12px}.cht{flex:1;min-width:0}.cht h2{display:flex;align-items:center;gap:8px;font-size:16px;margin:0}.cht small{color:#8b98b5;font:500 11px ui-monospace,Menlo,monospace;letter-spacing:1.5px}
 .lvd{width:9px;height:9px;border-radius:50%;background:#ff3b4e;box-shadow:0 0 8px #ff3b4e;animation:lvp 1.6s ease-in-out infinite}@keyframes lvp{50%{opacity:.35}}
 #ch{padding:14px 14px 10px}
-.cx{display:flex;gap:10px;align-items:flex-end;margin-bottom:14px}.cx.me{flex-direction:row-reverse}
+.cx{display:flex;gap:10px;align-items:flex-end;margin-bottom:10px}.cx.me{flex-direction:row-reverse}
+.cx.mid{margin-bottom:2px}
 .cx .avw{margin-bottom:20px}
+.cx.cont .cmh{display:none}
+.cx.cont .cmb{margin-top:0}
 .avw .avl{position:absolute;inset:0;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:18px;z-index:0}
 .ava{position:relative;z-index:1;display:block;width:44px;height:44px;border-radius:50%;object-fit:cover;background:transparent;border:3px solid var(--bg)}
 .cmb{max-width:calc(100% - 64px);min-width:0}
@@ -629,16 +632,21 @@ function mediaHTML(x){const m=x.media,u=mUrl(m.k),sv=`<button class="dlm" data-s
  if(m.type==='photo')return `<img class="mi" src="${u}" alt="photo" loading="lazy">${sv}`;
  if(m.type==='video')return `<video class="mi" src="${u}" controls playsinline preload="metadata"></video>${sv}`;
  return `<div class="vp" data-dur="${m.d}"><button class="pp2" aria-label="Play">▶</button><div class="pb2"><i></i></div><span class="vt">${fmt(m.d)}</span><audio preload="none" src="${u}"></audio></div>`}
-function msgHTML(x){const me=x.name===user,sk=x.sticker,md=x.media,bd=x.badge||(x.admin?'gold':'');
+const GRP_GAP=300000;   // 5 min : au-delà, même un même expéditeur repart un nouveau groupe
+function msgHTML(x,grp){grp=grp||{first:true,last:true};const me=x.name===user,sk=x.sticker,md=x.media,bd=x.badge||(x.admin?'gold':'');
  const inner=sk?`<img class="stk" data-p="${esc(sk.p)}" src="${sImg(sk.p,sk.s)}" alt="sticker">`:md?mediaHTML(x):`<p>${esc(x.text)}</p>`;
  const q=x.re?`<div class="qt"><b>${esc(x.re.name)}</b> ${esc(x.re.t)}</div>`:'';
  const chip=bd?`<span class="chip ${bd}"><span class="nbd ${bd}">${BD}</span>${bd.toUpperCase()}</span>`:`<span class="chip">${S(IC.user)}MEMBER</span>`;
- return `<div class="cx${me?' me':''}${bd?' '+bd:''}"><div class="avw">${avw(x.name,'')}</div><div class="cmb"><div class="cmh"><b class="cn ${bd||''}">${esc(x.name)}</b>${chip}</div><div class="bx${sk||md?' nb':''}">${q}${inner}${x.edited?'<small>edited</small>':''}<div class="ac-row"><button class="ac" data-r="${esc(x.id)}" aria-label="Reply">↩</button>${me&&!sk&&!md?`<button class="ac" data-e="${esc(x.id)}" aria-label="Edit">✎</button>`:''}${me?`<button class="ac" data-del="${esc(x.id)}" aria-label="Delete">🗑</button>`:''}</div></div><div class="cmf"><span>${tm(x.ts)}</span></div></div></div>`}
+ const av=grp.last?avw(x.name,''):`<div style="visibility:hidden">${avw(x.name,'')}</div>`;
+ const cls='cx'+(me?' me':'')+(bd?' '+bd:'')+(grp.last?'':' mid')+(grp.first?'':' cont');
+ return `<div class="${cls}" data-mid="${esc(x.id)}"><div class="avw">${av}</div><div class="cmb"><div class="cmh"><b class="cn ${bd||''}">${esc(x.name)}</b>${chip}</div><div class="bx${sk||md?' nb':''}">${q}${inner}${x.edited?'<small>edited</small>':''}<div class="ac-row"><button class="ac" data-r="${esc(x.id)}" aria-label="Reply">↩</button>${me&&!sk&&!md?`<button class="ac" data-e="${esc(x.id)}" aria-label="Edit">✎</button>`:''}${me?`<button class="ac" data-del="${esc(x.id)}" aria-label="Delete">🗑</button>`:''}</div></div><div class="cmf"><span>${tm(x.ts)}</span></div></div></div>`}
+function groupOf(c,i){const p=c[i-1],n=c[i+1],x=c[i];
+ return{first:!p||p.name!==x.name||(x.ts-p.ts)>GRP_GAP,last:!n||n.name!==x.name||(n.ts-x.ts)>GRP_GAP}}
 async function chat(force){try{if(!force&&$$('#ch audio,#ch video').some(a=>!a.paused))return;
  const c=await (await fetch('/api/comments?k=chat'+(force?'&t='+Date.now():''))).json(),k=JSON.stringify(c);if(!force&&k===last)return;last=k;CHAT=c;
  $('#chc').textContent='LIVE · '+c.length+' messages';
  const box=$('#ch'),end=box.scrollTop+box.clientHeight>=box.scrollHeight-40;
- box.innerHTML=c.map(msgHTML).join('')||'<div class="ms"><p>No messages yet. Start the chat.</p></div>';
+ box.innerHTML=c.map((x,i)=>msgHTML(x,groupOf(c,i))).join('')||'<div class="ms"><p>No messages yet. Start the chat.</p></div>';
  if(end||force)box.scrollTop=box.scrollHeight}catch{}}
 const clearReply=()=>{replyTo=null;$('#rb').hidden=true},goIcon=()=>{$('#go').innerHTML=S(IC[$('#cx').value.trim()&&!rec?'send':'mic'])};
 $('#rc').onclick=clearReply;
