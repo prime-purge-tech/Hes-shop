@@ -1,4 +1,4 @@
-import { redis, tg, admins, isAdmin, limit, BRAND, brandName } from '../lib/db.js';
+import { redis, tg, admins, isAdmin, BRAND, brandName } from '../lib/db.js';
 import { PICS, WELCOME_PIC } from '../lib/pics.js';
 export const config = { maxDuration: 60 };
 
@@ -22,7 +22,6 @@ const HELP = `📥 Ajouter : envoie une photo avec en légende le titre (ligne 1
 /ad media délai lien texte — en réponse à une photo/vidéo : ajoute une pub média plein écran
 Plusieurs pubs peuvent être actives en même temps : chaque /ad page ou /ad media EN AJOUTE une nouvelle (elle ne remplace pas les autres), et le site en choisit une au hasard à chaque fois, en plus de les afficher toutes dans la liste des applications.
 /lien — lien de la mini app avec une photo au hasard (tout le monde, aussi dans les groupes)
-/tagall [message] — dans un groupe (admins du groupe) : mentionne tous les membres connus, avec ta photo de profil ou celle du groupe (1 fois / 5 min)
 /ok ID · /no ID — valider / refuser une demande d'ajout (ou utilise les boutons ✅ ❌)
 /admins — voir les admins
 /addadmin ID · /rmadmin ID (propriétaire)
@@ -94,59 +93,19 @@ async function memberPic(u) {
   return null;
 }
 
-// bienvenue / au revoir dans les groupes (+ suivi des membres pour /tagall)
+// bienvenue / au revoir dans les groupes
 async function group(m) {
   for (const u of m.new_chat_members || []) {
     if (u.is_bot) continue;
-    await redis.hset('gm:' + m.chat.id, { [u.id]: u.first_name || 'Membre' }).catch(() => {});
+    await trackMember(m.chat.id, u);
     await sendFramed(m.chat.id, (await memberPic(u)) || pick(), welcomeSegs(u));
   }
   const l = m.left_chat_member;
-  if (l && !l.is_bot) {
-    await redis.hdel('gm:' + m.chat.id, String(l.id)).catch(() => {});
-    await sendFramed(m.chat.id, (await memberPic(l)) || pick(), byeSegs(l));
-  }
+  if (l && !l.is_bot) { await redis.hdel('grpmem:' + m.chat.id, l.id).catch(() => {}); await sendFramed(m.chat.id, (await memberPic(l)) || pick(), byeSegs(l)); }
 }
 
 // /lien : lien de la mini app + photo au hasard
 const lien = chat => sendFramed(chat, pick(), linkSegs());
-
-/* ================= /tagall : même style que le welcome ================= *
- * Telegram ne permet pas à un bot de lister tous les membres d'un groupe : on mentionne les admins
- * + tous ceux vus (message ou arrivée) depuis que le bot est dans le groupe.
- * 1er message : photo de celui qui lance (sinon photo du groupe, sinon photo du bot) dans un cadre.
- * Ensuite : la liste des membres en cadres, par paquets de 30 (limite Telegram = 100 mentions / message). */
-const TAG_CHUNK = 30;
-async function tagall(m) {
-  const chat = m.chat.id, say = t => tg('sendMessage', { chat_id: chat, text: t });
-  if (!/group/.test(m.chat.type)) return say('Cette commande fonctionne uniquement dans les groupes.');
-
-  const st = await tg('getChatMember', { chat_id: chat, user_id: m.from.id });
-  const ok = ['creator', 'administrator'].includes(st.result?.status) || await isAdmin(m.from.id);
-  if (!ok) return say('⛔ Réservé aux admins du groupe.');
-  if (await limit('rl:tagall:' + chat, 1, 300)) return say('⏳ Réessaie dans quelques minutes.');
-
-  const known = { ...(await redis.hgetall('gm:' + chat) || {}) };
-  const adm = await tg('getChatAdministrators', { chat_id: chat });
-  for (const a of adm.result || []) if (!a.user.is_bot) known[a.user.id] = a.user.first_name || 'Membre';
-  known[m.from.id] = m.from.first_name || 'Membre';
-  const users = Object.entries(known).map(([id, n]) => ({ id: Number(id), first_name: String(n) }));
-  const custom = m.text.replace(/^\/tagall(@\w+)?/i, '').trim();
-
-  // photo : la personne qui lance, sinon la photo du groupe, sinon une photo du bot
-  let photo = await memberPic(m.from);
-  if (!photo) { const c = await tg('getChat', { chat_id: chat }); photo = c.result?.photo?.big_file_id || pick(); }
-  await sendFramed(chat, photo, frame('TAGALL', '📢', [who(m.from), seg(custom ? ' — ' + custom : '')]));
-
-  for (let i = 0; i < users.length; i += TAG_CHUNK) {
-    const body = [];
-    users.slice(i, i + TAG_CHUNK).forEach((u, k) => { if (k) body.push(seg('\n┃≫ ')); body.push(who(u)); });
-    const { text, entities } = compose(frame('MEMBRES', '👥', body));
-    entities.unshift({ type: 'expandable_blockquote', offset: 0, length: text.length });   // même cadre, repliable
-    await tg('sendMessage', { chat_id: chat, text, entities, reply_markup: BTN });
-    await new Promise(r => setTimeout(r, 1000));
-  }
-}
 
 /* ================= liste de commandes en citation (comme /start), avec /commandes cliquables ================= */
 const HELP_CMDS = ['/list', '/del', '/chat', '/clearchat', '/pub', '/users', '/badge', '/badges', '/edit', '/restrict', '/notify', '/ad', '/lien', '/tagall', '/ok', '/no', '/admins', '/addadmin', '/rmadmin'];
@@ -164,6 +123,61 @@ function helpEntities(text) {
 function sendHelp(chat) {
   const text = helpQuotedText();
   return tg('sendMessage', { chat_id: chat, text, entities: helpEntities(text), reply_markup: BTN });
+}
+
+/* ================= /tagall : mentionne tout le monde dans un groupe ================= *
+ * Telegram ne donne pas la liste complète des membres à un bot, donc on la construit nous-mêmes :
+ * chaque fois que quelqu'un écrit ou rejoint un groupe suivi, on note son id dans grpmem:<chatId>. */
+async function trackMember(chatId, u) {
+  if (!u || u.is_bot) return;
+  try { await redis.hset('grpmem:' + chatId, { [u.id]: { id: u.id, name: u.first_name || 'Membre', user: u.username || '' } }); } catch {}
+}
+
+async function tagAll(m) {
+  const chat = m.chat.id;
+  if (await limit('rl:tagall:' + chat, 1, 20)) return tg('sendMessage', { chat_id: chat, text: '⏳ Attends un peu avant de refaire /tagall.' });
+  const mem = Object.values(await redis.hgetall('grpmem:' + chat) || {});
+  if (!mem.length) return tg('sendMessage', { chat_id: chat, text: "Aucun membre suivi pour l'instant : la liste se remplit au fur et à mesure que les gens écrivent ou rejoignent le groupe." });
+
+  // photo : celle de la personne qui lance /tagall, sinon la photo du groupe, sinon une photo du bot au hasard
+  let photo = null;
+  try { const p = await tg('getUserProfilePhotos', { user_id: m.from.id, limit: 1 }); if (p.ok && p.result.total_count > 0) photo = p.result.photos[0].at(-1).file_id; } catch {}
+  if (!photo) { try { const c = await tg('getChat', { chat_id: chat }); if (c.ok && c.result.photo) photo = c.result.photo.big_file_id; } catch {} }
+  if (!photo) photo = pick();
+
+  const CHUNK = 20, launcher = m.from.first_name || "Quelqu'un";
+  const chunks = []; for (let i = 0; i < mem.length; i += CHUNK) chunks.push(mem.slice(i, i + CHUNK));
+
+  for (let ci = 0; ci < chunks.length; ci++) {
+    const group_ = chunks[ci];
+    // construit le texte + les entities ensemble, comme compose() : jamais d'offset devinés à la main
+    let text = '', entities = [];
+    const put = (t, ent) => { const start = utf16len(text); text += t; if (ent) entities.push({ ...ent, offset: start, length: utf16len(t) }); };
+    if (ci === 0) {
+      put(`╭▱▱ ${mono('TAGALL')} ▱▱\n┃≫ `);
+      put(mono(launcher));
+      put(` appelle tout le monde 📣\n`);
+    } else put('┃\n');
+    for (const u of group_) { put('┃≫ '); put(u.name || 'Membre', { type: 'text_mention', user: { id: u.id } }); put('\n'); }
+    if (ci === chunks.length - 1) {
+      put(`╰▱▱▱▱▱▱▱▱\n≪ `);
+      put(mono("THE H'ES SHOP"));
+      put(` 🛒≫`);
+    }
+    entities.unshift({ type: 'expandable_blockquote', offset: 0, length: utf16len(text) });
+
+    if (ci === 0) {
+      const r = text.length <= 1024
+        ? await tg('sendPhoto', { chat_id: chat, photo, caption: text, caption_entities: entities }).catch(() => ({ ok: false }))
+        : { ok: false };
+      if (!r.ok) {
+        await tg('sendPhoto', { chat_id: chat, photo }).catch(() => {});
+        await tg('sendMessage', { chat_id: chat, text, entities }).catch(() => {});
+      }
+    } else {
+      await tg('sendMessage', { chat_id: chat, text, entities }).catch(() => {});
+    }
+  }
 }
 
 /* ================= demandes d'ajout envoyées depuis le site ================= */
@@ -462,19 +476,22 @@ async function handle(m) {
   return sendHelp(chat);
 }
 
+const isGroup = m => ['group', 'supergroup'].includes(m?.chat?.type);
+
 export default async (req, res) => {
   if (req.headers['x-telegram-bot-api-secret-token'] !== process.env.WEBHOOK_SECRET) return res.status(401).end();
   const m = req.body?.message, cq = req.body?.callback_query;
-  // suivi des membres des groupes (pour /tagall)
-  if (m?.from && !m.from.is_bot && /group/.test(m.chat?.type || ''))
-    await redis.hset('gm:' + m.chat.id, { [m.from.id]: m.from.first_name || 'Membre' }).catch(() => {});
   if (cq) await callback(cq).catch(console.error);
   else if (m?.new_chat_members || m?.left_chat_member) await group(m).catch(console.error);
-  else if (m?.text && /^\/tagall(@\w+)?(\s|$)/i.test(m.text.trim())) await tagall(m).catch(console.error);
+  else if (isGroup(m) && m.text && /^\/(tagall|all)(@\w+)?(\s|$)/i.test(m.text.trim())) {
+    await trackMember(m.chat.id, m.from).catch(() => {});
+    await tagAll(m).catch(console.error);
+  }
   else if (m?.text && /^\/lien(@\w+)?(\s|$)/i.test(m.text.trim())) await lien(m.chat.id).catch(console.error);
   else if (m?.chat?.type === 'private') await handle(m).catch(e => {
     console.error(e);
     if (String(m.from.id) === String(process.env.OWNER_ID)) return tg('sendMessage', { chat_id: m.chat.id, text: '⚠️ Erreur : ' + e.message });
   });
+  else if (isGroup(m)) await trackMember(m.chat.id, m.from).catch(() => {});   // fait grandir la liste pour /tagall à chaque message
   res.status(200).end();
 };
