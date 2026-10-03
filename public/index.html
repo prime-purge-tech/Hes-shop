@@ -880,12 +880,12 @@ async function loadRank(){await ensureList();renderCrew();renderMembers()}
 
 /* ===== TUTOS ===== */
 let TUTOS=[],TCUR=null,TIT=null;
-const tcov=t=>'/api/tutos?k=cover&id='+encodeURIComponent(t.id);
+const tcov=t=>'/api/like?k=tcover&id='+encodeURIComponent(t.id);
 const twGet=()=>{try{return JSON.parse(localStorage.getItem('hesTW:'+user)||'{}')}catch{return{}}};
 const twSet=o=>{try{localStorage.setItem('hesTW:'+user,JSON.stringify(o))}catch{}};
 const tcard=t=>`<div class="tuc" data-t="${esc(t.id)}"><div class="th"><img src="${tcov(t)}" alt="" onerror="this.style.visibility='hidden'">${t.prog?`<u style="width:${t.prog}%"></u>`:''}</div><b>${esc(t.title)}</b><small>▶ ${t.views} · ❤ ${t.likes}</small></div>`;
 async function loadTutos(){const box=$('#tub');if(!TUTOS.length)box.innerHTML='<p class="sub">Loading…</p>';
- try{const r=await fetch('/api/tutos?k=list',{headers:auth()});if(!r.ok)throw 0;TUTOS=await r.json()}
+ try{const r=await fetch('/api/like?k=tlist',{headers:auth()});if(!r.ok)throw 0;TUTOS=await r.json()}
  catch{if(!TUTOS.length){box.innerHTML='<p class="sub">Could not load the tutorials.</p>';return}}
  renderTutos()}
 function renderTutos(){const box=$('#tub');
@@ -905,13 +905,13 @@ function openTuto(id){const t=TUTOS.find(x=>x.id===id);if(!t)return;TCUR=t;
  renderTinfo();loadTcm()}
 function tplay(){clearTimeout(TIT);const t=TCUR;if(!t||!$('#tpl').classList.contains('on'))return;$('#tps').hidden=true;
  const w=twGet()[t.id],v=document.createElement('video');
- v.src='/api/tutos?k=video&id='+encodeURIComponent(t.id);v.poster=tcov(t);v.controls=true;v.autoplay=true;v.playsInline=true;
+ v.src='/api/like?k=tvideo&id='+encodeURIComponent(t.id);v.poster=tcov(t);v.controls=true;v.autoplay=true;v.playsInline=true;
  v.onloadedmetadata=()=>{if(w&&w.t>3&&w.t<v.duration-3)v.currentTime=w.t};
  let sv=0;v.ontimeupdate=()=>{if(Date.now()-sv<4000)return;sv=Date.now();const o=twGet();o[t.id]={t:v.currentTime,d:v.duration||0};twSet(o)};
  v.onended=()=>{const o=twGet();delete o[t.id];twSet(o)};
  v.onerror=()=>toast('Video unavailable');
  $('#tuv').innerHTML='';$('#tuv').appendChild(v);v.play().catch(()=>{});
- post('/api/tutos?k=view',{id:t.id}).catch(()=>{})}
+ post('/api/like?k=tview',{id:t.id}).catch(()=>{})}
 async function tpLand(on){const p=$('#tpl');
  if(on){let ok=false;try{await (p.requestFullscreen||p.webkitRequestFullscreen).call(p);await screen.orientation.lock('landscape');ok=true}catch{}
   p.classList.add('land');if(!ok){try{if(document.fullscreenElement)await document.exitFullscreen()}catch{}p.classList.add('rot')}}
@@ -924,20 +924,20 @@ function renderTinfo(){const t=TCUR;
  <p class="rm" style="margin:12px 0">${esc(t.desc)}</p>
  <div class="hs"><h3>Comments</h3></div><div class="card cf" style="margin-top:0"><textarea class="ta" id="tct" rows="2" maxlength="300" placeholder="Write a comment"></textarea><button class="btn c" id="tcs"><span>Send</span></button></div><div id="tcl" style="margin-top:14px"></div>`}
 async function loadTcm(){const t=TCUR;if(!t)return;const box=$('#tcl');if(!box)return;
- try{const c=await (await fetch('/api/tutos?k=cm&id='+encodeURIComponent(t.id))).json();if(!Array.isArray(c))throw 0;
+ try{const c=await (await fetch('/api/like?k=tcm&id='+encodeURIComponent(t.id))).json();if(!Array.isArray(c))throw 0;
   box.innerHTML=c.map(x=>`<div class="rvb"><div class="rvh">${avw(x.name,x.badge)}<div><div class="rn">${esc(x.name)}</div><small>${new Date(x.ts).toLocaleDateString()}</small></div></div><div class="rm">${esc(x.text)}</div>${x.name===user?`<button class="ed" data-tdel="${esc(x.id)}">🗑</button>`:''}</div>`).join('')||'<div class="rvb"><div class="rm">No comments yet.</div></div>';
   t.cm=c.length}catch{box.innerHTML='<div class="rvb"><div class="rm">Could not load the comments.</div></div>'}}
 $('#tpl').addEventListener('click',async e=>{const t=TCUR;if(!t)return;const g=s=>e.target.closest(s);
  if(g('#tpx'))return tclose();
  if(g('#tps'))return tplay();
  if(g('#tpo'))return tpLand(!$('#tpl').classList.contains('land'));
- if(g('#tlk')){const on=!t.mine,r=await post('/api/tutos?k=like',{id:t.id,on}).catch(()=>null);if(!r||!r.ok)return toast('Try again in a moment');
+ if(g('#tlk')){const on=!t.mine,r=await post('/api/like?k=tlike',{id:t.id,on}).catch(()=>null);if(!r||!r.ok)return toast('Try again in a moment');
   const n=(await r.json()).n;t.mine=on;t.likes=n;$('#tlk').classList.toggle('on',on);$('#tlk span').textContent=n;return}
  if(g('#tcp')){const u=location.origin+location.pathname+'?tuto='+encodeURIComponent(t.id);return (await copyText(u))?toast('Link copied — send it to anyone'):toast('Could not copy the link')}
  if(g('#tcs')){const x=$('#tct').value.trim();if(!x)return;
-  const r=await post('/api/tutos?k=cm',{id:t.id,text:x}).catch(()=>null),j=r?await r.json().catch(()=>({})):{};
+  const r=await post('/api/like?k=tcm',{id:t.id,text:x}).catch(()=>null),j=r?await r.json().catch(()=>({})):{};
   if(!r||!r.ok)return toast(j.error||'Something went wrong');$('#tct').value='';loadTcm();return}
- const d=g('[data-tdel]');if(d){await post('/api/tutos?k=cm',{id:t.id,cid:d.dataset.tdel},'DELETE').catch(()=>{});loadTcm()}});
+ const d=g('[data-tdel]');if(d){await post('/api/like?k=tcm',{id:t.id,cid:d.dataset.tdel},'DELETE').catch(()=>{});loadTcm()}});
 
 /* ---- quitter le site : confirmation solide ---- */
 history.pushState({h:1},'');
