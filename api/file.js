@@ -22,14 +22,21 @@ export default async (req, res) => {
   const fid = k === 'img' ? (n != null ? (it.shots || [])[Number(n)] : it.photo) : (it.file || it.blob);
   if (!fid) return res.status(404).end();
 
+  let me = null;
   if (k === 'dl' || k === 'chk') {
+    me = await whoami(req);
     const need = await redis.hget('restrict', String(id));
     if (need) {
-      const me = await whoami(req), mine = me && await redis.hget('badges', me);
+      const mine = me && await redis.hget('badges', me);
       if (!me) return res.status(401).json({ error: 'Please log in again to download this file' });
       if (!canGet(need, mine)) return res.status(403).json({ error: needMsg(need) + ' (your badge: ' + (mine || 'none') + ')' });
     }
   }
+  // compte le téléchargement pour le fichier ET pour le compte
+  const count = async () => {
+    await redis.hincrby('dls', String(id), 1);
+    if (me) await redis.hincrby('udls', me, 1);
+  };
 
   // Vérification : dit au site si le fichier se télécharge directement ou passe par le bot (gros fichier Telegram)
   if (k === 'chk') {
@@ -38,11 +45,12 @@ export default async (req, res) => {
       big = Number(it.size) > BIG;
       if (!big) { const g = await tg('getFile', { file_id: it.file }); if (!g.ok) big = true; }
     }
+    if (big) await count();   // les gros fichiers passent par le bot : on compte ici
     return res.json({ ok: true, big, deep: deepOf(id) });
   }
 
   if (k === 'dl' && it.blob) {
-    await redis.hincrby('dls', String(id), 1);
+    await count();
     if (!/\.private\.blob\./.test(it.blob)) return res.redirect(302, dlUrl(it.blob));   // store public : téléchargement direct
     // store privé : le site lit le fichier et le renvoie (garde le lien secret)
     const { get } = await import('@vercel/blob');
@@ -58,7 +66,7 @@ export default async (req, res) => {
 
   const g = await tg('getFile', { file_id: fid });
   if (!g.ok) return k === 'dl' ? res.redirect(302, deepOf(id)) : res.status(404).end();
-  if (k === 'dl') await redis.hincrby('dls', String(id), 1);
+  if (k === 'dl') await count();
   const r = await fetch(`https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${g.result.file_path}`);
   if (!r.ok || !r.body) return k === 'dl' ? res.redirect(302, deepOf(id)) : res.status(502).end();
   if (k === 'img') {
