@@ -269,8 +269,38 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 .adv-pr{height:4px;margin:0 14px;background:#ffffff30;border-radius:4px;position:relative;background-clip:padding-box}
 .adv-pr i{display:block;height:100%;width:0;background:#fff;border-radius:4px;position:relative}.adv-pr i::after{content:'';position:absolute;right:-5px;top:-4px;width:12px;height:12px;border-radius:50%;background:#fff}
 .adv-f{display:flex;padding:16px 14px calc(16px + env(safe-area-inset-bottom,0px));background:#000}
-.adv-cta{width:60px;height:60px;border-radius:18px;overflow:hidden;border:2px solid #fff;padding:0;flex:none;background:#000;box-shadow:0 4px 14px #0008}
+.adv-cta{width:112px;height:63px;border-radius:12px;overflow:hidden;border:0;padding:0;flex:none;background:#000;box-shadow:0 4px 14px #0008}
 .adv-cta video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+
+/* ===== TOP MEMBERS ===== */
+.mems{padding:6px 16px;max-height:380px;overflow-y:auto}
+.mem{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.1)}
+.mem:last-child{border:0}
+.mem .rk{width:26px;text-align:center;font:700 13px 'Orbitron',sans-serif;color:var(--mut)}
+.mem .mn2{flex:1;min-width:0;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mem .md{font:600 13px 'Orbitron',sans-serif;color:var(--cy)}
+
+/* ===== GLASSMORPHISM ===== */
+.screen{background:radial-gradient(circle at 15% 10%,#1e88e5aa,transparent 45%),radial-gradient(circle at 90% 35%,#b0239faa,transparent 45%),radial-gradient(circle at 20% 90%,#39c0ff66,transparent 50%),var(--bg)}
+#home{background:radial-gradient(circle at 20% 0,#1e88e5aa,transparent 50%),radial-gradient(circle at 90% 80%,#8e24aa88,transparent 50%),var(--bg)}
+.card,.crc,.rvb,.foot,.pill,.dsr,.app,.chips span,.tabs button,.sfoot .row2 button,.rp{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);box-shadow:0 8px 32px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.14)}
+.sc{background:rgba(255,255,255,.06);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.inp,.ta,.sr,.sq,.pillb,.chip,.stz{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.top{background:rgba(10,14,28,.45);backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);border-bottom:1px solid rgba(255,255,255,.10)}
+.nav2{background:rgba(10,14,28,.40);backdrop-filter:blur(26px) saturate(170%);-webkit-backdrop-filter:blur(26px) saturate(170%);border:1px solid rgba(255,255,255,.18)}
+.nav2 button.a{box-shadow:0 0 0 6px rgba(10,14,28,.40),0 10px 22px #000a}
+.dr,.pb{background:rgba(23,27,41,.55);backdrop-filter:blur(28px) saturate(160%);-webkit-backdrop-filter:blur(28px) saturate(160%);border:1px solid rgba(255,255,255,.16)}
+.it{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14)}
+.ov,.ov2{backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);background:#0007}
+.bx{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.cx.me .bx{background:rgba(30,136,229,.20);border-color:rgba(57,192,255,.35)}
+.cx.gold .bx{background:rgba(255,210,31,.12);border-color:rgba(255,210,31,.4)}
+.cx.blue .bx{background:rgba(57,192,255,.12);border-color:rgba(57,192,255,.4)}
+.bx.nb{background:none;border:0;backdrop-filter:none;box-shadow:none}
+#chat .cfm .pl{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.cfm{background:transparent}
+.pc-b{background:rgba(207,230,255,.75);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.dl,.tc img,.ic2{border:1px solid rgba(255,255,255,.12)}
 </style></head><body><div id="app">
 
 <section class="screen on" id="home"><div class="wrap">
@@ -312,13 +342,15 @@ label{display:block;color:#aab5cf;font:600 15px 'Orbitron';margin:0 0 10px 4px}
 </div>
 <div class="fban" id="fban"><img class="fban-i" alt="" onerror="this.style.visibility='hidden'"><div class="fban-o"><span class="fban-b" id="fbanb"></span><h3 id="fbant">…</h3><small id="fbans"></small></div><div class="fban-d" id="fband"></div></div><div class="crew" id="crew"></div>
 <div class="two"><div class="card st"><small>Accounts</small><div><i data-i="users"></i><span id="stA">…</span></div></div><div class="card st"><small>APK &amp; ZIP</small><div><i data-i="phone"></i><span id="stF">…</span></div></div></div>
+<div class="sec">TOP MEMBERS</div>
+<div class="card mems" id="mems"><small class="sub">Loading…</small></div>
 <div class="sec">FEATURE NEWS</div>
 <button class="feat" data-link="wa"><div class="bx"><i data-i="wa" data-c="#fff"></i></div><div><h3>WhatsApp Hub</h3><p>Maximizing potential, boundless performance</p></div></button>
 <div class="hs"><h3>✨ New &amp; Noteworthy</h3></div>
 <div class="hc" id="newApps"></div>
 <div class="hs" id="sugHs" hidden><h3>🎯 Suggested for you</h3></div>
 <div class="hc" id="sugApps"></div>
-<div class="hs"><h3>Sponsored · Recommendations</h3><button class="hsdot" aria-label="More">⋮</button></div>
+<div class="hs"><h3>Recommendations</h3><button class="hsdot" aria-label="More">⋮</button></div>
 <div id="dashApps"></div>
 <div class="pc"><button class="pc-ic l mn" aria-label="Menu"><i data-i="menu"></i></button><button class="pc-ic r" id="pg" aria-label="Edit profile"><i data-i="sl"></i></button>
 <div class="pc-t"><div class="avw big"><div class="sh" id="mp"><i data-i="shield"></i></div><span class="bd" id="mb" hidden></span></div>
@@ -479,7 +511,12 @@ async function dash(){const h=new Date().getHours();$('#gr').textContent=h<5?'Go
  try{PROF=await (await fetch('/api/profile?u='+encodeURIComponent(user))).json();const a=`<img class="av2" src="${esc(PROF.photo)}" alt="" onerror="this.remove()">`;$('#mp').innerHTML=a;$('#tp').innerHTML=a;const bb=PROF.badge;$('#mb').className='bd '+(bb||'');$('#mb').hidden=!bb;$('#mb').innerHTML=bb?BD:''}catch{}
  if($('#dq'))$('#dq').value='';
  try{DL=JSON.parse(localStorage.getItem('hesDL:'+user)||'{}')}catch{}
- await ensureList();await ensureAds();renderCrew();startFban();renderNewApps();renderSuggested();renderDashApps()}
+ await ensureList();await ensureAds();renderCrew();startFban();renderNewApps();renderSuggested();renderDashApps();renderMembers()}
+/* ---- classement des membres par telechargements ---- */
+async function renderMembers(){const box=$('#mems');if(!box)return;
+ try{const l=await (await fetch('/api/stats?users=1')).json(),M=['🥇','🥈','🥉'];
+  box.innerHTML=l.map((u,x)=>`<div class="mem"><span class="rk">${M[x]||x+1}</span>${avw(u.name,u.badge)}<span class="mn2">${esc(u.name)}</span><span class="md">⬇ ${u.dls||0}</span></div>`).join('')||'<small class="sub">No members yet.</small>'
+ }catch{box.innerHTML='<small class="sub">Could not load members.</small>'}}
 /* ---- bannière du haut (tourne toutes les 8s parmi les apps a badge) + top 3 telechargements ---- */
 async function ensureList(){if(LIST.length)return;
  try{const [d,m]=await Promise.all([fetch('/api/items').then(r=>r.json()),fetch('/api/like?v='+encodeURIComponent(user)).then(r=>r.json())]);
@@ -497,12 +534,12 @@ function renderFban(){const pool=LIST.filter(i=>i.badge);clearInterval(FBT);cons
 function startFban(){FBI=0;renderFban()}
 function renderCrew(){const top=[...LIST].sort((a,b)=>b.dls-a.dls).slice(0,3),CR=['🥇','🥈','🥉'];
  $('#crew').innerHTML=top.map((i,x)=>`<div class="crc" data-o="${esc(i.id)}"><span class="crown">${CR[x]}</span><img src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><b>${esc(i.title)}</b><small>⬇ ${i.dls}</small><span class="gt2">Download</span></div>`).join('')}
-/* ---- liste « Play Store » sur le dashboard : pubs (Sponsorisé) + reste des applications ---- */
+/* ---- liste « Play Store » sur le dashboard : pubs + reste des applications ---- */
 function adRowHTML(ad){
  if(ad.type==='apk'){const cover=ad.photo&&ad.apkId?'/api/file?k=img&id='+encodeURIComponent(ad.apkId):'';
-  return `<div class="pr rv" data-ad="${esc(ad.id)}"><img class="ic2" src="${cover}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3>${esc(ad.title||'')}</h3><small class="spn">Sponsored</small><small>${esc((ad.text||'').slice(0,60))}</small></div><span class="get">GET</span></div>`}
- if(ad.type==='page'){return `<div class="pr rv" data-ad="${esc(ad.id)}"><img class="ic2" src="https://ganga--link--ghhzdp9sv8hk.code.run/i/jtn1l7jk.jpg" alt=""><div class="inf"><h3>H'es Store</h3><small class="spn">Sponsored</small><small>${esc((ad.url||'').replace(/^https?:\/\//,'').slice(0,60))}</small></div><span class="get">OPEN</span></div>`}
- return `<div class="pr rv" data-ad="${esc(ad.id)}"><img class="ic2" src="https://ganga--link--ghhzdp9sv8hk.code.run/i/jtn1l7jk.jpg" alt=""><div class="inf"><h3>${esc((ad.text||"H'es Store").split('\n')[0].slice(0,40))}</h3><small class="spn">Sponsored</small><small>${esc((ad.link||'').replace(/^https?:\/\//,'').slice(0,60))}</small></div><span class="get">OPEN</span></div>`}
+  return `<div class="pr rv" data-ad="${esc(ad.id)}"><img class="ic2" src="${cover}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3>${esc(ad.title||'')}</h3><small>${esc((ad.text||'').slice(0,60))}</small></div><span class="get">GET</span></div>`}
+ if(ad.type==='page'){return `<div class="pr rv" data-ad="${esc(ad.id)}"><img class="ic2" src="https://ganga--link--ghhzdp9sv8hk.code.run/i/jtn1l7jk.jpg" alt=""><div class="inf"><h3>H'es Store</h3><small>${esc((ad.url||'').replace(/^https?:\/\//,'').slice(0,60))}</small></div><span class="get">OPEN</span></div>`}
+ return `<div class="pr rv" data-ad="${esc(ad.id)}"><img class="ic2" src="https://ganga--link--ghhzdp9sv8hk.code.run/i/jtn1l7jk.jpg" alt=""><div class="inf"><h3>${esc((ad.text||"H'es Store").split('\n')[0].slice(0,40))}</h3><small>${esc((ad.link||'').replace(/^https?:\/\//,'').slice(0,60))}</small></div><span class="get">OPEN</span></div>`}
 function appRowHTML(i){return `<div class="pr rv" data-o="${esc(i.id)}"><img class="ic2" src="${ico(i)}" alt="" onerror="this.style.visibility='hidden'"><div class="inf"><h3>${esc(i.title)}${nb(i.badge)}</h3><small>${i.rn?i.rt+' ★':'New'} · ⬇ ${i.dls}</small><small>${esc((i.desc||'').split('\n')[0].slice(0,60))}</small></div><span class="get">${DL[i.id]?'OPEN':'GET'}</span></div>`}
 /* ---- "New & Noteworthy" et "Suggested for you" (basé sur ce que tu as déjà téléchargé) ---- */
 const tokenize=s=>String(s||'').toLowerCase().match(/[a-z0-9]{3,}/g)||[];
@@ -520,7 +557,7 @@ function renderDashApps(q){const box=$('#dashApps');if(!box)return;q=(q||'').tri
  if(q){const hs=$('#dash .hs h3');if(hs)hs.textContent='Search results';
   const rows=LIST.filter(i=>(i.title+' '+(i.desc||'')).toLowerCase().includes(q)).sort((a,b)=>b.ts-a.ts).map(appRowHTML);
   box.innerHTML=rows.join('')||'<p class="sub" style="margin:0">No matching apps or files.</p>';return reveal('dash')}
- const hs=$('#dash .hs h3');if(hs)hs.textContent='Sponsored · Recommendations';
+ const hs=$('#dash .hs h3');if(hs)hs.textContent='Recommendations';
  const rows=[...ADS.map(adRowHTML),...[...LIST].sort((a,b)=>b.ts-a.ts).map(appRowHTML)];
  box.innerHTML=rows.join('')||'<p class="sub" style="margin:0">No apps yet.</p>';reveal('dash')}
 $('#dq').oninput=()=>renderDashApps($('#dq').value);
