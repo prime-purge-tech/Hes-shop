@@ -1,4 +1,4 @@
-import { redis, tg, admins, isAdmin, BRAND, brandName } from '../lib/db.js';
+import { redis, tg, admins, isAdmin, BRAND, brandName, siteUrl } from '../lib/db.js';
 import { PICS, WELCOME_PIC } from '../lib/pics.js';
 export const config = { maxDuration: 60 };
 
@@ -21,6 +21,11 @@ const HELP = `📥 Ajouter : envoie une photo avec en légende le titre (ligne 1
 /ad page url délai — ajoute une pub plein écran = une page web, croix/Skip après le délai (en secondes)
 /ad media délai lien texte — en réponse à une photo/vidéo : ajoute une pub média plein écran
 Plusieurs pubs peuvent être actives en même temps : chaque /ad page ou /ad media EN AJOUTE une nouvelle (elle ne remplace pas les autres), et le site en choisit une au hasard à chaque fois, en plus de les afficher toutes dans la liste des applications.
+🎬 Tutos : envoie une VIDÉO avec en légende le titre (ligne 1) puis la description. Envoie ensuite une photo SANS légende = couverture (sinon la vignette de la vidéo est utilisée). Puis /tuto pour publier.
+/tuto — publier le tuto en préparation (peut être suivi d'un nouveau titre + description sur 2 lignes)
+/tutoannuler — annuler le tuto en préparation
+/tutos — voir les tutos
+/tutodel ID — supprimer un tuto
 /lien — lien de la mini app avec une photo au hasard (tout le monde, aussi dans les groupes)
 /ok ID · /no ID — valider / refuser une demande d'ajout (ou utilise les boutons ✅ ❌)
 /admins — voir les admins
@@ -108,7 +113,7 @@ async function group(m) {
 const lien = chat => sendFramed(chat, pick(), linkSegs());
 
 /* ================= liste de commandes en citation (comme /start), avec /commandes cliquables ================= */
-const HELP_CMDS = ['/list', '/del', '/chat', '/clearchat', '/pub', '/users', '/badge', '/badges', '/edit', '/restrict', '/notify', '/ad', '/lien', '/tagall', '/ok', '/no', '/admins', '/addadmin', '/rmadmin'];
+const HELP_CMDS = ['/list', '/del', '/chat', '/clearchat', '/pub', '/users', '/badge', '/badges', '/edit', '/restrict', '/notify', '/ad', '/lien', '/tagall', '/tuto', '/tutos', '/tutodel', '/tutoannuler', '/ok', '/no', '/admins', '/addadmin', '/rmadmin'];
 const utf16len = s => String(s).length;   // les chaînes JS sont déjà en unités UTF-16, comme les offsets Telegram
 function helpQuotedText() {
   const lines = HELP_CMDS.map(c => `┃≫ ${c}`).join('\n');
@@ -453,6 +458,52 @@ async function handle(m) {
     return say('✅ Envoyé dans le chat');
   }
   if (cmd === '/clearchat') return redis.del('chm').then(() => say('🧹 Chat vidé'));
+
+  /* ===== tutos vidéo ===== */
+  const vid = m.video || (m.document && /^video\//.test(m.document.mime_type || '') ? m.document : null);
+  if (cmd === '/tutos') {
+    const a = Object.values(await redis.hgetall('tutos') || {});
+    return say(a.map(t => `${t.id} — ${t.title}`).join('\n') || 'Aucun tuto');
+  }
+  if (cmd === '/tutodel' && arg) {
+    const n = await redis.hdel('tutos', arg);
+    await redis.del('tl:' + arg, 'tcm:' + arg, 'tv:' + arg); await redis.hdel('tviews', arg);
+    return say(n ? '🗑 Tuto supprimé' : '❌ ID introuvable (voir /tutos)');
+  }
+  if (cmd === '/tutoannuler') { await redis.del('tdraft:' + id); return say('✅ Tuto en préparation annulé'); }
+  if (vid) {
+    if ((vid.file_size || 0) > 20 * 1024 * 1024) return say('⚠️ Vidéo de plus de 20 Mo : le site ne pourra pas la lire (limite Telegram). Compresse-la puis renvoie-la.');
+    const [title, ...desc] = (m.caption || '').split('\n');
+    const th = vid.thumbnail || vid.thumb;
+    await redis.set('tdraft:' + id, { video: vid.file_id, size: vid.file_size || 0, cover: th?.file_id || null, title: title || 'Sans titre', desc: desc.join('\n') }, { ex: 3600 });
+    return say('🎬 Vidéo reçue.\n🖼 Envoie une photo (sans légende) pour choisir la couverture, sinon la vignette de la vidéo sera utilisée.\n✅ /tuto pour publier · /tutoannuler pour annuler.');
+  }
+  if (m.photo && !m.caption) {   // couverture au choix
+    const td = await redis.get('tdraft:' + id);
+    if (td) { td.cover = m.photo.at(-1).file_id; await redis.set('tdraft:' + id, td, { ex: 3600 }); return say('🖼 Couverture choisie. /tuto pour publier.'); }
+  }
+  if (cmd === '/tuto') {
+    const d = await redis.get('tdraft:' + id);
+    if (!d) return say("Envoie d'abord la vidéo (légende : titre puis description).");
+    const o = text.slice(5).trim();
+    if (o) { const [t, ...ds] = o.split('\n'); d.title = t || d.title; d.desc = ds.join('\n') || d.desc; }
+    const tid = Date.now().toString(36);
+    await redis.hset('tutos', { [tid]: { id: tid, ...d, ts: Date.now(), by: 'admin' } });
+    await redis.del('tdraft:' + id);
+    // notification : site (avec son) + Telegram (avec son par défaut)
+    const label = `🎬 Nouveau tuto : ${d.title}`;
+    await redis.hset('notifs', { [tid + 'n']: { id: tid + 'n', text: label, ts: Date.now() } });
+    const site = siteUrl() || 'https://hes-shop.vercel.app';
+    const kb = { inline_keyboard: [[{ text: '▶️ Regarder', url: `${site}/?tuto=${tid}` }]] };
+    const users = await redis.smembers('bu');
+    for (let i = 0; i < users.length; i += 25) {
+      await Promise.all(users.slice(i, i + 25).map(u =>
+        (d.cover ? tg('sendPhoto', { chat_id: u, photo: d.cover, caption: label, reply_markup: kb }) : Promise.resolve({ ok: false }))
+          .then(r => r.ok ? r : tg('sendMessage', { chat_id: u, text: label, reply_markup: kb })).catch(() => {})));
+      await new Promise(r => setTimeout(r, 1000));
+    }
+    return say(`✅ Tuto publié (ID ${tid}) — notification envoyée au site + ${users.length} utilisateurs Telegram`);
+  }
 
   if (m.photo) {
     const fid = m.photo.at(-1).file_id, d = await redis.get('draft:' + id);
