@@ -1,4 +1,4 @@
-import { redis, tg, admins, isAdmin, BRAND, brandName, siteUrl } from '../lib/db.js';
+import { redis, tg, admins, isAdmin, limit, BRAND, brandName, siteUrl } from '../lib/db.js';
 import { PICS, WELCOME_PIC } from '../lib/pics.js';
 export const config = { maxDuration: 60 };
 
